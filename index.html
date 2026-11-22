@@ -24,6 +24,11 @@ body.dark{--bg:#101d32;--surface:#172943;--text:#edf4ff;--muted:#a9bdd5;--soft:#
 .food-search-results{display:grid;gap:6px;margin-top:8px}.food-suggestion{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:10px;padding:9px;text-align:right;font-size:12px}.exercise-motion{position:relative;overflow:hidden;border-radius:14px;background:var(--soft);padding:8px;text-align:center}.exercise-motion img{width:100%;height:190px;object-fit:contain}.motion-label{font-size:11px;color:var(--muted)}.corrective-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.corrective-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px}.corrective-card h3{font-size:14px;margin:0 0 7px}.corrective-card p{font-size:12px;line-height:1.9;margin:6px 0}.food-macros{font-size:11px;color:var(--muted);line-height:1.8}
 @media(max-width:390px){.corrective-grid{grid-template-columns:1fr}}
 @media(max-width:760px){.dashboard-layout{display:block}.sidebar{position:fixed;z-index:40;right:0;top:0;height:100dvh;width:min(290px,84vw);transform:translateX(110%);transition:transform .22s;box-shadow:0 0 35px #0002}.sidebar.open{transform:translateX(0)}.sidebar-shade.open{display:block;position:fixed;inset:0;background:#0007;z-index:35}.app{padding:12px 13px 40px}.menu-toggle{display:block}.top{gap:10px}.top-left{display:flex;align-items:center;gap:10px}.nav{display:none}}@media(max-width:390px){.coach-grid,.food-grid{grid-template-columns:1fr}}
+
+.education-btn{border:0;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+#coachPanelPage .card,#foodLibraryPage .card,#musicPage .card,#shopPage .card{margin:12px 0}
+#coachPanelPage textarea,#foodLibraryPage input{width:100%}
+#shopProducts .food-row{align-items:center}
 </style>
 </head>
 <body><div class="dashboard-layout">
@@ -37,6 +42,11 @@ body.dark{--bg:#101d32;--surface:#172943;--text:#edf4ff;--muted:#a9bdd5;--soft:#
 <button data-page="nutrition" onclick="showPage('nutrition')"><span class="ico">🥗</span>تغذیه و کالری</button>
 <button data-page="progress" onclick="showPage('progress')"><span class="ico">▥</span>آمار و پیشرفت</button>
 <button data-page="profile" onclick="showPage('profile')"><span class="ico">♙</span>پروفایل و تنظیمات</button>
+
+<button data-page="coachPanel" onclick="showPage('coachPanel')"><span class="ico">👥</span>پنل مربی و شاگرد</button>
+<button data-page="foodLibrary" onclick="showPage('foodLibrary')"><span class="ico">🍽️</span>بانک جامع غذا</button>
+<button data-page="music" onclick="showPage('music')"><span class="ico">🎵</span>IRON MUSIC</button>
+<button data-page="shop" onclick="showPage('shop')"><span class="ico">🛍️</span>فروشگاه</button>
 </nav><div class="contact-card"><b>انتقادات و پیشنهادات</b><a class="contact-number" href="tel:09981915416">09981915416</a><div class="social-links">
 <a href="https://t.me/+989981915416" target="_blank" rel="noopener" aria-label="تلگرام" title="تلگرام"><svg viewBox="0 0 24 24"><path d="M21.7 3.3a1.6 1.6 0 0 0-1.7-.3L2.8 9.5c-1.2.5-1.2 2.2.1 2.6l4.4 1.4 1.7 5.3c.4 1.2 2 1.5 2.8.5l2.5-3 4.4 3.2c1 .7 2.4.2 2.6-1l2.5-13.6a1.6 1.6 0 0 0-.1-1.6ZM9 13l8.7-6.1-7.1 7.5-.3 3.1L9 13Z"/></svg></a>
 <a href="https://eitaa.com/" target="_blank" rel="noopener" aria-label="ایتا" title="ایتا"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20h5.2a1.8 1.8 0 0 0 0-3.6H12a6.4 6.4 0 1 1 6.4-6.4v.8a1.6 1.6 0 1 1-3.2 0v-.8a3.2 3.2 0 1 0-1.1 2.4A5.1 5.1 0 0 0 18.4 16a5.2 5.2 0 0 0 5.2-5.2A10 10 0 0 0 12 2Zm0 11.6a1.6 1.6 0 1 1 0-3.2 1.6 1.6 0 0 1 0 3.2Z"/></svg></a>
@@ -107,6 +117,83 @@ body.dark{--bg:#101d32;--surface:#172943;--text:#edf4ff;--muted:#a9bdd5;--soft:#
 <div class="card"><p class="muted">مقادیر بانک خوراکی تخمینی و بر پایه ۱۰۰ گرم بخش خوراکی هستند. غذاهای ترکیبی و دستورهای خانگی بسته به روغن، مواد و روش پخت تفاوت زیادی دارند؛ برای آن‌ها از برچسب یا دستور دقیق استفاده کن.</p></div>
 </section>
 
+
+<section id="coachPanelPage" class="hidden">
+<h1>IRON COACH | پنل مربی و شاگرد</h1>
+<p class="muted">اتصال با رضایت دوطرفه، انتشار برنامه و ثبت گزارش شاگرد. برای استفاده، ابتدا با حساب IRONNOVA وارد شو.</p>
+<div class="card">
+<h2>پروفایل مربی یا شاگرد</h2>
+<div class="field"><label>نام نمایشی</label><input id="icName" placeholder="نام و نام خانوادگی"></div>
+<div class="field"><label>نقش حساب</label><select id="icRole"><option value="student">شاگرد</option><option value="coach">مربی</option></select></div>
+<button class="btn" onclick="icSetRole()">ثبت نقش</button>
+<p class="muted" id="icStatus">برای فعال‌سازی باید وارد حساب کاربری شده باشی.</p>
+</div>
+<div class="card">
+<h2>اتصال با کد دعوت مربی</h2>
+<button class="btn" onclick="icCreateInvite()">ساخت کد دعوت مربی</button>
+<div id="icInviteOut" class="result-box hidden"></div>
+<div class="field"><label>کد دعوت مربی (برای شاگرد)</label><input id="icInviteCode" placeholder="کد UUID دعوت"></div>
+<button class="btn secondary" onclick="icClaimInvite()">ارسال درخواست اتصال</button>
+<p class="muted">در این نسخه ورود دستی کد پشتیبانی می‌شود؛ اسکن دوربین QR هنوز در این بسته فعال نشده است.</p>
+</div>
+<div class="card">
+<h2>درخواست‌های شاگردان</h2>
+<button class="btn secondary" onclick="icLoadLinks()">به‌روزرسانی درخواست‌ها</button>
+<div id="icLinks"></div>
+</div>
+<div class="card">
+<h2>ساخت و انتشار برنامه</h2>
+<div class="field"><label>شناسه کاربری شاگرد (UUID)</label><input id="icStudentId" placeholder="شناسه شاگرد متصل"></div>
+<div class="field"><label>عنوان برنامه</label><input id="icPlanTitle" value="برنامه تمرینی جدید"></div>
+<div class="field"><label>برنامه (هر حرکت در یک خط: نام | ست | تکرار | استراحت)</label><textarea id="icPlanBody" rows="6" placeholder="اسکوات | 4 | 10 | 90&#10;پرس سینه | 3 | 12 | 60"></textarea></div>
+<button class="btn" onclick="icPublishPlan()">انتشار برنامه برای شاگرد</button>
+<div id="icPlans"></div>
+</div>
+<div class="card">
+<h2>ثبت گزارش شاگرد</h2>
+<div class="field"><label>نوع گزارش</label><select id="icLogType"><option value="workout">تمرین</option><option value="sleep">خواب</option><option value="nutrition">تغذیه</option><option value="weight">وزن</option><option value="note">یادداشت</option></select></div>
+<div class="field"><label>جزئیات</label><textarea id="icLogPayload" rows="3" placeholder="مثلاً ۷ ساعت خواب یا وعده ناهار..."></textarea></div>
+<button class="btn" onclick="icAddLog()">ثبت گزارش در حساب من</button>
+<button class="btn secondary" onclick="icLoadPlans()">دریافت برنامه‌های منتشرشده</button>
+<div id="icStudentPlans"></div>
+</div>
+</section>
+
+<section id="foodLibraryPage" class="hidden">
+<h1>بانک غذا و خوراکی ایرانی</h1>
+<p class="muted">مقادیر کالری و درشت‌مغذی‌ها تخمینی‌اند و با دستور پخت و اندازه واقعی تغییر می‌کنند.</p>
+<div class="card">
+<div class="field"><label>جستجوی غذا، میوه یا خوراکی</label><input id="foodDbSearch" oninput="renderFoodDb()" placeholder="مثلاً قورمه‌سبزی، موز، شیر..."></div>
+<div class="field"><label>دسته‌بندی</label><select id="foodDbCategory" onchange="renderFoodDb()"><option value="">همه</option><option>غذای ایرانی</option><option>نان و غلات</option><option>لبنیات</option><option>میوه</option><option>سبزیجات</option><option>پروتئین</option><option>تنقلات</option></select></div>
+<div id="foodDbResults"></div>
+</div>
+<div class="card">
+<h2>ثبت مقدار مصرف</h2>
+<div id="foodDbSelected" class="muted">یک خوراکی را از فهرست انتخاب کن.</div>
+<div class="field"><label>واحد اندازه‌گیری</label><select id="foodDbUnit"><option value="100">۱۰۰ گرم</option><option value="150">یک کف دست (حدودی ۱۵۰ گرم)</option><option value="15">یک قاشق غذاخوری (حدودی ۱۵ گرم)</option><option value="100">یک کفگیر متوسط (حدودی ۱۰۰ گرم)</option><option value="30">یک عدد متوسط/۳۰ گرم</option><option value="250">یک لیوان (حدودی ۲۵۰ گرم/میلی‌لیتر)</option></select></div>
+<div class="field"><label>تعداد واحد</label><input id="foodDbQty" type="number" min="0.25" step="0.25" value="1"></div>
+<button class="btn" onclick="addFoodDbLog()">افزودن به ثبت تغذیه امروز</button>
+</div>
+</section>
+
+<section id="musicPage" class="hidden">
+<h1>IRON MUSIC</h1>
+<p class="muted">پخش‌کننده فایل‌های موسیقی شخصی؛ فایل‌ها از گوشی تو انتخاب می‌شوند و روی سرور آپلود نمی‌شوند.</p>
+<div class="card">
+<div class="field"><label>انتخاب فایل MP3 / صوتی</label><input id="musicFiles" type="file" accept="audio/*" multiple onchange="loadLocalMusic(this.files)"></div>
+<div id="musicList"></div>
+<audio id="ironAudio" controls style="width:100%;margin-top:14px"></audio>
+<p class="muted">برای رعایت حقوق ناشر، این بخش فایل‌های قانونی و شخصی خودت را پخش می‌کند و آرشیو آهنگ‌های دارای حق نشر ارائه نمی‌کند.</p>
+</div>
+</section>
+
+<section id="shopPage" class="hidden">
+<h1>فروشگاه IRONNOVA</h1>
+<p class="muted">نمونه کاتالوگ و سبد خرید محلی. ثبت سفارش و پرداخت آنلاین تا اتصال درگاه و پنل مدیریت، واقعی و نهایی نیست.</p>
+<div class="card"><div id="shopProducts"></div></div>
+<div class="card"><h2>سبد خرید</h2><div id="shopCart"></div><button class="btn" onclick="shopCheckout()">ثبت پیش‌نویس سفارش</button></div>
+</section>
+
 <section id="adminPage" class="hidden"><h1>مدیریت حرکات برنامه</h1><div class="admin-note">این بخش فقط حرکات برنامه شخصی امروز را تغییر می‌دهد؛ بانک حرکات جداگانه باقی می‌ماند.</div><div class="card"><h2>افزودن حرکت</h2><div class="field"><label>نام حرکت</label><input id="newName" placeholder="مثلاً اسکوات هالتر"></div><div class="field"><label>تعداد ست</label><input id="newSets" type="number" value="3" min="1"></div><div class="field"><label>تکرار</label><input id="newReps" placeholder="۱۰ تا ۱۲"></div><div class="field"><label>لینک تصویر یا GIF (اختیاری)</label><input id="newGif" placeholder="https://..."></div><button class="btn" onclick="addExercise()">افزودن حرکت</button></div><div class="card"><h2>حرکات فعلی</h2><div id="adminExercises"></div></div></section>
 </main></div>
 <div class="toast" id="toast"></div>
@@ -130,9 +217,9 @@ async function loadCloudData(uid){cloudReady=false;setCloudStatus('در حال �
 function handleAuthSession(s){const uid=s&&s.user?s.user.id:null;showAuthSession(s);if(!uid){currentUserId=null;cloudReady=false;clearTimeout(cloudTimer);return}if(uid===currentUserId&&cloudReady)return;currentUserId=uid;loadCloudData(uid)}
 function toast(s){const e=document.getElementById('toast');e.textContent=s;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2400)}
 function toggleSidebar(force){const sb=document.getElementById('sidebar'),shade=document.getElementById('sidebarShade');const open=typeof force==='boolean'?force:!sb.classList.contains('open');sb.classList.toggle('open',open);shade.classList.toggle('open',open)}
-function showPage(p){['home','workout','library','homeWorkout','corrective','progress','coach','nutrition','profile','admin'].forEach(x=>document.getElementById(x+'Page').classList.toggle('hidden',x!==p));document.querySelectorAll('.side-nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===p));toggleSidebar(false);if(p==='admin')renderAdmin();if(p==='library'&&!exerciseCatalog.length)loadExerciseCatalog();if(p==='library')renderLibrary();if(p==='homeWorkout')renderHomeExercises();if(p==='corrective')renderCorrective();if(p==='nutrition')renderNutrition();if(p==='progress')renderProgress();if(p==='coach'){document.getElementById('coachWeight').value=data.weight;document.getElementById('nutWeight').value=data.weight}window.scrollTo(0,0)}
+function showPage(p){['home','workout','library','homeWorkout','corrective','progress','coach','nutrition','profile','admin','coachPanel','foodLibrary','music','shop'].forEach(x=>document.getElementById(x+'Page').classList.toggle('hidden',x!==p));document.querySelectorAll('.side-nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===p));toggleSidebar(false);if(p==='admin')renderAdmin();if(p==='library'&&!exerciseCatalog.length)loadExerciseCatalog();if(p==='library')renderLibrary();if(p==='homeWorkout')renderHomeExercises();if(p==='corrective')renderCorrective();if(p==='nutrition')renderNutrition();if(p==='progress')renderProgress();if(p==='coach'){document.getElementById('coachWeight').value=data.weight;document.getElementById('nutWeight').value=data.weight}if(p==='foodLibrary')renderFoodDb();if(p==='shop')renderShop();if(p==='coachPanel')icLoadLinks();window.scrollTo(0,0)}
 function safe(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function itemHTML(e,compact=false){const img=e.gif?`<img src="${safe(e.gif)}" alt="نمایش اجرای ${safe(e.name)}">`:`<div style="width:102px;height:88px;border-radius:13px;background:var(--soft);display:grid;place-items:center;color:var(--accent);font-size:30px;flex-shrink:0">🏋️</div>`;return `<div class="card"><div class="exercise">${img}<div class="info"><h3>${safe(e.name)}</h3><div class="muted">${e.sets} ست × ${safe(e.reps)} تکرار</div><span class="pill">آموزش حرکت</span></div>${compact?'':`<input class="check" type="checkbox" ${e.done?'checked':''} aria-label="انجام شد" onchange="toggleDone(${Number(e.id)},this.checked)">`}</div>${compact?'':`<div class="row between" style="margin-top:10px"><span class="muted">وزنه (کیلوگرم)</span><input style="max-width:110px" type="number" min="0" placeholder="مثلاً ۲۰" value="${safe(e.weight||'')}" onchange="setWeight(${Number(e.id)},this.value)"></div>`}</div>`}
+function itemHTML(e,compact=false){const img=e.gif?`<img src="${safe(e.gif)}" alt="نمایش اجرای ${safe(e.name)}">`:`<div style="width:102px;height:88px;border-radius:13px;background:var(--soft);display:grid;place-items:center;color:var(--accent);font-size:30px;flex-shrink:0">🏋️</div>`;return `<div class="card"><div class="exercise">${img}<div class="info"><h3>${safe(e.name)}</h3><div class="muted">${e.sets} ست × ${safe(e.reps)} تکرار</div><button type="button" class="pill education-btn" onclick="openWorkoutExerciseDetail(${Number(e.id)})">آموزش حرکت</button></div>${compact?'':`<input class="check" type="checkbox" ${e.done?'checked':''} aria-label="انجام شد" onchange="toggleDone(${Number(e.id)},this.checked)">`}</div>${compact?'':`<div class="row between" style="margin-top:10px"><span class="muted">وزنه (کیلوگرم)</span><input style="max-width:110px" type="number" min="0" placeholder="مثلاً ۲۰" value="${safe(e.weight||'')}" onchange="setWeight(${Number(e.id)},this.value)"></div>`}</div>`}
 function render(){const done=data.exercises.filter(e=>e.done).length,total=data.exercises.length;document.getElementById('greeting').textContent='سلام، '+data.name+' 👋';document.getElementById('homeWeight').textContent=data.weight+' kg';document.getElementById('homeDone').textContent=done;document.getElementById('homeCount').textContent=`${done} از ${total} حرکت`;document.getElementById('homeProgress').style.width=(total?done/total*100:0)+'%';document.getElementById('workoutCount').textContent=`${done} / ${total}`;document.getElementById('workoutTitle').textContent=data.planName||'سینه و پشت بازو';document.getElementById('homePlanCount').textContent=total+' حرکت · '+(data.planName||'روز اول');document.getElementById('homeExercises').innerHTML=data.exercises.slice(0,3).map(e=>itemHTML(e,true)).join('');document.getElementById('workoutExercises').innerHTML=data.exercises.map(e=>itemHTML(e)).join('');document.getElementById('nameInput').value=data.name;document.getElementById('weightInput').value=data.weight;document.getElementById('themeGrid').innerHTML=themes.map(t=>`<button class="theme ${data.theme===t[0]?'selected':''}" onclick="setTheme('${t[0]}')"><div class="swatch" style="background:linear-gradient(90deg,${t[3]} 0 65%,${t[2]} 65%)"></div>${t[1]}</button>`).join('');document.body.className=data.theme==='blue'?'':data.theme;if(document.getElementById('progressPage')&&!document.getElementById('progressPage').classList.contains('hidden'))renderProgress()}
 function todayKey(){return dayStamp()}
 function addWeightLog(){const v=Number(document.getElementById('weightLogInput').value);if(!v||v<1||v>400){toast('وزن معتبر وارد کن');return}data.weight=v;data.weightLogs.push({date:todayKey(),weight:v});data.weightLogs=data.weightLogs.slice(-180);document.getElementById('weightLogInput').value='';save();toast('وزن ثبت شد')}
@@ -316,6 +403,59 @@ function renderHomeExercises(){
  list.innerHTML=rows.map((e,i)=>`<details class="card" style="margin:9px 0"><summary style="cursor:pointer;font-weight:bold;font-size:14px">${safe(e[0])}<div class="muted" style="margin-top:6px;font-weight:normal">${safe(e[1])} · ${safe(e[2])} · ${safe(e[3])}</div></summary><p style="font-size:13px;line-height:2">${safe(e[6])}</p><div class="row between"><span class="pill">${safe(e[4])} ست · ${safe(e[5])}</span><button class="btn small" onclick="addHomeExercise(${homeExerciseData.indexOf(e)})">افزودن به برنامه</button></div></details>`).join('')||'<p class="muted">حرکتی با این فیلتر پیدا نشد.</p>';
 }
 function addHomeExercise(i){const e=homeExerciseData[i];if(!e)return;if(data.exercises.some(x=>x.name===e[0])){toast('این حرکت از قبل در برنامه است');return}data.exercises.push({id:Date.now(),name:e[0],sets:Number(e[4]),reps:e[5],done:false,weight:'',home:true});save();toast('حرکت به برنامه تمرین اضافه شد')}
+
+
+// ===== IRONNOVA COMPLETE MODULES (local features + Supabase coach RPC) =====
+const ironFoodDB = [
+['چلوکباب کوبیده','غذای ایرانی',260,15,18,18,'۱۰۰ گرم'],['چلو مرغ','غذای ایرانی',190,12,5,25,'۱۰۰ گرم'],['قورمه‌سبزی','غذای ایرانی',155,9,9,10,'۱۰۰ گرم'],['قیمه','غذای ایرانی',170,8,8,16,'۱۰۰ گرم'],['فسنجان','غذای ایرانی',260,10,22,8,'۱۰۰ گرم'],['زرشک‌پلو با مرغ','غذای ایرانی',205,11,6,25,'۱۰۰ گرم'],['عدس‌پلو','غذای ایرانی',175,6,4,29,'۱۰۰ گرم'],['لوبیاپلو','غذای ایرانی',165,6,5,24,'۱۰۰ گرم'],['آبگوشت','غذای ایرانی',150,12,8,8,'۱۰۰ گرم'],['کشک بادمجان','غذای ایرانی',150,5,11,8,'۱۰۰ گرم'],['میرزاقاسمی','غذای ایرانی',120,4,9,6,'۱۰۰ گرم'],['کوکو سبزی','غذای ایرانی',190,8,14,7,'۱۰۰ گرم'],['کتلت','غذای ایرانی',230,10,14,18,'۱۰۰ گرم'],['آش رشته','غذای ایرانی',110,5,3,16,'۱۰۰ گرم'],['ماکارونی','غذای ایرانی',165,6,5,25,'۱۰۰ گرم'],['نان سنگک','نان و غلات',260,9,2,52,'۱۰۰ گرم'],['نان بربری','نان و غلات',270,9,2,54,'۱۰۰ گرم'],['نان لواش','نان و غلات',290,9,2,58,'۱۰۰ گرم'],['برنج پخته','نان و غلات',130,2.7,.3,28,'۱۰۰ گرم'],['جو دوسر','نان و غلات',389,17,7,66,'۱۰۰ گرم'],['شیر پرچرب','لبنیات',62,3.2,3.3,4.8,'۱۰۰ میلی‌لیتر'],['شیر کم‌چرب','لبنیات',45,3.4,1.5,5,'۱۰۰ میلی‌لیتر'],['ماست','لبنیات',61,3.5,3.3,4.7,'۱۰۰ گرم'],['ماست یونانی','لبنیات',97,9,5,3.5,'۱۰۰ گرم'],['پنیر سفید','لبنیات',260,14,21,3,'۱۰۰ گرم'],['دوغ','لبنیات',25,1.2,1.2,2,'۱۰۰ میلی‌لیتر'],['موز','میوه',89,1.1,.3,23,'۱۰۰ گرم'],['سیب','میوه',52,.3,.2,14,'۱۰۰ گرم'],['پرتقال','میوه',47,.9,.1,12,'۱۰۰ گرم'],['خرما','میوه',282,2.5,.4,75,'۱۰۰ گرم'],['انگور','میوه',69,.7,.2,18,'۱۰۰ گرم'],['انار','میوه',83,1.7,1.2,19,'۱۰۰ گرم'],['هندوانه','میوه',30,.6,.2,8,'۱۰۰ گرم'],['توت‌فرنگی','میوه',32,.7,.3,8,'۱۰۰ گرم'],['خیار','سبزیجات',15,.7,.1,3.6,'۱۰۰ گرم'],['گوجه‌فرنگی','سبزیجات',18,.9,.2,3.9,'۱۰۰ گرم'],['سیب‌زمینی آبپز','سبزیجات',87,1.9,.1,20,'۱۰۰ گرم'],['هویج','سبزیجات',41,.9,.2,10,'۱۰۰ گرم'],['اسفناج','سبزیجات',23,2.9,.4,3.6,'۱۰۰ گرم'],['بروکلی','سبزیجات',34,2.8,.4,7,'۱۰۰ گرم'],['کاهو','سبزیجات',15,1.4,.2,2.9,'۱۰۰ گرم'],['تخم‌مرغ','پروتئین',143,13,10,1.1,'۱۰۰ گرم'],['سینه مرغ پخته','پروتئین',165,31,3.6,0,'۱۰۰ گرم'],['گوشت گوساله کم‌چرب','پروتئین',217,26,12,0,'۱۰۰ گرم'],['ماهی','پروتئین',140,22,5,0,'۱۰۰ گرم'],['تن ماهی آبکش‌شده','پروتئین',132,26,1,0,'۱۰۰ گرم'],['عدس پخته','پروتئین',116,9,0.4,20,'۱۰۰ گرم'],['لوبیا پخته','پروتئین',127,8.7,.5,23,'۱۰۰ گرم'],['بادام','تنقلات',579,21,50,22,'۱۰۰ گرم'],['گردو','تنقلات',654,15,65,14,'۱۰۰ گرم'],['کره بادام‌زمینی','تنقلات',588,25,50,20,'۱۰۰ گرم'],['شکلات تلخ','تنقلات',598,7.8,43,46,'۱۰۰ گرم'],['عسل','تنقلات',304,.3,0,82,'۱۰۰ گرم'],['بستنی وانیلی','تنقلات',207,3.5,11,24,'۱۰۰ گرم']
+].map(r=>r[2]==='گ'?['تن ماهی آبکش‌شده','پروتئین',132,26,1,0,'۱۰۰ گرم']:r);
+let selectedFoodDb=null;
+function renderFoodDb(){
+ const q=(document.getElementById('foodDbSearch')?.value||'').trim().toLowerCase(),cat=document.getElementById('foodDbCategory')?.value||'';
+ const rows=ironFoodDB.filter(f=>(!cat||f[1]===cat)&&(!q||f[0].toLowerCase().includes(q)));
+ const el=document.getElementById('foodDbResults');if(!el)return;
+ el.innerHTML=rows.map(f=>`<button class="food-suggestion" onclick="selectFoodDb(${ironFoodDB.indexOf(f)})"><b>${safe(f[0])}</b> · ${safe(f[1])}<br><span class="muted">${f[2]} kcal · پروتئین ${f[3]}g · چربی ${f[4]}g · کربوهیدرات ${f[5]}g در ۱۰۰ گرم</span></button>`).join('')||'<p class="muted">موردی پیدا نشد.</p>';
+}
+function selectFoodDb(i){selectedFoodDb=ironFoodDB[i];document.getElementById('foodDbSelected').textContent=selectedFoodDb[0]+' · '+selectedFoodDb[2]+' کیلوکالری در ۱۰۰ گرم';}
+function addFoodDbLog(){
+ if(!selectedFoodDb){toast('ابتدا یک خوراکی انتخاب کن');return}
+ const grams=Number(document.getElementById('foodDbUnit').value)*Number(document.getElementById('foodDbQty').value||1);
+ const f=selectedFoodDb,entry={id:Date.now(),name:f[0],grams,calories:Math.round(f[2]*grams/100),protein:+(f[3]*grams/100).toFixed(1),fat:+(f[4]*grams/100).toFixed(1),carbs:+(f[5]*grams/100).toFixed(1),fiber:0,meal:'بانک غذا',date:dayStamp()};
+ data.foodLogs=data.foodLogs||[];data.foodLogs.push(entry);save();renderNutrition();toast('به ثبت تغذیه اضافه شد');
+}
+const ironShopProducts=[
+{id:'shaker',name:'شیکر ورزشی',price:390000,desc:'شیکر درب‌دار تمرینی'},
+{id:'band',name:'کش تمرینی',price:280000,desc:'کش مقاومتی چندمنظوره'},
+{id:'gloves',name:'دستکش بدنسازی',price:450000,desc:'دستکش تمرین با کف ضدلغزش'},
+{id:'belt',name:'کمربند بدنسازی',price:890000,desc:'کمربند تمرین قدرتی'}
+];
+function renderShop(){
+ data.shopCart=data.shopCart||[];
+ document.getElementById('shopProducts').innerHTML=ironShopProducts.map(p=>`<div class="food-row"><div><b>${p.name}</b><div class="muted">${p.desc}</div><b>${p.price.toLocaleString('fa-IR')} تومان</b></div><button class="btn small" onclick="shopAdd('${p.id}')">افزودن</button></div>`).join('');
+ document.getElementById('shopCart').innerHTML=data.shopCart.length?data.shopCart.map(x=>`<div class="food-row">${safe(x.name)} × ${x.qty} <button class="btn small secondary" onclick="shopRemove('${x.id}')">حذف</button></div>`).join(''):'سبد خرید خالی است.';
+}
+function shopAdd(id){const p=ironShopProducts.find(x=>x.id===id);if(!p)return;data.shopCart=data.shopCart||[];let x=data.shopCart.find(x=>x.id===id);if(x)x.qty++;else data.shopCart.push({...p,qty:1});save();renderShop()}
+function shopRemove(id){data.shopCart=(data.shopCart||[]).filter(x=>x.id!==id);save();renderShop()}
+function shopCheckout(){if(!(data.shopCart||[]).length){toast('سبد خرید خالی است');return}data.shopOrders=data.shopOrders||[];data.shopOrders.push({id:Date.now(),items:data.shopCart,total:data.shopCart.reduce((s,x)=>s+x.price*x.qty,0),status:'پیش‌نویس محلی',createdAt:new Date().toISOString()});data.shopCart=[];save();renderShop();toast('پیش‌نویس سفارش روی همین دستگاه ذخیره شد؛ پرداخت فعال نیست')}
+let localMusicUrls=[];
+function loadLocalMusic(files){const list=document.getElementById('musicList');localMusicUrls.forEach(URL.revokeObjectURL);localMusicUrls=[];list.innerHTML='';[...files].forEach((f,i)=>{const url=URL.createObjectURL(f);localMusicUrls.push(url);const b=document.createElement('button');b.className='food-suggestion';b.textContent='▶ '+f.name;b.onclick=()=>{const a=document.getElementById('ironAudio');a.src=url;a.play()};list.appendChild(b)})}
+function icUser(){return currentUserId}
+async function icCall(fn,args={}){if(!currentUserId){toast('ابتدا وارد حساب کاربری شو');return null}const {data:r,error}=await supabaseClient.rpc(fn,args);if(error){toast('خطا: '+error.message);return null}return {data:r}}
+async function icSetRole(){const r=await icCall('iron_set_role',{p_role:document.getElementById('icRole').value,p_name:document.getElementById('icName').value||''});if(r!==null)document.getElementById('icStatus').textContent='نقش حساب ثبت شد.'}
+async function icCreateInvite(){const result=await icCall('iron_create_invite');if(!result)return;const code=result.data;const el=document.getElementById('icInviteOut');el.classList.remove('hidden');el.innerHTML=`<b>کد دعوت:</b><br><code>${safe(code)}</code><br><img alt="QR کد دعوت" style="display:block;width:180px;height:180px;margin:12px auto;background:white" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(code)}"><button class="btn small secondary" onclick="navigator.clipboard?.writeText('${safe(code)}')">کپی کد</button><div class="muted">این کد ۲۴ ساعت اعتبار دارد. شاگرد می‌تواند QR را اسکن کند یا کد را دستی وارد کند.</div>`}
+async function icClaimInvite(){const code=document.getElementById('icInviteCode').value.trim();if(!code){toast('کد دعوت را وارد کن');return}const r=await icCall('iron_claim_invite',{p_code:code});if(r)toast('درخواست اتصال ارسال شد؛ منتظر تأیید مربی بمان')}
+async function icLoadLinks(){if(!currentUserId)return;const {data:r,error}=await supabaseClient.from('iron_coach_links').select('*').or(`coach_id.eq.${currentUserId},student_id.eq.${currentUserId}`).order('created_at',{ascending:false});const el=document.getElementById('icLinks');if(error){el.textContent=error.message;return}el.innerHTML=(r||[]).map(x=>`<div class="food-row"><div><b>${x.coach_id===currentUserId?'شاگرد':'مربی'}: ${safe(x.coach_id===currentUserId?x.student_id:x.coach_id)}</b><div class="muted">${safe(x.status)}</div></div>${x.coach_id===currentUserId&&x.status==='pending'?`<button class="btn small" onclick="icRespond('${x.id}',true)">تأیید</button><button class="btn small secondary" onclick="icRespond('${x.id}',false)">رد</button>`:''}</div>`).join('')||'اتصال ثبت‌شده‌ای وجود ندارد.'}
+async function icRespond(id,accept){const r=await icCall('iron_respond_link',{p_link_id:id,p_accept:accept});if(r!==null){toast('وضعیت اتصال به‌روزرسانی شد');icLoadLinks()}}
+async function icPublishPlan(){const student=document.getElementById('icStudentId').value.trim(),title=document.getElementById('icPlanTitle').value.trim(),lines=document.getElementById('icPlanBody').value.split('\n').filter(Boolean);if(!student||!lines.length){toast('شناسه شاگرد و حداقل یک حرکت لازم است');return}const plan={days:[{name:'برنامه تمرینی',exercises:lines.map(line=>{const [name,sets,reps,rest]=line.split('|').map(x=>x.trim());return {name,sets:Number(sets)||3,reps:reps||'۸ تا ۱۲',rest:rest||'۶۰ ثانیه'}})}]};const r=await icCall('iron_publish_plan',{p_student:student,p_title:title,p_plan:plan});if(r!==null)toast('برنامه منتشر شد')}
+async function icLoadPlans(){if(!currentUserId)return;const {data:r,error}=await supabaseClient.from('iron_coach_plans').select('*').eq('student_id',currentUserId).eq('published',true).order('created_at',{ascending:false});const el=document.getElementById('icStudentPlans');if(error){el.textContent=error.message;return}el.innerHTML=(r||[]).map(p=>`<div class="result-box"><b>${safe(p.title)}</b><pre>${safe(JSON.stringify(p.plan,null,2))}</pre></div>`).join('')||'برنامه منتشرشده‌ای وجود ندارد.'}
+async function icAddLog(){const type=document.getElementById('icLogType').value,payload={text:document.getElementById('icLogPayload').value};const r=await icCall('iron_add_student_log',{p_type:type,p_payload:payload});if(r!==null)toast('گزارش ثبت شد')}
+function openWorkoutExerciseDetail(id){
+ const e=(data.exercises||[]).find(x=>Number(x.id)===Number(id));if(!e)return;
+ const match=exerciseCatalog.find(x=>String(x.name||'').trim().toLowerCase()===String(e.name||'').trim().toLowerCase()||String(x.name_en||'').trim().toLowerCase()===String(e.name||'').trim().toLowerCase());
+ if(match){openExerciseDetail(match.id);return}
+ document.getElementById('detailContent').innerHTML=`<h2>${safe(e.name)}</h2><p>این حرکت در فهرست آنلاین جزئیات پیدا نشد.</p><div class="result-box">با کنترل فرم بدن، دامنه حرکتی بدون درد و وزنه قابل‌کنترل اجرا کن. در صورت درد تیز یا غیرعادی حرکت را متوقف کن.</div><p>پیشنهاد برنامه: ${safe(e.sets||3)} ست × ${safe(e.reps||'۸ تا ۱۲')} تکرار</p>`;
+ document.getElementById('detailBackdrop').classList.add('open');
+}
 
 fillFoodOptions();
 render();
