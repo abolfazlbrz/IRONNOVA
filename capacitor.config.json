@@ -1,0 +1,7 @@
+
+{
+  "appId": "com.ironnova.app",
+  "appName": "IRONNOVA",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}
