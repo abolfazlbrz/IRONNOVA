@@ -525,10 +525,10 @@ async function reviewIronCoach(id,approve){
  if(error){toast('خطا: '+error.message);return}
  toast(data|| (approve?'مربی تأیید شد':'درخواست رد شد'));await refreshIronCoachRequests();
 }
-function updateCoachStudentPickers(links,userId){
+function updateCoachStudentPickers(links,userId,accountRole){
  const approved=(links||[]).filter(x=>x.status==='approved');
  const roleSelect=document.getElementById('icStudent'),partnerSelect=document.getElementById('icMessagePartner'),picker=document.getElementById('icGroupStudentPicker');
- const isCoach=approved.some(x=>x.coach_id===userId);
+ const isCoach=accountRole==='coach';
  const counterpartIds=[...new Set(approved.map(x=>x.coach_id===userId?x.student_id:x.coach_id))];
  const options='<option value="">'+(isCoach?'انتخاب شاگرد متصل':'انتخاب مربی متصل')+'</option>'+counterpartIds.map((id,i)=>'<option value="'+id+'">'+(isCoach?'شاگرد ':'مربی ')+(i+1)+' · '+id.slice(0,8)+'</option>').join('');
  if(roleSelect)roleSelect.innerHTML='<option value="">انتخاب شاگرد متصل</option>'+counterpartIds.filter(id=>approved.some(x=>x.coach_id===userId&&x.student_id===id)).map((id,i)=>'<option value="'+id+'">شاگرد '+(i+1)+' · '+id.slice(0,8)+'</option>').join('');
@@ -540,8 +540,8 @@ async function loadIronCoachLinks(){
  const {data:{user}}=await supabaseClient.auth.getUser();if(!user){out.textContent='ابتدا وارد حساب شو';return}
  const {data,error}=await supabaseClient.from('iron_coach_students_v2').select('coach_id,student_id,status,created_at').or('coach_id.eq.'+user.id+',student_id.eq.'+user.id).order('created_at',{ascending:false});
  if(error){out.textContent='خطا: '+error.message;return}
- if(!data?.length){out.textContent='هنوز درخواست یا شاگرد متصلی وجود ندارد.';updateCoachStudentPickers([],user.id);return}
-  updateCoachStudentPickers(data,user.id);
+ if(!data?.length){out.textContent='هنوز درخواست یا شاگرد متصلی وجود ندارد.';updateCoachStudentPickers([],user.id,accountRole?.role);return}
+  updateCoachStudentPickers(data,user.id,accountRole?.role);
  out.innerHTML=data.map(x=>{const other=x.coach_id===user.id?x.student_id:x.coach_id;const canReview=x.coach_id===user.id&&x.status==='pending';return '<div style="padding:8px 0;border-bottom:1px solid var(--line)"><small>'+(x.coach_id===user.id?'شاگرد: ':'مربی: ')+safe(other)+'</small><div>'+({pending:'در انتظار تأیید مربی',approved:'اتصال تأیید شده',rejected:'درخواست رد شده'}[x.status]||safe(x.status))+'</div>'+(canReview?'<div class="row"><button class="btn small grow" onclick="reviewIronStudent(\''+safe(x.student_id)+'\',true)">تأیید</button><button class="btn small secondary grow" onclick="reviewIronStudent(\''+safe(x.student_id)+'\',false)">رد</button></div>':'')+'</div>'}).join('');
 }
 async function reviewIronStudent(id,approve){
