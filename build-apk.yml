@@ -1,0 +1,97 @@
+name: Build IRONNOVA APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact source revision
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Verify source contains the new IRONNOVA modules
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Commit: $(git rev-parse HEAD)"
+          echo "Branch: $(git branch --show-current)"
+          echo "index.html bytes: $(wc -c < index.html)"
+          for marker in 'coachPanelPage' 'foodLibraryPage' 'musicPage' 'shopPage'; do
+            if ! grep -q "$marker" index.html; then
+              echo "ERROR: $marker is missing from repository root index.html"
+              exit 1
+            fi
+            echo "Verified: $marker"
+          done
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Prepare web files
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf www
+          mkdir -p www
+          cp index.html www/index.html
+          [ ! -d assets ] || cp -r assets www/assets
+          [ ! -f manifest.webmanifest ] || cp manifest.webmanifest www/
+          [ ! -f service-worker.js ] || cp service-worker.js www/
+          [ ! -f sw.js ] || cp sw.js www/
+          echo "www/index.html bytes: $(wc -c < www/index.html)"
+          for marker in 'coachPanelPage' 'foodLibraryPage' 'musicPage' 'shopPage'; do
+            grep -q "$marker" www/index.html || { echo "ERROR: $marker missing from www/index.html"; exit 1; }
+          done
+          sha256sum index.html www/index.html
+          cmp -s index.html www/index.html
+
+      - name: Create Android project
+        run: npx cap add android
+
+      - name: Sync Android
+        run: npx cap sync android
+
+      - name: Verify packaged web files before build
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f android/app/src/main/assets/public/index.html
+          echo "Android bundled index bytes: $(wc -c < android/app/src/main/assets/public/index.html)"
+          for marker in 'coachPanelPage' 'foodLibraryPage' 'musicPage' 'shopPage'; do
+            grep -q "$marker" android/app/src/main/assets/public/index.html || { echo "ERROR: $marker missing from Android bundle"; exit 1; }
+          done
+          sha256sum android/app/src/main/assets/public/index.html
+
+      - name: Build APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: IRONNOVA-APK-${{ github.run_number }}-${{ github.sha }}
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
