@@ -42,9 +42,63 @@ body.dark{--bg:#101d32;--surface:#172943;--text:#edf4ff;--muted:#a9bdd5;--soft:#
 @media(max-width:760px){.app{padding-bottom:calc(104px + env(safe-area-inset-bottom))}.mobile-dock{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;z-index:30;bottom:0;left:0;right:0;padding:7px 7px calc(7px + env(safe-area-inset-bottom));background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -7px 25px #0b142410}.mobile-dock button{border:0;background:transparent;color:var(--muted);display:grid;justify-items:center;gap:4px;padding:5px 2px;border-radius:12px;font-size:10px}.mobile-dock button.active{background:var(--soft);color:var(--accent);font-weight:bold}.mobile-dock svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 .coach-result{padding:15px}.coach-avatar{width:58px;height:58px;border-radius:17px;object-fit:cover;background:var(--soft);border:1px solid var(--line);flex:0 0 58px}.coach-avatar.large{width:76px;height:76px;flex-basis:76px}.coach-tags{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}.coach-tags span{font-size:10px;background:var(--soft);border-radius:99px;padding:6px 9px}.coach-bio{line-height:1.9}.coach-result .row button{white-space:nowrap}.coach-admin-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:12px 0;border-bottom:1px solid var(--line)}.coach-admin-row .grow{min-width:160px}.coach-resume-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:15px 0}.coach-resume-grid>div{background:var(--soft);border-radius:12px;padding:10px;text-align:center;min-width:0}.coach-resume-grid b,.coach-resume-grid small{display:block;overflow-wrap:anywhere}.coach-resume-grid small{font-size:10px;color:var(--muted);margin-top:4px}.coach-shortcuts{grid-template-columns:repeat(4,minmax(0,1fr))}@media(max-width:390px){.coach-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr))}.coach-result .row.between{align-items:flex-start;flex-direction:column}.coach-result .row.between>div{width:100%}.coach-result .row.between button{flex:1}}
-.group-student-picker{display:grid;gap:8px}.group-student-option{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:11px;padding:10px;font-size:12px}.group-student-option small{margin-right:auto;color:var(--muted);direction:ltr}</style>
+.group-student-picker{display:grid;gap:8px}.group-student-option{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:11px;padding:10px;font-size:12px}.group-student-option small{margin-right:auto;color:var(--muted);direction:ltr}
+/* IRONNOVA animated entry */
+#ironIntro{position:fixed;inset:0;z-index:100000;display:grid;place-items:center;overflow:hidden;background:radial-gradient(circle at 50% 42%,#193b64 0,#0b1424 65%,#070d18 100%);color:#fff;transition:opacity .55s ease,visibility .55s ease}
+#ironIntro.is-leaving{opacity:0;visibility:hidden;pointer-events:none}
+#ironIntro .intro-inner{width:min(92vw,520px);display:grid;justify-items:center;text-align:center;gap:8px;position:relative}
+#ironIntro .intro-kicker{font-size:10px;letter-spacing:5px;color:#8cb9e8;font-weight:800}
+#ironIntro .intro-art{width:min(82vw,390px);height:auto;overflow:visible;filter:drop-shadow(0 22px 26px #0008)}
+#ironIntro .intro-arm{fill:#f0a16b;stroke:#ffd0a4;stroke-width:5;stroke-linejoin:round}
+#ironIntro .intro-muscle{fill:#ffb27a;stroke:#ffe0bd;stroke-width:4;transform-box:fill-box;transform-origin:50% 60%;animation:intro-bicep 2.7s ease-in-out forwards}
+#ironIntro .intro-forearm{transform-box:view-box;transform-origin:225px 180px;animation:intro-curl 2.7s cubic-bezier(.3,.8,.2,1) forwards}
+#ironIntro .intro-weight{fill:#9fc8f5;stroke:#e4f2ff;stroke-width:4}
+#ironIntro .intro-bar{stroke:#eaf4ff;stroke-width:9;stroke-linecap:round}
+#ironIntro .intro-burst{fill:#ffcf4a;stroke:#fff2a8;stroke-width:4;opacity:0;transform-box:fill-box;transform-origin:center;animation:intro-burst .7s 2.55s cubic-bezier(.15,.8,.2,1) forwards}
+#ironIntro .intro-spark{stroke:#ffcf4a;stroke-width:5;stroke-linecap:round;opacity:0;animation:intro-spark .65s 2.6s ease-out forwards}
+#ironIntro .intro-brand{font-size:clamp(29px,8vw,42px);font-weight:1000;letter-spacing:4px;margin-top:-5px;color:#fff;text-shadow:0 3px 20px #4d9eff55}
+#ironIntro .intro-tag{font-size:11px;letter-spacing:3px;color:#8cb9e8}
+#ironIntro .intro-enter{margin-top:17px;border:1px solid #75baff88;border-radius:999px;background:#287be0;color:#fff;font-weight:800;padding:12px 28px;box-shadow:0 8px 28px #287be055;animation:intro-button .5s 2.8s both}
+#ironIntro .intro-enter:active{transform:scale(.97)}
+#ironIntro .intro-skip{position:absolute;top:max(18px,env(safe-area-inset-top));left:18px;background:#ffffff12;color:#b8d6f6;border:1px solid #ffffff25;border-radius:99px;padding:8px 13px;font-size:11px}
+@keyframes intro-curl{0%,15%{transform:rotate(0)}48%,76%{transform:rotate(-17deg)}100%{transform:rotate(-17deg)}}
+@keyframes intro-bicep{0%,12%{transform:scale(.82,.86)}48%,78%{transform:scale(1.3,1.23)}100%{transform:scale(1.36,1.3)}}
+@keyframes intro-burst{0%{opacity:0;transform:scale(.12) rotate(-35deg)}65%{opacity:1;transform:scale(1.2) rotate(8deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
+@keyframes intro-spark{0%{opacity:0;transform:scale(.2)}35%{opacity:1}100%{opacity:0;transform:translate(var(--sx),var(--sy)) scale(1.2)}}
+@keyframes intro-button{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){#ironIntro *{animation-duration:.01ms!important;animation-delay:0ms!important}#ironIntro .intro-enter{opacity:1}}
+</style>
 </head>
-<body><div class="dashboard-layout">
+<body>
+<div id="ironIntro" role="dialog" aria-label="خوش آمدید به IRONNOVA">
+<button class="intro-skip" type="button" onclick="enterIronNOVA()">ورود سریع</button>
+<div class="intro-inner">
+<div class="intro-kicker">READY TO GET STRONGER?</div>
+<svg class="intro-art" viewBox="0 0 360 285" role="img" aria-label="بازویی که دمبل می‌زند و عضله‌اش به شکل انفجاری کارتونی بزرگ می‌شود">
+<defs><linearGradient id="introSkin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd0a4"/><stop offset="1" stop-color="#d8794d"/></linearGradient><radialGradient id="introGlow"><stop offset="0" stop-color="#287be0" stop-opacity=".65"/><stop offset="1" stop-color="#287be0" stop-opacity="0"/></radialGradient></defs>
+<ellipse cx="178" cy="160" rx="160" ry="125" fill="url(#introGlow)"/>
+<path d="M43 210 C40 177 54 137 84 115 C100 103 120 106 133 120 L220 155 C239 163 245 181 233 197 C220 214 196 222 171 220 L95 239 C67 245 48 234 43 210Z" fill="url(#introSkin)" stroke="#ffd0a4" stroke-width="5"/>
+<path class="intro-arm" d="M55 211 C58 177 74 138 103 122 C122 111 139 121 151 132 C174 151 198 151 222 160 C244 168 250 188 235 205 C217 225 185 228 157 219 L91 239 C67 246 51 234 55 211Z"/>
+<path class="intro-muscle" d="M102 156 C119 126 151 119 179 132 C199 141 205 164 194 184 C180 207 145 211 119 193 C104 183 96 171 102 156Z"/>
+<path d="M117 158 C132 140 156 136 174 145" fill="none" stroke="#ffe0bd" stroke-width="5" stroke-linecap="round" opacity=".75"/>
+<g class="intro-forearm">
+<path class="intro-arm" d="M216 176 C231 159 245 128 256 91 C261 73 278 68 290 78 C300 86 297 99 291 116 L269 190 C262 211 243 224 224 214 C209 206 205 190 216 176Z"/>
+<path d="M272 83 C282 72 298 75 304 87 C310 98 301 110 288 111 L274 109Z" fill="#f0a16b" stroke="#ffd0a4" stroke-width="4"/>
+<g class="intro-dumbbell">
+<path class="intro-bar" d="M278 75 H333"/>
+<rect class="intro-weight" x="268" y="54" width="14" height="43" rx="5"/>
+<rect class="intro-weight" x="328" y="48" width="19" height="55" rx="6"/>
+</g>
+</g>
+<path class="intro-burst" d="M155 74 L168 102 L197 83 L190 115 L224 118 L198 139 L220 164 L185 159 L177 194 L158 165 L130 185 L138 151 L105 139 L137 125 L124 94Z"/>
+<path class="intro-spark" style="--sx:-35px;--sy:-38px" d="M112 93l-12-15"/><path class="intro-spark" style="--sx:38px;--sy:-35px" d="M209 88l14-16"/><path class="intro-spark" style="--sx:42px;--sy:28px" d="M226 157l19 5"/><path class="intro-spark" style="--sx:-42px;--sy:25px" d="M118 174l-17 9"/>
+<text x="166" y="146" text-anchor="middle" font-size="24" font-weight="1000" fill="#173b64" opacity="0" class="intro-bang">BOOM!</text>
+</svg>
+<div class="intro-brand">IRONNOVA</div>
+<div class="intro-tag">TRAIN SMART · GET STRONGER</div>
+<button class="intro-enter" type="button" onclick="enterIronNOVA()">ورود به برنامه</button>
+</div>
+</div><div class="dashboard-layout">
 <aside class="sidebar" id="sidebar"><div class="side-brand"><img src="assets/ironnova-icon.svg" alt="" class="brand-mark">IRONNOVA</div><div class="side-sub">TRAIN SMART · GET STRONGER</div><div class="side-title">داشبورد</div><nav class="side-nav">
 <button class="active" data-page="home" onclick="showPage('home')"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span>خانه</button>
 <button data-page="workout" onclick="showPage('workout')"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8v8M3 10v4M18 8v8m3-6v4M6 12h12"/></svg></span>برنامه تمرینی</button>
@@ -220,6 +274,13 @@ async function loadCloudData(uid){cloudReady=false;setCloudStatus('در حال �
 function handleAuthSession(s){const uid=s&&s.user?s.user.id:null;showAuthSession(s);if(!uid){currentUserId=null;cloudReady=false;clearTimeout(cloudTimer);icLoadRole();return}icLoadRole();if(uid===currentUserId&&cloudReady)return;currentUserId=uid;loadCloudData(uid)}
 function toast(s){const e=document.getElementById('toast');e.textContent=s;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2400)}
 function toggleSidebar(force){const sb=document.getElementById('sidebar'),shade=document.getElementById('sidebarShade');const open=typeof force==='boolean'?force:!sb.classList.contains('open');sb.classList.toggle('open',open);shade.classList.toggle('open',open)}
+
+let ironIntroFinished=false;
+function enterIronNOVA(){
+ const intro=document.getElementById('ironIntro');if(!intro||ironIntroFinished)return;
+ ironIntroFinished=true;intro.classList.add('is-leaving');
+ window.setTimeout(()=>{intro.remove();document.getElementById('homePage')?.scrollIntoView({block:'start'});},600);
+}
 function showPage(p){['home','workout','library','homeWorkout','corrective','progress','coach','nutrition','profile','admin','coachPanel','coachExplore','foodLibrary','music','shop','education'].forEach(x=>document.getElementById(x+'Page').classList.toggle('hidden',x!==p));document.querySelectorAll('.side-nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===p));document.querySelectorAll('.mobile-dock button').forEach(b=>b.classList.toggle('active',b.dataset.dock===p));toggleSidebar(false);if(p==='admin')renderAdmin();if(p==='coachPanel'){loadIronAdminPanel();loadIronCoachLinks();loadMyCoachPlans();loadMyStudentLogs();loadIronCoachProfile();icLoadRole();loadIronGroups()}if(p==='coachExplore')loadCoachExplorer();if(p==='library'&&!exerciseCatalog.length)loadExerciseCatalog();if(p==='library')renderLibrary();if(p==='homeWorkout')renderHomeExercises();if(p==='corrective')renderCorrective();if(p==='nutrition')renderNutrition();if(p==='foodLibrary')renderFoodLibrary();if(p==='shop'){renderShop();loadShopOrders();loadShopAdmin()}if(p==='education'){renderIronEducation();loadEducationAdmin()}if(p==='progress')renderProgress();if(p==='coach'){document.getElementById('coachWeight').value=data.weight;document.getElementById('nutWeight').value=data.weight}window.scrollTo(0,0)}
 function safe(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function openWorkoutExerciseDetail(id){const workout=data.exercises.find(x=>Number(x.id)===Number(id));if(!workout)return;const found=exerciseCatalog.find(x=>String(x.name||'').trim()===String(workout.name||'').trim());if(found){openExerciseDetail(found.id);return}document.getElementById('detailContent').innerHTML='<h2>'+safe(workout.name)+'</h2><p>برای اجرای صحیح این حرکت، دامنه حرکت را کنترل کن، از تاب دادن بدن خودداری کن و وزنه‌ای انتخاب کن که فرم صحیح حفظ شود.</p><p><b>برنامه فعلی:</b> '+safe(workout.sets)+' ست × '+safe(workout.reps)+' تکرار</p>';document.getElementById('detailBackdrop').classList.add('open')}
@@ -641,6 +702,7 @@ async function sendIronGroupMessage(){const id=document.getElementById('icSelect
 fillFoodOptions();
 render();
 renderNutrition();
+window.addEventListener('load',()=>{const intro=document.getElementById('ironIntro');if(intro&&!ironIntroFinished)window.setTimeout(enterIronNOVA,3900);},{once:true});
 renderCorrective();
 supabaseClient.auth.getSession().then(({data:r,error})=>{if(error)setAuthMessage('خطای بررسی حساب: '+error.message);else handleAuthSession(r.session)});
 supabaseClient.auth.onAuthStateChange((_event,session)=>setTimeout(()=>handleAuthSession(session),0));
