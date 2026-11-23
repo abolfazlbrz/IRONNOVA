@@ -83,7 +83,7 @@ create policy iron_store_orders_admin_update_v2 on public.iron_store_orders_v2 f
 using(exists(select 1 from public.iron_admins_v2 a where a.user_id=auth.uid() and a.is_main_admin))
 with check(exists(select 1 from public.iron_admins_v2 a where a.user_id=auth.uid() and a.is_main_admin));
 revoke all on public.iron_store_orders_v2 from anon,authenticated;
-grant select,insert,update on public.iron_store_orders_v2 to authenticated;
+grant select,update on public.iron_store_orders_v2 to authenticated;
 
 create table if not exists public.iron_education_v2 (
  id uuid primary key default gen_random_uuid(),
