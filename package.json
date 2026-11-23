@@ -1,4 +1,3 @@
-
 {
   "name": "ironnova",
   "version": "1.0.0",
@@ -8,7 +7,8 @@
   },
   "dependencies": {
     "@capacitor/core": "^6.2.1",
-    "@capacitor/android": "^6.2.1"
+    "@capacitor/android": "^6.2.1",
+    "sharp": "^0.33.5"
   },
   "devDependencies": {
     "@capacitor/cli": "^6.2.1"
