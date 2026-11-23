@@ -47,6 +47,9 @@ jobs:
       - name: Sync Android
         run: npx cap sync android
 
+      - name: Apply IRONNOVA launcher icons
+        run: node scripts/generate-icons.mjs
+
       - name: Build APK
         run: |
           cd android
