@@ -145,8 +145,83 @@ $function$;
 REVOKE ALL ON FUNCTION public.iron_admin_pending_coaches_v2() FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.iron_admin_pending_coaches_v2() TO authenticated;
 
+
+-- Keep legacy and internal RPCs callable only by the database owner.
+REVOKE ALL ON FUNCTION public.iron_respond_link(uuid,boolean) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.iron_publish_plan(uuid) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.iron_request_role_v2(text) FROM PUBLIC, anon, authenticated;
+
+-- Query indexes for the V2 coach/student workflow.
+CREATE INDEX IF NOT EXISTS idx_iron_invites_coach_v2 ON public.iron_coach_invites(coach_id);
+CREATE INDEX IF NOT EXISTS idx_iron_invites_claimed_by_v2 ON public.iron_coach_invites(claimed_by);
+CREATE INDEX IF NOT EXISTS idx_iron_links_student_status_v2 ON public.iron_coach_students_v2(student_id,status);
+CREATE INDEX IF NOT EXISTS idx_iron_links_coach_status_v2 ON public.iron_coach_students_v2(coach_id,status);
+CREATE INDEX IF NOT EXISTS idx_iron_logs_student ON public.iron_student_logs(student_id,logged_at DESC);
+CREATE INDEX IF NOT EXISTS idx_iron_plans_coach_student_status_v2 ON public.iron_workout_plans_v2(coach_id,student_id,status);
+CREATE INDEX IF NOT EXISTS idx_iron_plans_student_status_v2 ON public.iron_workout_plans_v2(student_id,status);
+CREATE INDEX IF NOT EXISTS idx_iron_day_exercises_plan_order_v2 ON public.iron_workout_day_exercises_v2(plan_day_id,order_number);
+CREATE INDEX IF NOT EXISTS idx_iron_day_exercises_exercise_v2 ON public.iron_workout_day_exercises_v2(exercise_id);
+CREATE INDEX IF NOT EXISTS idx_iron_exercises_active_name_v2 ON public.iron_workout_exercises_v2(lower(name)) WHERE is_active = true;
+CREATE INDEX IF NOT EXISTS idx_iron_roles_role_status_v2 ON public.iron_account_roles_v2(role,status);
+
+-- Active exercises are visible to signed-in users; only the main admin can
+-- manage the catalog or inspect inactive exercises.
 DROP POLICY IF EXISTS iron_exercises_active_select_v2 ON public.iron_workout_exercises_v2;
-CREATE POLICY iron_exercises_active_select_v2
+DROP POLICY IF EXISTS iron_workout_exercises_v2_admin_manage ON public.iron_workout_exercises_v2;
+DROP POLICY IF EXISTS iron_workout_exercises_v2_read ON public.iron_workout_exercises_v2;
+DROP POLICY IF EXISTS iron_workout_exercises_v2_select ON public.iron_workout_exercises_v2;
+DROP POLICY IF EXISTS iron_workout_exercises_v2_insert_admin ON public.iron_workout_exercises_v2;
+DROP POLICY IF EXISTS iron_workout_exercises_v2_update_admin ON public.iron_workout_exercises_v2;
+DROP POLICY IF EXISTS iron_workout_exercises_v2_delete_admin ON public.iron_workout_exercises_v2;
+
+CREATE POLICY iron_workout_exercises_v2_select
 ON public.iron_workout_exercises_v2
 FOR SELECT TO authenticated
-USING (is_active = true);
+USING (
+  is_active = true
+  OR EXISTS (
+    SELECT 1 FROM public.iron_admins_v2
+    WHERE user_id = (select auth.uid()) AND is_main_admin = true
+  )
+);
+CREATE POLICY iron_workout_exercises_v2_insert_admin
+ON public.iron_workout_exercises_v2
+FOR INSERT TO authenticated
+WITH CHECK (
+  EXISTS (SELECT 1 FROM public.iron_admins_v2
+          WHERE user_id = (select auth.uid()) AND is_main_admin = true)
+);
+CREATE POLICY iron_workout_exercises_v2_update_admin
+ON public.iron_workout_exercises_v2
+FOR UPDATE TO authenticated
+USING (
+  EXISTS (SELECT 1 FROM public.iron_admins_v2
+          WHERE user_id = (select auth.uid()) AND is_main_admin = true)
+)
+WITH CHECK (
+  EXISTS (SELECT 1 FROM public.iron_admins_v2
+          WHERE user_id = (select auth.uid()) AND is_main_admin = true)
+);
+CREATE POLICY iron_workout_exercises_v2_delete_admin
+ON public.iron_workout_exercises_v2
+FOR DELETE TO authenticated
+USING (
+  EXISTS (SELECT 1 FROM public.iron_admins_v2
+          WHERE user_id = (select auth.uid()) AND is_main_admin = true)
+);
+
+DROP POLICY IF EXISTS iron_coach_profile_select_linked_students ON public.iron_coach_profiles_v2;
+DROP POLICY IF EXISTS iron_coach_profile_select_own ON public.iron_coach_profiles_v2;
+DROP POLICY IF EXISTS iron_coach_profile_select_v2 ON public.iron_coach_profiles_v2;
+CREATE POLICY iron_coach_profile_select_v2
+ON public.iron_coach_profiles_v2
+FOR SELECT TO authenticated
+USING (
+  user_id = (select auth.uid())
+  OR EXISTS (
+    SELECT 1 FROM public.iron_coach_students_v2 cs
+    WHERE cs.coach_id = iron_coach_profiles_v2.user_id
+      AND cs.student_id = (select auth.uid())
+      AND cs.status = 'approved'
+  )
+);
