@@ -55,6 +55,8 @@ body.dark{--bg:#101d32;--surface:#172943;--text:#edf4ff;--muted:#a9bdd5;--soft:#
 #ironIntro .intro-weight{fill:#9fc8f5;stroke:#e4f2ff;stroke-width:4}
 #ironIntro .intro-bar{stroke:#eaf4ff;stroke-width:9;stroke-linecap:round}
 #ironIntro .intro-burst{fill:#ffcf4a;stroke:#fff2a8;stroke-width:4;opacity:0;transform-box:fill-box;transform-origin:center;animation:intro-burst .7s 2.55s cubic-bezier(.15,.8,.2,1) forwards}
+#ironIntro .intro-bang{transform-box:fill-box;transform-origin:center;animation:intro-boom .65s 2.62s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes intro-boom{0%{opacity:0;transform:scale(.2) rotate(-12deg)}60%{opacity:1;transform:scale(1.2) rotate(5deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
 #ironIntro .intro-spark{stroke:#ffcf4a;stroke-width:5;stroke-linecap:round;opacity:0;animation:intro-spark .65s 2.6s ease-out forwards}
 #ironIntro .intro-brand{font-size:clamp(29px,8vw,42px);font-weight:1000;letter-spacing:4px;margin-top:-5px;color:#fff;text-shadow:0 3px 20px #4d9eff55}
 #ironIntro .intro-tag{font-size:11px;letter-spacing:3px;color:#8cb9e8}
