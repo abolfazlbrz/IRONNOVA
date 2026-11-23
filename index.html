@@ -356,7 +356,7 @@ async function icSaveRole(){const name=document.getElementById('icName').value.t
 async function icCreateInvite(){const {data:{user}}=await supabaseClient.auth.getUser();if(!user){toast('ابتدا وارد حساب کاربری شو');return}const {data,error}=await supabaseClient.rpc('iron_create_invite');document.getElementById('icInvite').textContent=error?'خطا: '+error.message:'کد دعوت: '+JSON.stringify(data)}
 async function icClaimInvite(){const code=document.getElementById('icCode').value.trim();const {error}=await supabaseClient.rpc('iron_claim_invite',{p_code:code});document.getElementById('icLinks').textContent=error?'خطا: '+error.message:'درخواست اتصال ثبت شد.'}
 async function icPublishPlan(){const student=document.getElementById('icStudent').value.trim(),title=document.getElementById('icPlanTitle').value.trim(),plan={text:document.getElementById('icPlan').value};const {error}=await supabaseClient.rpc('iron_publish_plan',{p_student:student,p_title:title,p_plan:plan});toast(error?'خطا: '+error.message:'برنامه منتشر شد')}
-async function icAddLog(){const {error}=await supabaseClient.rpc('iron_add_student_log',{p_type:document.getElementById('icLogType').value,p_payload:{text:document.getElementById('icLog').value}});toast(error?'خطا: '+error.message:'گزارش ثبت شد')}
+async function icAddLog(){const {data:{user}}=await supabaseClient.auth.getUser();if(!user){toast('ابتدا وارد حساب کاربری شو');return}const {error}=await supabaseClient.rpc('iron_add_student_log',{p_log_type:document.getElementById('icLogType').value,p_payload:{text:document.getElementById('icLog').value}});toast(error?'خطا: '+error.message:'گزارش ثبت شد')}
 
 fillFoodOptions();
 render();
