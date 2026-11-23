@@ -480,13 +480,18 @@ async function requestCoachConnection(id){
  if(error)return toast('درخواست ارسال نشد: '+error.message);
  toast(data||'درخواست ارسال شد');if(!document.getElementById('coachPanelPage').classList.contains('hidden'))loadIronCoachLinks();
 }
+async function setIronCoachStatus(id,status){
+ const {data,error}=await supabaseClient.rpc('iron_admin_set_coach_status_v2',{p_coach_id:id,p_status:status});
+ if(error)return toast('تغییر وضعیت انجام نشد: '+error.message);
+ toast(data||'وضعیت مربی تغییر کرد');await refreshIronCoachRequests();await loadIronCoachAdminManagement();
+}
 async function loadIronCoachAdminManagement(){
  const box=document.getElementById('ironCoachAdminManagement'),out=document.getElementById('ironCoachAdminList');if(!box||!out)return;
  const {data,error}=await supabaseClient.rpc('iron_admin_coaches_overview_v2');
  if(error){out.textContent='خطا: '+error.message;return}
  box.classList.remove('hidden');
  const labels={approved:'تأییدشده',pending:'در انتظار بررسی',rejected:'ردشده',suspended:'تعلیق‌شده'};
- out.innerHTML=data?.length?data.map(x=>'<div class="coach-admin-row"><div class="grow"><b>'+safe(x.full_name||'بدون نام')+'</b><div class="muted">'+safe(x.specialty||'بدون تخصص')+' · '+safe(x.city||'شهر ثبت نشده')+'</div><small class="muted">'+(labels[x.status]||safe(x.status))+' · '+Number(x.experience_years||0)+' سال سابقه · '+Number(x.student_count||0)+' شاگرد · '+Number(x.pending_count||0)+' درخواست</small></div>'+(x.status==='pending'?'<button class="btn small" onclick="reviewIronCoach(\''+x.user_id+'\',true)">تأیید</button><button class="btn secondary small" onclick="reviewIronCoach(\''+x.user_id+'\',false)">رد</button>':'')+'</div>').join(''):'<p class="muted">هنوز حساب مربی‌ای ثبت نشده است.</p>';
+ out.innerHTML=data?.length?data.map(x=>'<div class="coach-admin-row"><div class="grow"><b>'+safe(x.full_name||'بدون نام')+'</b><div class="muted">'+safe(x.specialty||'بدون تخصص')+' · '+safe(x.city||'شهر ثبت نشده')+'</div><small class="muted">'+(labels[x.status]||safe(x.status))+' · '+Number(x.experience_years||0)+' سال سابقه · '+Number(x.student_count||0)+' شاگرد · '+Number(x.pending_count||0)+' درخواست</small></div>'+(x.status==='pending'?'<button class="btn small" onclick="reviewIronCoach(\\''+x.user_id+'\\',true)">تأیید</button><button class="btn secondary small" onclick="reviewIronCoach(\\''+x.user_id+'\\',false)">رد</button>':x.status==='approved'?'<button class="btn secondary small" onclick="setIronCoachStatus(\\''+x.user_id+'\\',\\'suspended\\')">تعلیق</button>':x.status==='suspended'||x.status==='rejected'?'<button class="btn small" onclick="setIronCoachStatus(\\''+x.user_id+'\\',\\'approved\\')">فعال‌سازی</button>':'')+'</div>').join(''):'<p class="muted">هنوز حساب مربی‌ای ثبت نشده است.</p>';
 }
 
 async function icLoadRole(){const {data:{user}}=await supabaseClient.auth.getUser();const select=document.getElementById('icRole'),status=document.getElementById('icStatus');if(!select||!status)return;if(!user){select.disabled=false;status.textContent='برای انتخاب نقش ابتدا وارد حساب شو.';return}const {data,error}=await supabaseClient.from('iron_account_roles_v2').select('role,status').eq('user_id',user.id).maybeSingle();if(error){status.textContent='خطا در دریافت نقش: '+error.message;return}if(data){select.value=data.role;select.disabled=true;const labels={approved:'تأییدشده',pending:'در انتظار تأیید مدیر اصلی',rejected:'ردشده',suspended:'تعلیق‌شده'};status.textContent='نقش ثبت‌شده: '+(data.role==='coach'?'مربی':'شاگرد')+' · '+(labels[data.status]||data.status)+' · نقش تا خروج از حساب قابل تغییر نیست.'}else{select.disabled=false;status.textContent='نقش را فقط یک‌بار برای این حساب انتخاب کن.'}}
