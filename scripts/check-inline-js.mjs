@@ -24,7 +24,16 @@ const required = [
   'intro-arm',
   'anatomy-panel',
   'anatomy-svg',
-  'filterAnatomyMuscle'
+  'filterAnatomyMuscle',
+  'coachSectionExplore',
+  'coachSectionAccount',
+  'coachSectionPlans',
+  'loadCoachDirectory',
+  'requestCoachConnection',
+  'iron_admin_coaches_overview_v2',
+  'introBurst',
+  'icCoachExperience',
+  'muscle-hit.is-selected'
 ];
 for (const token of required) {
   if (!html.includes(token)) throw new Error('Missing expected IRONNOVA feature marker: ' + token);
