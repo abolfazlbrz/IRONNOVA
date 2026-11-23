@@ -122,7 +122,7 @@ body.dark{--bg:#101d32;--surface:#172943;--text:#edf4ff;--muted:#a9bdd5;--soft:#
 <h1>پنل مربی و شاگرد</h1><p class="muted">ارتباط مربی و شاگرد و ارسال برنامه تمرینی. برای همگام‌سازی آنلاین، مهاجرت SQL همراه پروژه باید در Supabase اجرا شود.</p>
 <div class="card"><h2>حساب کاربری</h2><div class="field"><label>نام نمایشی</label><input id="icName" placeholder="نام مربی یا شاگرد"></div><div class="field"><label>نقش</label><select id="icRole"><option value="student">شاگرد</option><option value="coach">مربی</option></select></div><button class="btn" onclick="icSaveRole()">ثبت نقش</button><div id="icStatus" class="muted" style="margin-top:10px"></div></div>
 <div class="card"><h2>دعوت و اتصال</h2><button class="btn" onclick="icCreateInvite()">ساخت کد دعوت (مربی تأییدشده)</button><div id="icInvite" style="margin:10px 0"></div><div class="field"><label>کد دعوت مربی</label><input id="icCode" placeholder="کد دعوت را وارد کن"></div><button class="btn secondary" onclick="icClaimInvite()">ارسال درخواست اتصال</button><div id="icLinks" class="muted" style="margin-top:12px"></div></div>
-<div class="card"><h2>ساخت و انتشار برنامه</h2><div class="field"><label>شناسه حساب شاگرد (UUID)</label><input id="icStudent" placeholder="شناسه کاربری شاگرد"></div><div class="field"><label>عنوان برنامه</label><input id="icPlanTitle" value="برنامه تمرینی جدید"></div><div class="field"><label>محتوای برنامه</label><textarea id="icPlan" rows="5" placeholder="نام حرکت، ست و تکرار هر خط"></textarea></div><button class="btn" onclick="icPublishPlan()">انتشار برنامه</button></div>
+<div class="card"><h2>ساخت و انتشار برنامه</h2><div class="field"><label>شناسه حساب شاگرد (UUID)</label><input id="icStudent" placeholder="شناسه کاربری شاگرد"></div><div class="field"><label>عنوان برنامه</label><input id="icPlanTitle" value="برنامه تمرینی جدید"></div><div class="field"><label>محتوای برنامه</label><p class="muted">هر حرکت در یک خط؛ نام حرکت | ست | تکرار | استراحت (ثانیه). برای چند روز، تیتر «روز ۱» و «روز ۲» بنویس. نام حرکت باید در بانک حرکات باشد.</p><textarea id="icPlan" rows="7" placeholder="روز ۱&#10;پرس سینه دمبل | ۳ | ۱۰ | ۹۰&#10;لت سیم‌کش از جلو | ۳ | ۱۲ | ۶۰&#10;روز ۲&#10;اسکوات جام | ۳ | ۱۰ | ۹۰"></textarea></div><button class="btn" onclick="icPublishPlan()">انتشار برنامه</button></div>
 <div class="card"><h2>ثبت گزارش شاگرد</h2><select id="icLogType"><option value="workout">تمرین</option><option value="nutrition">تغذیه</option><option value="weight">وزن</option><option value="sleep">خواب</option><option value="note">یادداشت</option></select><textarea id="icLog" rows="3" placeholder="گزارش امروز"></textarea><button class="btn" onclick="icAddLog()">ثبت گزارش</button></div>
 </section>
 <section id="foodLibraryPage" class="hidden"><h1>بانک غذا و کالری</h1><p class="muted">مقادیر کالری تقریبی‌اند. واحد و مقدار را انتخاب کن و به دفتر تغذیه اضافه کن.</p><div class="card"><input id="foodSearch" placeholder="جست‌وجوی غذا..." oninput="renderFoodLibrary()"><div id="foodItems"></div></div></section>
@@ -355,7 +355,32 @@ function shopCheckout(){const c=JSON.parse(localStorage.getItem('ironShopCart')|
 async function icSaveRole(){const name=document.getElementById('icName').value.trim(),role=document.getElementById('icRole').value;const {data:{user}}=await supabaseClient.auth.getUser();if(!user){document.getElementById('icStatus').textContent='ابتدا از بخش پروفایل وارد حساب کاربری شو.';return}const {error}=await supabaseClient.rpc('iron_set_role',{p_role:role,p_display_name:name});document.getElementById('icStatus').textContent=error?'خطا: '+error.message:'نقش ثبت شد.'}
 async function icCreateInvite(){const {data:{user}}=await supabaseClient.auth.getUser();if(!user){toast('ابتدا وارد حساب کاربری شو');return}const {data,error}=await supabaseClient.rpc('iron_create_invite');document.getElementById('icInvite').textContent=error?'خطا: '+error.message:'کد دعوت: '+JSON.stringify(data)}
 async function icClaimInvite(){const code=document.getElementById('icCode').value.trim();const {error}=await supabaseClient.rpc('iron_claim_invite',{p_code:code});document.getElementById('icLinks').textContent=error?'خطا: '+error.message:'درخواست اتصال ثبت شد.'}
-async function icPublishPlan(){const student=document.getElementById('icStudent').value.trim(),title=document.getElementById('icPlanTitle').value.trim(),plan={text:document.getElementById('icPlan').value};const {error}=await supabaseClient.rpc('iron_publish_plan',{p_student:student,p_title:title,p_plan:plan});toast(error?'خطا: '+error.message:'برنامه منتشر شد')}
+async function icPublishPlan(){
+ const student=document.getElementById('icStudent').value.trim();
+ const title=document.getElementById('icPlanTitle').value.trim();
+ const raw=document.getElementById('icPlan').value.split(/\\r?\\n/).map(x=>x.trim()).filter(Boolean);
+ if(!student||!title||!raw.length){toast('شناسه شاگرد، عنوان و محتوای برنامه را کامل کن');return}
+ const days=[];let current=null;
+ const normalizeDigits=s=>s.replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+ for(const line of raw){
+   if(/^روز\\s*[۰-۹0-9٠-٩]+\\s*:?$/i.test(line)){
+     current={title:line.replace(/:$/,'').trim(),notes:'',exercises:[]};days.push(current);continue;
+   }
+   if(!current){current={title:'روز ۱',notes:'',exercises:[]};days.push(current)}
+   const parts=line.split('|').map(x=>x.trim());
+   const sets=Number(normalizeDigits(parts[1]||'3'));
+   const reps=normalizeDigits(parts[2]||'8 تا 12');
+   const rest=Number(normalizeDigits(parts[3]||'60'));
+   if(!parts[0])continue;
+   current.exercises.push({name:parts[0],sets:Number.isFinite(sets)?sets:3,reps,rest_seconds:Number.isFinite(rest)?rest:60});
+ }
+ const validDays=days.filter(d=>d.exercises.length);
+ if(!validDays.length){toast('برای هر روز حداقل یک حرکت وارد کن');return}
+ const {data,error}=await supabaseClient.rpc('iron_create_coach_plan_v2',{p_student_id:student,p_title:title,p_days:validDays});
+ if(error){toast('خطا: '+error.message);return}
+ toast('برنامه با موفقیت برای شاگرد منتشر شد');
+ document.getElementById('icPlan').value='';
+}
 async function icAddLog(){const {data:{user}}=await supabaseClient.auth.getUser();if(!user){toast('ابتدا وارد حساب کاربری شو');return}const {error}=await supabaseClient.rpc('iron_add_student_log',{p_log_type:document.getElementById('icLogType').value,p_payload:{text:document.getElementById('icLog').value}});toast(error?'خطا: '+error.message:'گزارش ثبت شد')}
 
 fillFoodOptions();
