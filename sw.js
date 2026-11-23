@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ironnova-v14-intro-splash';
+const CACHE_NAME = 'ironnova-v15-muscle-atlas';
 const APP_SHELL = ['./', './index.html', './manifest.webmanifest', './assets/icon-192.png', './assets/icon-512.png', './assets/icon-maskable-512.png', './assets/ironnova-icon.svg'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)).then(() => self.skipWaiting()));
