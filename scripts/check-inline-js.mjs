@@ -8,7 +8,7 @@ const scripts = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)]
 
 if (scripts.length === 0) throw new Error('No inline JavaScript found in index.html');
 for (let i = 0; i < scripts.length; i += 1) {
-  new vm.Script(scripts[i], { filename: \`index.html:inline-script-\${i + 1}\` });
+  new vm.Script(scripts[i], { filename: 'index.html:inline-script-' + (i + 1) });
 }
 
 const required = [
@@ -20,6 +20,6 @@ const required = [
   'ironFoods'
 ];
 for (const token of required) {
-  if (!html.includes(token)) throw new Error(\`Missing expected IRONNOVA feature marker: \${token}\`);
+  if (!html.includes(token)) throw new Error('Missing expected IRONNOVA feature marker: ' + token);
 }
-console.log(\`Validated \${scripts.length} inline JavaScript block(s) and \${required.length} feature markers.\`);
+console.log('Validated ' + scripts.length + ' inline JavaScript block(s) and ' + required.length + ' feature markers.');
