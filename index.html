@@ -139,6 +139,7 @@ body.dark{--bg:#101d32;--surface:#172943;--text:#edf4ff;--muted:#a9bdd5;--soft:#
 <div class="toast" id="toast"></div>
 <div class="detail-backdrop" id="detailBackdrop" onclick="if(event.target===this)closeExerciseDetail()"><article class="detail"><button class="detail-close" onclick="closeExerciseDetail()">بستن ✕</button><div id="detailContent"></div></article></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script>
 const SUPABASE_URL='https://hcdcllknzxllyuptlwpy.supabase.co';
 const SUPABASE_KEY='sb_publishable_k8bBQvzidEOcwtUBb_YU3A_pUN6PG3u';
@@ -464,7 +465,7 @@ async function icSaveRole(){
  document.getElementById('icStatus').textContent=current?'نقش حساب: '+(current.role==='coach'?'مربی':'شاگرد')+' · وضعیت: '+(status[current.status]||current.status):'درخواست نقش ثبت شد.';
  await loadIronAdminPanel();await loadIronCoachProfile();
 }
-async function icCreateInvite(){const {data:{user}}=await supabaseClient.auth.getUser();if(!user){toast('ابتدا وارد حساب کاربری شو');return}const {data,error}=await supabaseClient.rpc('iron_create_invite');document.getElementById('icInvite').textContent=error?'خطا: '+error.message:'کد دعوت: '+JSON.stringify(data)}
+async function icCreateInvite(){const {data:{user}}=await supabaseClient.auth.getUser();if(!user){toast('ابتدا وارد حساب کاربری شو');return}const {data,error}=await supabaseClient.rpc('iron_create_invite');const out=document.getElementById('icInvite');if(error){out.textContent='خطا: '+error.message;return}const code=String(data||'').trim();if(!/^[0-9a-f-]{36}$/i.test(code)){out.textContent='کد دعوت دریافت نشد: '+safe(code);return}out.innerHTML=`<div class="card"><b>کد دعوت مربی</b><p style="direction:ltr;word-break:break-all">${safe(code)}</p><div id="icInviteQr" style="display:grid;place-items:center;background:white;padding:12px;border-radius:12px;max-width:220px;margin:auto"></div><small class="muted">شاگرد می‌تواند این QR را با دوربین گوشی اسکن کند و کد را در بخش دعوت وارد کند.</small></div>`;if(window.QRCode)new QRCode(document.getElementById('icInviteQr'),{text:code,width:190,height:190,colorDark:'#10243d',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});else out.insertAdjacentHTML('beforeend','<p class="muted">ساخت تصویر QR به اتصال اینترنت نیاز دارد؛ کد بالا را دستی کپی کن.</p>')}
 async function icClaimInvite(){const code=document.getElementById('icCode').value.trim();if(!code){toast('کد دعوت را وارد کن');return}const {error}=await supabaseClient.rpc('iron_claim_invite',{p_code:code});if(error){document.getElementById('icLinks').textContent='خطا: '+error.message;return}document.getElementById('icLinks').textContent='درخواست اتصال ثبت شد.';await loadIronCoachLinks()}
 async function icPublishPlan(){
  const student=document.getElementById('icStudent').value.trim();
