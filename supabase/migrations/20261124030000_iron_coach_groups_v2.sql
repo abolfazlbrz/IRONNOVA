@@ -24,20 +24,35 @@ create index if not exists idx_iron_group_messages_created_v2 on public.iron_coa
 alter table public.iron_coach_groups_v2 enable row level security;
 alter table public.iron_coach_group_members_v2 enable row level security;
 alter table public.iron_coach_group_messages_v2 enable row level security;
+create or replace function public.iron_is_group_member_v2(p_group_id uuid)
+returns boolean language sql stable security definer set search_path=''
+as $function$
+ select auth.uid() is not null and exists(
+  select 1 from public.iron_coach_group_members_v2 m where m.group_id=p_group_id and m.student_id=auth.uid()
+ );
+$function$;
+create or replace function public.iron_is_group_coach_v2(p_group_id uuid)
+returns boolean language sql stable security definer set search_path=''
+as $function$
+ select auth.uid() is not null and exists(
+  select 1 from public.iron_coach_groups_v2 g where g.id=p_group_id and g.coach_id=auth.uid()
+ );
+$function$;
+revoke all on function public.iron_is_group_member_v2(uuid),public.iron_is_group_coach_v2(uuid) from public,anon;
+grant execute on function public.iron_is_group_member_v2(uuid),public.iron_is_group_coach_v2(uuid) to authenticated;
+
 drop policy if exists iron_coach_groups_select_member_v2 on public.iron_coach_groups_v2;
 create policy iron_coach_groups_select_member_v2 on public.iron_coach_groups_v2 for select to authenticated
-using(coach_id=auth.uid() or exists(select 1 from public.iron_coach_group_members_v2 m where m.group_id=iron_coach_groups_v2.id and m.student_id=auth.uid()));
+using(coach_id=auth.uid() or public.iron_is_group_member_v2(id));
 drop policy if exists iron_group_members_select_v2 on public.iron_coach_group_members_v2;
 create policy iron_group_members_select_v2 on public.iron_coach_group_members_v2 for select to authenticated
-using(student_id=auth.uid() or exists(select 1 from public.iron_coach_groups_v2 g where g.id=iron_coach_group_members_v2.group_id and g.coach_id=auth.uid()));
+using(student_id=auth.uid() or public.iron_is_group_coach_v2(group_id));
 drop policy if exists iron_group_messages_select_v2 on public.iron_coach_group_messages_v2;
 create policy iron_group_messages_select_v2 on public.iron_coach_group_messages_v2 for select to authenticated
-using(exists(select 1 from public.iron_coach_groups_v2 g where g.id=iron_coach_group_messages_v2.group_id and
- (g.coach_id=auth.uid() or exists(select 1 from public.iron_coach_group_members_v2 m where m.group_id=g.id and m.student_id=auth.uid()))));
+using(public.iron_is_group_coach_v2(group_id) or public.iron_is_group_member_v2(group_id));
 drop policy if exists iron_group_messages_insert_v2 on public.iron_coach_group_messages_v2;
 create policy iron_group_messages_insert_v2 on public.iron_coach_group_messages_v2 for insert to authenticated
-with check(sender_id=auth.uid() and exists(select 1 from public.iron_coach_groups_v2 g where g.id=iron_coach_group_messages_v2.group_id and
- (g.coach_id=auth.uid() or exists(select 1 from public.iron_coach_group_members_v2 m where m.group_id=g.id and m.student_id=auth.uid()))));
+with check(sender_id=auth.uid() and (public.iron_is_group_coach_v2(group_id) or public.iron_is_group_member_v2(group_id)));
 revoke all on public.iron_coach_groups_v2,public.iron_coach_group_members_v2,public.iron_coach_group_messages_v2 from anon,authenticated;
 grant select on public.iron_coach_groups_v2,public.iron_coach_group_members_v2 to authenticated;
 grant select,insert on public.iron_coach_group_messages_v2 to authenticated;
