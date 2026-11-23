@@ -14,6 +14,8 @@ create table if not exists public.iron_messages_v2 (
  constraint iron_messages_v2_sender_check check (sender_id = coach_id or sender_id = student_id)
 );
 create index if not exists idx_iron_messages_pair_created_v2 on public.iron_messages_v2(coach_id,student_id,created_at desc);
+create index if not exists idx_iron_messages_sender_v2 on public.iron_messages_v2(sender_id);
+create index if not exists idx_iron_messages_student_created_v2 on public.iron_messages_v2(student_id,created_at desc);
 alter table public.iron_messages_v2 enable row level security;
 drop policy if exists iron_messages_select_linked_v2 on public.iron_messages_v2;
 create policy iron_messages_select_linked_v2 on public.iron_messages_v2 for select to authenticated
@@ -112,18 +114,20 @@ returns table(order_id uuid,total_toman bigint)
 language plpgsql security definer set search_path=''
 as $function$
 declare
- v_uid uuid := auth.uid(); v_item jsonb; v_product_id uuid; v_qty integer;
- v_product record; v_total bigint := 0; v_items jsonb := '[]'::jsonb;
- v_shipping jsonb;
+ v_uid uuid:=auth.uid(); v_item jsonb; v_product_id uuid; v_qty integer;
+ v_product record; v_total bigint:=0; v_items jsonb:='[]'::jsonb; v_shipping jsonb;
 begin
  if v_uid is null then raise exception 'ابتدا وارد حساب کاربری شوید'; end if;
- if jsonb_typeof(p_items)<>'array' or jsonb_array_length(p_items) not between 1 and 50 then raise exception 'سبد خرید معتبر نیست'; end if;
- if jsonb_typeof(p_shipping)<>'object' or length(trim(coalesce(p_shipping->>'name','')))<3
- or length(trim(coalesce(p_shipping->>'phone','')))<8 or length(trim(coalesce(p_shipping->>'address','')))<12 then raise exception 'اطلاعات ارسال کامل نیست'; end if;
+ if p_items is null or jsonb_typeof(p_items) is distinct from 'array'
+    or jsonb_array_length(p_items) not between 1 and 50 then raise exception 'سبد خرید معتبر نیست'; end if;
+ if p_shipping is null or jsonb_typeof(p_shipping) is distinct from 'object'
+    or length(trim(coalesce(p_shipping->>'name',''))) < 3
+    or length(trim(coalesce(p_shipping->>'phone',''))) < 8
+    or length(trim(coalesce(p_shipping->>'address',''))) < 12 then raise exception 'اطلاعات ارسال کامل نیست'; end if;
  for v_item in select value from jsonb_array_elements(p_items) loop
   begin v_product_id := (v_item->>'product_id')::uuid; v_qty := (v_item->>'quantity')::integer;
   exception when others then raise exception 'شناسه یا تعداد محصول معتبر نیست'; end;
-  if v_qty<1 or v_qty>20 then raise exception 'تعداد محصول معتبر نیست'; end if;
+  if v_product_id is null or v_qty is null or v_qty<1 or v_qty>20 then raise exception 'تعداد یا شناسه محصول معتبر نیست'; end if;
   select id,name,price_toman,stock,is_active into v_product from public.iron_store_products_v2 where id=v_product_id for update;
   if not found or not v_product.is_active then raise exception 'محصول در دسترس نیست'; end if;
   if v_product.stock<v_qty then raise exception 'موجودی محصول % کافی نیست',v_product.name; end if;
@@ -132,8 +136,8 @@ begin
   v_items:=v_items||jsonb_build_array(jsonb_build_object('product_id',v_product.id,'name',v_product.name,'unit_price_toman',v_product.price_toman,'quantity',v_qty));
  end loop;
  v_shipping:=jsonb_build_object('name',trim(p_shipping->>'name'),'phone',trim(p_shipping->>'phone'),'address',trim(p_shipping->>'address'));
- return query insert into public.iron_store_orders_v2(user_id,items,total_toman,shipping_info,status)
- values(v_uid,v_items,v_total,v_shipping,'pending') returning id,total_toman;
+ return query insert into public.iron_store_orders_v2 as inserted(user_id,items,total_toman,shipping_info,status)
+ values(v_uid,v_items,v_total,v_shipping,'pending') returning inserted.id,inserted.total_toman;
 end;
 $function$;
 revoke all on function public.iron_place_order_v2(jsonb,jsonb) from public,anon;
