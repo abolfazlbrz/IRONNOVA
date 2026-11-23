@@ -57,14 +57,17 @@ DECLARE
 BEGIN
   IF auth.uid() IS NULL THEN RAISE EXCEPTION 'ابتدا وارد حساب کاربری شوید'; END IF;
   IF p_title IS NULL OR length(trim(p_title)) = 0 THEN RAISE EXCEPTION 'عنوان برنامه الزامی است'; END IF;
-  IF p_student_id IS NULL OR NOT public.iron_is_linked_coach(p_student_id) THEN
+  IF p_student_id IS NULL OR NOT COALESCE(public.iron_is_linked_coach(p_student_id), false) THEN
     RAISE EXCEPTION 'شاگرد متصل و تأییدشده پیدا نشد';
   END IF;
   IF NOT EXISTS (
     SELECT 1 FROM public.iron_account_roles_v2
     WHERE user_id = auth.uid() AND role = 'coach' AND status = 'approved'
   ) THEN RAISE EXCEPTION 'حساب مربی تأییدشده لازم است'; END IF;
-  IF jsonb_typeof(p_days) <> 'array' OR jsonb_array_length(p_days) < 1 OR jsonb_array_length(p_days) > 10 THEN
+  IF p_days IS NULL OR jsonb_typeof(p_days) IS DISTINCT FROM 'array' THEN
+    RAISE EXCEPTION 'ساختار روزهای برنامه معتبر نیست';
+  END IF;
+  IF jsonb_array_length(p_days) < 1 OR jsonb_array_length(p_days) > 10 THEN
     RAISE EXCEPTION 'برنامه باید بین ۱ تا ۱۰ روز داشته باشد';
   END IF;
 
@@ -74,8 +77,12 @@ BEGIN
 
   FOR v_day IN SELECT value FROM jsonb_array_elements(p_days) LOOP
     v_day_number := v_day_number + 1;
-    IF jsonb_typeof(v_day->'exercises') <> 'array'
-       OR jsonb_array_length(v_day->'exercises') < 1
+    IF jsonb_typeof(v_day) IS DISTINCT FROM 'object'
+       OR v_day->'exercises' IS NULL
+       OR jsonb_typeof(v_day->'exercises') IS DISTINCT FROM 'array' THEN
+      RAISE EXCEPTION 'ساختار روز % معتبر نیست', v_day_number;
+    END IF;
+    IF jsonb_array_length(v_day->'exercises') < 1
        OR jsonb_array_length(v_day->'exercises') > 30 THEN
       RAISE EXCEPTION 'روز % باید حداقل یک و حداکثر ۳۰ حرکت داشته باشد', v_day_number;
     END IF;
@@ -98,7 +105,9 @@ BEGIN
       WHERE is_active = true AND lower(name) = lower(v_name)
       ORDER BY id LIMIT 1;
 
-      IF v_exercise_id IS NULL THEN RAISE EXCEPTION 'حرکت «%» در بانک حرکات فعال پیدا نشد', v_name; END IF;
+      IF v_exercise_id IS NULL THEN
+        RAISE EXCEPTION 'حرکت «%» در بانک حرکات فعال پیدا نشد', v_name;
+      END IF;
 
       INSERT INTO public.iron_workout_day_exercises_v2
         (plan_day_id, exercise_id, order_number, sets, reps, rest_seconds)
