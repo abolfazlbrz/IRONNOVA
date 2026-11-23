@@ -17,6 +17,8 @@ const required = [
   'iron_store_orders_v2',
   'iron_place_order_v2',
   'iron_submit_order_receipt_v2',
+  'iron_coach_group_messages_v2',
+  'iron_create_group_v2',
   'ironFoods'
 ];
 for (const token of required) {
