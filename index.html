@@ -358,12 +358,12 @@ async function icClaimInvite(){const code=document.getElementById('icCode').valu
 async function icPublishPlan(){
  const student=document.getElementById('icStudent').value.trim();
  const title=document.getElementById('icPlanTitle').value.trim();
- const raw=document.getElementById('icPlan').value.split(/\\r?\\n/).map(x=>x.trim()).filter(Boolean);
+ const raw=document.getElementById('icPlan').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
  if(!student||!title||!raw.length){toast('شناسه شاگرد، عنوان و محتوای برنامه را کامل کن');return}
  const days=[];let current=null;
  const normalizeDigits=s=>s.replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d));
  for(const line of raw){
-   if(/^روز\\s*[۰-۹0-9٠-٩]+\\s*:?$/i.test(line)){
+   if(/^روز\s*[۰-۹0-9٠-٩]+\s*:?$/i.test(line)){
      current={title:line.replace(/:$/,'').trim(),notes:'',exercises:[]};days.push(current);continue;
    }
    if(!current){current={title:'روز ۱',notes:'',exercises:[]};days.push(current)}
