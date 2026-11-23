@@ -19,7 +19,12 @@ const required = [
   'iron_submit_order_receipt_v2',
   'iron_coach_group_messages_v2',
   'iron_create_group_v2',
-  'ironFoods'
+  'ironFoods',
+  'ironIntro',
+  'intro-arm',
+  'anatomy-panel',
+  'anatomy-svg',
+  'filterAnatomyMuscle'
 ];
 for (const token of required) {
   if (!html.includes(token)) throw new Error('Missing expected IRONNOVA feature marker: ' + token);
