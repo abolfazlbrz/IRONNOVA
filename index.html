@@ -381,7 +381,7 @@ function renderNutrition(){
  sendDailyNutritionDigest();
 }
 
-){const wrap=document.getElementById('coachLimitDetailsWrap');const active=document.getElementById('coachLimit').value!=='none';wrap.classList.toggle('hidden',!active);if(!active)document.getElementById('coachLimitDetails').value=''}
+function toggleCoachLimitDetails(){const wrap=document.getElementById('coachLimitDetailsWrap');const active=document.getElementById('coachLimit').value!=='none';wrap.classList.toggle('hidden',!active);if(!active)document.getElementById('coachLimitDetails').value=''}
 function buildSmartPlan(){
  const level=document.getElementById('coachLevel').value,goal=document.getElementById('coachGoal').value,days=+document.getElementById('coachDays').value,h=+document.getElementById('coachHeight').value,w=+(document.getElementById('coachWeight').value||data.weight),age=+document.getElementById('coachAge').value,place=document.getElementById('coachPlace').value,limit=document.getElementById('coachLimit').value,limitDetails=document.getElementById('coachLimitDetails').value.trim();
  if(limit!=='none'&&limitDetails.length<3){toast('لطفاً نوع و توضیح محدودیت جسمی را کامل بنویس');return}
