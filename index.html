@@ -836,7 +836,7 @@ async function refreshIronCoachOverview(){
  const labels={pending:'در انتظار تأیید',approved:'فعال و تأییدشده',rejected:'ردشده',suspended:'تعلیق‌شده'};
  out.innerHTML=data.map(c=>{
   const id=String(c.user_id||'');if(!/^[0-9a-f-]{36}$/i.test(id))return '';
-  const actions=c.status==='approved'?'<button class="btn secondary small" onclick="setCoachAccountStatus(\\''+id+'\\',\\'suspended\\')">تعلیق مربی</button>':c.status==='pending'?'<button class="btn small" onclick="issueCoachVerificationCode(\\''+id+'\\')">صدور کد تأیید</button>':'<button class="btn small" onclick="resetCoachForVerification(\\''+id+'\\')">بازگشت به انتظار تأیید</button>';
+  const actions=c.status==='approved'?'<button class="btn secondary small" onclick="setCoachAccountStatus(\''+id+'\',\'suspended\')">تعلیق مربی</button>':c.status==='pending'?'<button class="btn small" onclick="issueCoachVerificationCode(\''+id+'\')">صدور کد تأیید</button>':'<button class="btn small" onclick="resetCoachForVerification(\''+id+'\')">بازگشت به انتظار تأیید</button>';
   return '<div class="card" style="margin:9px 0"><div class="row between"><b>'+safe(c.full_name||'مربی بدون نام')+'</b><span class="pill">'+(labels[c.status]||safe(c.status))+'</span></div><div class="muted">'+safe(c.specialty||'بدون تخصص')+' · '+safe(c.city||'بدون شهر')+' · '+Number(c.experience_years||0)+' سال سابقه</div><div class="muted">شاگرد تأییدشده: '+Number(c.student_count||0)+' · درخواست‌های در انتظار: '+Number(c.pending_count||0)+'</div><div class="row" style="margin-top:8px">'+actions+'<button class="btn secondary small" onclick="setCoachAccountStatus(\''+id+'\',\'rejected\')">رد درخواست</button></div></div>';
  }).join('');
 }
