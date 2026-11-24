@@ -9,33 +9,29 @@ ASSETS = ROOT / "assets"
 def make_icon(size, transparent=False):
     scale = 3
     n = size * scale
-    bg = (0, 0, 0, 0) if transparent else (7, 16, 9, 255)
-    image = Image.new("RGBA", (n, n), bg)
-    if not transparent:
-        halo = Image.new("RGBA", (n, n), (0, 0, 0, 0))
-        hd = ImageDraw.Draw(halo)
-        hd.ellipse((n*.13, n*.13, n*.87, n*.87), fill=(76, 255, 38, 42))
-        halo = halo.filter(ImageFilter.GaussianBlur(n*.10))
-        image = Image.alpha_composite(image, halo)
+    image = Image.new("RGBA", (n, n), (0, 0, 0, 0) if transparent else (255, 255, 255, 255))
     draw = ImageDraw.Draw(image)
-    if not transparent:
-        pad = n*.035
-        draw.rounded_rectangle((pad, pad, n-pad, n-pad), radius=n*.22,
-                               fill=(7, 16, 9, 255), outline=(88, 255, 45, 255),
-                               width=max(2, int(n*.018)))
-    draw.ellipse((n*.18, n*.18, n*.82, n*.82),
-                 outline=(50, 155, 42, 210), width=max(2, int(n*.012)))
-    triangle = [(n*.50, n*.25), (n*.235, n*.72), (n*.765, n*.72)]
-    draw.line(triangle + [triangle[0]], fill=(88, 255, 45, 255),
-              width=max(4, int(n*.034)), joint="curve")
-    y = n*.50
-    draw.rounded_rectangle((n*.29, y-n*.035, n*.71, y+n*.035),
-                           radius=n*.025, fill=(239, 247, 239, 255))
-    for x0, x1 in ((n*.225, n*.325), (n*.675, n*.775)):
-        draw.rounded_rectangle((x0, y-n*.105, x1, y+n*.105),
-                               radius=n*.025, fill=(239, 247, 239, 255))
-    draw.rounded_rectangle((n*.46, y-n*.055, n*.54, y+n*.055),
-                           radius=n*.018, fill=(88, 255, 45, 255))
+    # Clean white app tile with the original-style blue dumbbell mark.
+    blue = (35, 126, 224, 255)
+    dark_blue = (24, 91, 177, 255)
+    y = n * 0.50
+    bar_h = n * 0.085
+    bar_x1, bar_x2 = n * 0.29, n * 0.71
+    draw.rounded_rectangle((bar_x1, y-bar_h/2, bar_x2, y+bar_h/2),
+                           radius=n*0.035, fill=blue)
+    # Weighted end plates, with a subtle darker inner edge for depth.
+    for cx, direction in ((n*0.25, -1), (n*0.75, 1)):
+        w, h = n*0.105, n*0.34
+        draw.rounded_rectangle((cx-w/2, y-h/2, cx+w/2, y+h/2),
+                               radius=n*0.035, fill=blue)
+        inner_x = cx + direction*n*0.025
+        draw.rounded_rectangle((inner_x-n*0.012, y-h*0.34,
+                                inner_x+n*0.012, y+h*0.34),
+                               radius=n*0.01, fill=dark_blue)
+    # Slightly wider collars where the bar meets the plates.
+    for cx in (n*0.34, n*0.66):
+        draw.rounded_rectangle((cx-n*0.025, y-n*0.105, cx+n*0.025, y+n*0.105),
+                               radius=n*0.012, fill=dark_blue)
     return image.resize((size, size), Image.Resampling.LANCZOS)
 
 def main():
@@ -67,7 +63,7 @@ def main():
         (values / "ic_launcher_background.xml").write_text(
             '<resources><color name="ic_launcher_background">#071009</color></resources>',
             encoding="utf-8")
-    print("IRONNOVA neon-green icons generated.")
+    print("IRONNOVA blue dumbbell icons generated.")
 
 if __name__ == "__main__":
     main()
