@@ -828,6 +828,13 @@ async function seekNativeMusic(position){const plugin=getNativeAudioPlugin();if(
 async function nextNativeTrack(){if(nativeMusicIndex<nativeMusicTracks.length-1)await playNativeTrack(nativeMusicIndex+1);else if(nativeMusicTracks.length)await playNativeTrack(0)}
 async function previousNativeTrack(){if(nativeMusicIndex>0)await playNativeTrack(nativeMusicIndex-1);else if(nativeMusicTracks.length)await playNativeTrack(nativeMusicTracks.length-1)}
 async function stopNativeMusic(){const plugin=getNativeAudioPlugin();if(!plugin)return;try{await plugin.stop();if(nativeMusicTimer)clearInterval(nativeMusicTimer);nativeMusicTimer=null;document.getElementById('nativeMusicToggle').textContent='پخش';setIronMusicStatus('پخش بومی متوقف شد.')}catch(e){toast(e?.message||'توقف پخش ناموفق بود')}}
+function formatIronTime(seconds){if(!Number.isFinite(seconds)||seconds<0)return '00:00';const m=Math.floor(seconds/60),s=Math.floor(seconds%60);return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')}
+function syncIronWebMusicUI(){const a=document.getElementById('musicAudio');if(!a)return;const seek=document.getElementById('webMusicSeek'),cur=document.getElementById('webMusicCurrent'),dur=document.getElementById('webMusicDuration'),play=document.getElementById('webMusicPlay');if(seek&&Number.isFinite(a.duration)&&a.duration>0)seek.value=Math.round(a.currentTime/a.duration*1000);if(cur)cur.textContent=formatIronTime(a.currentTime);if(dur)dur.textContent=formatIronTime(a.duration);if(play)play.textContent=a.paused?'▶':'Ⅱ';const title=document.getElementById('webMusicTitle'),sub=document.getElementById('webMusicSubtitle'),file=ironMusicFiles[ironCurrentTrack];if(title&&file)title.textContent=file.name;if(sub&&file)sub.textContent='IRON MUSIC · LOCAL LIBRARY'}
+function toggleIronWebMusic(){const a=document.getElementById('musicAudio');if(!a)return;if(a.paused){if(ironCurrentTrack<0&&ironMusicFiles.length)playIronTrack(0);else a.play().catch(()=>setIronMusicStatus('پخش انجام نشد؛ فرمت MP3 یا AAC را امتحان کن.',true))}else a.pause();syncIronWebMusicUI()}
+function previousIronTrack(){if(!ironMusicFiles.length)return toast('ابتدا آهنگ انتخاب کن');playIronTrack((ironCurrentTrack-1+ironMusicFiles.length)%ironMusicFiles.length)}
+function nextIronTrack(){if(!ironMusicFiles.length)return toast('ابتدا آهنگ انتخاب کن');playIronTrack((ironCurrentTrack+1)%ironMusicFiles.length)}
+function seekIronWebMusic(value){const a=document.getElementById('musicAudio');if(a&&Number.isFinite(a.duration)&&a.duration>0)a.currentTime=(Number(value)/1000)*a.duration}
+function setIronWebVolume(value){const a=document.getElementById('musicAudio');if(a)a.volume=Math.max(0,Math.min(1,Number(value)/100))}
 function loadMusicFiles(e){
  const selected=[...(e?.target?.files||[])];
  const valid=selected.filter(ironAudioFileSupported),rejected=selected.length-valid.length;
@@ -843,7 +850,7 @@ function loadMusicFiles(e){
  }
  ironMusicFiles=valid;
  ironAudioUrls=valid.map(file=>URL.createObjectURL(file));
- if(list)list.innerHTML=valid.map((file,i)=>'<button class="plan-option" style="width:100%;margin-top:8px" onclick="playIronTrack('+i+')">'+safe(file.name)+' · '+(file.size/1048576).toFixed(1)+' MB</button>').join('');
+ if(list)list.innerHTML=valid.map((file,i)=>'<button class="music-track" onclick="playIronTrack('+i+')"><span class="track-number">'+String(i+1).padStart(2,'0')+'</span><span class="track-name">'+safe(file.name)+'</span><span class="track-size">'+(file.size/1048576).toFixed(1)+' MB</span></button>').join('');
  setIronMusicStatus(valid.length+' آهنگ آماده است. برای پخش، روی نام آهنگ بزن.'+(rejected?' '+rejected+' فایل غیرصوتی یا ناسازگار کنار گذاشته شد.':''));
 }
 function restoreMusicAudio(){const a=document.getElementById('musicAudio'),home=document.getElementById('musicAudioHome'),panel=document.getElementById('nativeMusicPanel'),music=document.getElementById('musicPage');if(a&&home&&a.parentElement!==home)home.appendChild(a);if(panel&&music&&panel.parentElement!==music)music.appendChild(panel)}
@@ -852,11 +859,13 @@ function playIronTrack(i){
  const a=document.getElementById('musicAudio'),file=ironMusicFiles[i];
  if(!a||!ironAudioUrls[i]||!file)return toast('ابتدا یک فایل موسیقی انتخاب کن');
  ironCurrentTrack=i;
+ const title=document.getElementById('webMusicTitle');if(title)title.textContent=file.name;
+ document.querySelectorAll('.music-track').forEach((el,index)=>el.classList.toggle('active',index===i));
  a.pause();a.onerror=null;a.removeAttribute('src');a.src=ironAudioUrls[i];a.load();a.currentTime=0;
  setIronMusicStatus('در حال آماده‌سازی پخش: '+file.name);
  const playPromise=a.play();
  if(playPromise&&typeof playPromise.then==='function'){
-  playPromise.then(()=>setIronMusicStatus('در حال پخش: '+file.name)).catch(err=>{
+  playPromise.then(()=>{setIronMusicStatus('در حال پخش: '+file.name);syncIronWebMusicUI()}).catch(err=>{
    console.warn('IRONNOVA audio playback:',err);
    if(err?.name==='NotAllowedError')setIronMusicStatus('مرورگر اجازه پخش خودکار نداد. دکمه پخش روی نوار صوتی را لمس کن.',true);
    else setIronMusicStatus('پخش این فایل انجام نشد. ممکن است کدک آن روی گوشی پشتیبانی نشود؛ MP3 یا AAC را امتحان کن.',true);
@@ -873,6 +882,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   initNativeAudio();
  const a=document.getElementById('musicAudio');if(!a)return;
  a.addEventListener('playing',()=>{const f=ironMusicFiles[ironCurrentTrack];if(f)setIronMusicStatus('در حال پخش: '+f.name)});
+  a.addEventListener('timeupdate',syncIronWebMusicUI);a.addEventListener('durationchange',syncIronWebMusicUI);a.addEventListener('play',syncIronWebMusicUI);a.addEventListener('pause',syncIronWebMusicUI);a.addEventListener('ended',()=>{if(ironCurrentTrack<ironMusicFiles.length-1)nextIronTrack();else syncIronWebMusicUI()});const vol=document.getElementById('webMusicVolume');if(vol)a.volume=Number(vol.value)/100;
  a.addEventListener('pause',()=>{if(!a.ended&&ironCurrentTrack>=0)setIronMusicStatus('پخش متوقف شده است.')});
  a.addEventListener('ended',()=>setIronMusicStatus('پخش آهنگ تمام شد.'));
  a.addEventListener('error',()=>{const code=a.error?.code;const messages={1:'پخش آهنگ متوقف شد.',2:'خطا در خواندن فایل صوتی.',3:'رمزگشایی فایل صوتی ناموفق بود؛ احتمالاً کدک آن پشتیبانی نمی‌شود.',4:'این قالب صوتی در مرورگر این دستگاه پشتیبانی نمی‌شود.'};setIronMusicStatus(messages[code]||'پخش این فایل ناموفق بود. یک فایل صوتی دیگر امتحان کن.',true)});
