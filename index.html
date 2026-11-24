@@ -1458,3 +1458,66 @@ if('serviceWorker'in navigator&&!window.Capacitor?.isNativePlatform?.())window.a
 function closeIronIntro(){const el=document.getElementById('ironIntro');if(!el||el.classList.contains('is-leaving'))return;el.classList.add('is-leaving');setTimeout(()=>el.remove(),700)}
 window.addEventListener('load',()=>{const intro=document.getElementById('ironIntro');if(intro)setTimeout(closeIronIntro,4300)});
 </script><script>if(window.Capacitor?.isNativePlatform?.()){const s=document.createElement('script');s.src='./iron-push.js';s.defer=true;document.head.appendChild(s)}</script></body></html>
+
+/* IRONNOVA final polish: consistent circular icon artwork and sky-blue intro */
+main.app .home-feature-grid .home-workout-program-art,
+main.app .home-feature-grid .home-nutrition-main-art,
+main.app .home-feature-grid .home-shop-art{
+  box-sizing:border-box!important;
+  width:58px!important;height:58px!important;min-width:58px!important;
+  flex:0 0 58px!important;border-radius:50%!important;
+  background-color:#e7f5fd!important;background-image:none!important;
+  border:1px solid #bfe2f3!important;
+  box-shadow:0 5px 14px rgba(42,130,177,.16),inset 0 1px 0 rgba(255,255,255,.9)!important;
+  padding:9px!important;overflow:hidden!important;
+  isolation:isolate!important;
+}
+main.app .home-feature-grid .home-workout-program-art svg,
+main.app .home-feature-grid .home-nutrition-main-art svg,
+main.app .home-feature-grid .home-shop-art svg{
+  display:block!important;width:100%!important;height:100%!important;
+  max-width:100%!important;max-height:100%!important;
+  background:transparent!important;overflow:visible!important;
+}
+main.app .home-feature-grid .home-workout-program-art::before,
+main.app .home-feature-grid .home-nutrition-main-art::before,
+main.app .home-feature-grid .home-shop-art::before{content:none!important;display:none!important}
+main.app .home-feature-grid .home-workout-program-art *,
+main.app .home-feature-grid .home-nutrition-main-art *,
+main.app .home-feature-grid .home-shop-art *{background-color:transparent}
+main.app .home-feature-grid .home-workout-program-art svg{filter:drop-shadow(0 1px 1px rgba(38,132,181,.14))}
+main.app .home-feature-grid .home-nutrition-main-art svg{filter:drop-shadow(0 1px 1px rgba(38,132,181,.14))}
+main.app .home-feature-grid .home-shop-art svg{filter:drop-shadow(0 1px 1px rgba(38,132,181,.14))}
+body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.mono) .iron-intro{
+  background-color:#eaf6ff!important;
+  background-position:center 24%!important;
+  background-size:cover!important;
+}
+body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.mono) .iron-intro::before{
+  background:
+    radial-gradient(ellipse at 50% 42%,rgba(91,190,235,.10),transparent 58%),
+    linear-gradient(180deg,rgba(231,246,255,.02) 0%,rgba(231,246,255,.02) 56%,rgba(234,246,255,.72) 78%,#eaf6ff 100%)!important;
+}
+body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.mono) .intro-kicker{
+  letter-spacing:3.2px!important;text-shadow:0 2px 12px rgba(17,64,91,.25)!important;
+}
+body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.mono) .intro-progress{
+  background:rgba(37,143,201,.20)!important;box-shadow:0 0 18px rgba(37,143,201,.12)!important;
+}
+body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.mono) .intro-progress i{
+  background:linear-gradient(90deg,#8bd8f8,#258fc9,#8bd8f8)!important;
+  background-size:200% 100%!important;animation:introLoad 3.3s cubic-bezier(.2,.7,.2,1) .25s forwards,ironBlueShimmer 2.2s linear infinite!important;
+  box-shadow:0 0 14px rgba(37,143,201,.42)!important;
+}
+body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.mono) .intro-skip{
+  border-color:#a9d9ef!important;background:rgba(255,255,255,.92)!important;
+  color:#23658c!important;box-shadow:0 8px 22px rgba(43,121,165,.16)!important;
+  backdrop-filter:blur(12px);
+}
+@keyframes ironBlueShimmer{to{background-position:200% 0}}
+@media(prefers-reduced-motion:reduce){
+  body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.mono) .intro-progress i{animation:introLoad 3.3s ease .25s forwards!important}
+  main.app .home-feature-grid .home-workout-program-art,
+  main.app .home-feature-grid .home-nutrition-main-art,
+  main.app .home-feature-grid .home-shop-art{transition:none!important}
+}
