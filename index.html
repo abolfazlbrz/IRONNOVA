@@ -741,7 +741,7 @@ const IRON_AUDIO_EXTENSIONS=new Set(['mp3','m4a','m4b','aac','wav','wave','ogg',
 const IRON_AUDIO_MIMES=new Set(['audio/mpeg','audio/mp3','audio/mp4','audio/x-m4a','audio/aac','audio/aacp','audio/wav','audio/wave','audio/x-wav','audio/ogg','audio/opus','audio/webm','audio/flac','audio/3gpp','audio/amr']);
 function ironAudioFileSupported(file){
  const ext=(file.name.split('.').pop()||'').toLowerCase(),mime=(file.type||'').toLowerCase().split(';')[0].trim();
- if(mime.startsWith('video/'))return false;
+ if(mime.startsWith('video/')&&!(mime==='video/mp4'&&ext==='mp4'))return false;
  return IRON_AUDIO_EXTENSIONS.has(ext)||IRON_AUDIO_MIMES.has(mime);
 }
 function setIronMusicStatus(message,isError=false){
