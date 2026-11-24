@@ -514,8 +514,20 @@ function buildSmartPlan(){
  result.innerHTML='<b>برنامه '+days+' روزه · '+goalText+' · '+(place==='home'?'خانه':'باشگاه')+'</b>'+warn+safetyNote+plan.map(d=>'<p><b>روز '+d.day+'</b><br>'+d.exercises.map(e=>e.name+' · '+e.sets+' ست · '+e.reps).join('<br>')+'</p>').join('')+'<button class="btn" style="width:100%" onclick=\'applySmartPlan('+JSON.stringify(plan)+')\'>جایگزینی برنامه فعلی</button>';
 }
 
+function validateSmartPlanLimits(plan){
+ const limit=document.getElementById('coachLimit')?.value||'none',details=document.getElementById('coachLimitDetails')?.value||'';
+ const names=plan.flatMap(d=>(d.exercises||[]).map(e=>String(e.name||'')));
+ if(limit==='back'&&/(دیسک|فتق|بیرون.?زدگی|سیاتیک|بی.?حسی|گزگز|ضعف|درد تیرکشنده|جراحی|شکستگی)/i.test(details)){toast('با این توضیحات مربوط به کمر، ساخت خودکار برنامه متوقف شد. ابتدا حرکات مجاز را با پزشک یا فیزیوتراپیست مشخص کن.');return false}
+ if(limit==='back'){const safe=['پرس سینه دستگاه با تکیه‌گاه کامل','قایقی دستگاه با تکیه‌گاه سینه','جلو پا دستگاه با تکیه‌گاه','پشت پا نشسته با تکیه‌گاه','جلو بازو سیم‌کش نشسته با تکیه‌گاه','پشت بازو سیم‌کش با تنه ثابت','پرس سینه کش نشسته با تکیه‌گاه','جلو بازو کش نشسته با تکیه‌گاه','پشت بازو کش با تنه ثابت'];if(names.some(n=>!safe.includes(n))){toast('برنامه نهایی شامل حرکتی خارج از فهرست محافظه‌کارانه محدودیت کمر است و ذخیره نشد.');return false}}
+ if(limit==='shoulder'&&names.some(n=>/(پرس سرشانه|نشر جانب|نشر خم|شنا|دیپ|پرس بالای سر|پشت بازو بالای سر)/i.test(n))){toast('برنامه شامل حرکت نامتناسب با محدودیت شانه است و ذخیره نشد.');return false}
+ if(limit==='knee'&&names.some(n=>/(اسکوات|لانج|پرش|دویدن|پرس پا|جلو پا دستگاه|استپ آپ)/i.test(n))){toast('برنامه شامل حرکت نامتناسب با محدودیت زانو است و ذخیره نشد.');return false}
+ if(limit==='wrist'&&names.some(n=>/(شنا|پلانک|دیپ|مچ هالتر)/i.test(n))){toast('برنامه شامل حرکت فشار مستقیم روی مچ است و ذخیره نشد.');return false}
+ if(limit==='neck'&&names.some(n=>/(شراگ|پل گردن|پرس پشت گردن|پشت گردن)/i.test(n))){toast('برنامه شامل حرکت نامتناسب با محدودیت گردن است و ذخیره نشد.');return false}
+ return true
+}
 function applySmartPlan(plan){
  if(!Array.isArray(plan)||!plan.length)return;
+ if(!validateSmartPlanLimits(plan))return;
  data.exercises=plan.flatMap((d)=>d.exercises.map(e=>({id:Date.now()+Math.floor(Math.random()*100000),name:e.name,sets:e.sets,reps:e.reps,done:false,weight:''})));
  data.planName='برنامه مربی هوشمند';data.smartPlan=plan;save();showPage('workout');toast('برنامه ذخیره شد');
 }
