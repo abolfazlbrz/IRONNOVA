@@ -39,6 +39,9 @@ jobs:
         run: |
           mkdir -p www
           cp index.html www/
+          cp native-audio-bridge.js www/
+          mkdir -p www/capacitor-core
+          cp -r node_modules/@capacitor/core/dist/. www/capacitor-core/
           [ ! -d assets ] || cp -r assets www/
           [ ! -f manifest.webmanifest ] || cp manifest.webmanifest www/
           [ ! -f service-worker.js ] || cp service-worker.js www/
