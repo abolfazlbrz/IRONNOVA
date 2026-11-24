@@ -39,6 +39,23 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Assemble and verify high-resolution IRONNOVA splash
+        run: |
+          test -d .github/splash-parts
+          cat .github/splash-parts/*.b64 | base64 --decode > assets/ironnova-splash.webp
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          p = Path('assets/ironnova-splash.webp')
+          with Image.open(p) as image:
+              image.verify()
+          with Image.open(p) as image:
+              assert image.format == 'WEBP', image.format
+              assert image.size == (941, 1672), image.size
+          assert p.stat().st_size >= 70000, p.stat().st_size
+          print(f'Verified IRONNOVA splash: 941x1672, {p.stat().st_size} bytes')
+          PY
+
       - name: Prepare web files
         run: |
           mkdir -p www
