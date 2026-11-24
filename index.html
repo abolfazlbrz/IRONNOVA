@@ -361,11 +361,15 @@ let coachDirectoryCache=[];
 async function loadCoachDirectory(){
  const out=document.getElementById('coachDirectoryList');if(!out)return;
  out.textContent='در حال دریافت مربیان تأییدشده...';
- const {data:{user}}=await supabaseClient.auth.getUser();if(!user){out.textContent='برای مشاهده مربیان ابتدا وارد حساب شو.';return}
- const {data,error}=await supabaseClient.rpc('iron_explore_coaches_v2');
- if(error){out.textContent='دریافت فهرست مربیان ناموفق بود: '+error.message;return}
- coachDirectoryCache=Array.isArray(data)?data:[];
- renderCoachDirectory(coachDirectoryCache);
+ try{
+  const {data:{user},error:authError}=await supabaseClient.auth.getUser();
+  if(authError)throw authError;
+  if(!user){coachDirectoryCache=[];out.textContent='برای مشاهده مربیان ابتدا وارد حساب شو.';return}
+  const {data,error}=await supabaseClient.rpc('iron_explore_coaches_v2');
+  if(error)throw error;
+  coachDirectoryCache=Array.isArray(data)?data:[];
+  renderCoachDirectory(coachDirectoryCache);
+ }catch(error){console.error('IRONNOVA coach explorer:',error);coachDirectoryCache=[];out.textContent='دریافت اکسپلور مربیان ناموفق بود. اتصال اینترنت و ورود به حساب را بررسی کن و دوباره به‌روزرسانی را بزن.'}
 }
 function filterCoachDirectory(){
  const q=(document.getElementById('coachExploreSearch')?.value||'').trim().toLocaleLowerCase('fa');
@@ -374,7 +378,7 @@ function filterCoachDirectory(){
 }
 function renderCoachDirectory(rows){
  const out=document.getElementById('coachDirectoryList');if(!out)return;
- if(!rows.length){out.innerHTML='<p class="muted">مربی تأییدشده‌ای مطابق جست‌وجو پیدا نشد.</p>';return}
+ if(!rows.length){out.innerHTML='<p class="muted">فعلاً مربی تأییدشده و دارای پروفایل عمومی برای نمایش وجود ندارد؛ پس از تأیید مربی و فعال بودن نمایش عمومی، اینجا ظاهر می‌شود.</p>';return}
  out.innerHTML=rows.map(c=>{
   const id=String(c.user_id||'');if(!/^[0-9a-f-]{36}$/i.test(id))return '';
   const modes=Array.isArray(c.training_modes)?c.training_modes.join('، '):'';
