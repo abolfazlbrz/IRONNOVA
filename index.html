@@ -49,6 +49,21 @@ body.dark{--bg:#101d32;--surface:#172943;--text:#edf4ff;--muted:#a9bdd5;--soft:#
 #foodLibraryPage .card{margin:10px 0;padding:14px}
 #foodItems>.card{margin:10px 0;padding:14px}
 
+/* Premium store cards */
+#shopPage>h1{margin-bottom:4px}
+#shopPage>.muted{margin-top:0}
+#shopItems{display:grid;grid-template-columns:1fr;gap:12px}
+#shopPage .shop-product{display:grid;grid-template-columns:92px minmax(0,1fr);gap:12px;padding:12px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,#ffffff0a,#ffffff03);align-items:center}
+#shopPage .shop-product-image{width:92px;height:104px;border-radius:14px;flex:none;background:linear-gradient(145deg,#2d4234,#17231b);color:var(--accent)}
+#shopPage .shop-product-info{min-width:0;display:grid;gap:5px}
+#shopPage .shop-product-info b{font-size:14px}
+#shopPage .shop-price{font-weight:900;color:var(--accent);font-size:14px}
+#shopPage .shop-stock{font-size:10px;color:var(--muted)}
+#shopPage .shop-product-actions{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#shopPage .shop-product-actions button{font-size:11px;min-width:0}
+#shopPage .shop-product-actions .btn{padding:10px 8px}
+#shopPage .card{padding:15px}
+@media(min-width:620px){#shopItems{grid-template-columns:1fr 1fr}}
 /* IRON MUSIC premium player */
 #musicPage .music-heading{display:flex;align-items:center;justify-content:space-between;margin:6px 0 16px}
 .music-equalizer{display:flex;align-items:center;gap:4px;height:34px}
@@ -888,7 +903,7 @@ document.addEventListener('DOMContentLoaded',()=>{
  a.addEventListener('error',()=>{const code=a.error?.code;const messages={1:'پخش آهنگ متوقف شد.',2:'خطا در خواندن فایل صوتی.',3:'رمزگشایی فایل صوتی ناموفق بود؛ احتمالاً کدک آن پشتیبانی نمی‌شود.',4:'این قالب صوتی در مرورگر این دستگاه پشتیبانی نمی‌شود.'};setIronMusicStatus(messages[code]||'پخش این فایل ناموفق بود. یک فایل صوتی دیگر امتحان کن.',true)});
 });
 let ironShopProducts=[];
-async function renderShop(){const el=document.getElementById('shopItems');if(!el)return;el.textContent='در حال دریافت محصولات...';const {data,error}=await supabaseClient.from('iron_store_products_v2').select('id,name,description,category,price_toman,stock,image_url,approval_status,seller_id').eq('is_active',true).eq('approval_status','approved').order('created_at',{ascending:false});if(error){el.textContent='خطا در دریافت محصولات: '+error.message;return}ironShopProducts=data||[];el.innerHTML=ironShopProducts.length?ironShopProducts.map(p=>`<div class="shop-product"><div class="shop-product-image">${p.image_url?`<img src="${safe(p.image_url)}" alt="${safe(p.name)}">`:'🏋️'}</div><div class="grow"><b>${safe(p.name)}</b><div class="muted">${Number(p.price_toman).toLocaleString('fa-IR')} تومان · موجودی ${Number(p.stock)}</div><small class="muted">${safe(p.description||p.category||'')}</small></div><button class="btn small" ${p.stock<1?'disabled':''} onclick="openStoreChat('${p.id}')">گفت‌وگو</button><button class="btn small" ${p.stock<1?'disabled':''} onclick="addShopItem('${p.id}')">افزودن</button></div>`).join(''):'فعلاً محصول تأییدشده‌ای در فروشگاه نیست.';renderShopCart()}
+async function renderShop(){const el=document.getElementById('shopItems');if(!el)return;el.textContent='در حال دریافت محصولات...';const {data,error}=await supabaseClient.from('iron_store_products_v2').select('id,name,description,category,price_toman,stock,image_url,approval_status,seller_id').eq('is_active',true).eq('approval_status','approved').order('created_at',{ascending:false});if(error){el.textContent='خطا در دریافت محصولات: '+error.message;return}ironShopProducts=data||[];el.innerHTML=ironShopProducts.length?ironShopProducts.map(p=>`<article class="shop-product"><div class="shop-product-image">${p.image_url?`<img src="${safe(p.image_url)}" alt="${safe(p.name)}">`:'🏋️'}</div><div class="shop-product-info"><b>${safe(p.name)}</b><div class="shop-price">${Number(p.price_toman).toLocaleString('fa-IR')} تومان</div><small class="muted">${safe(p.description||p.category||'')}</small><span class="shop-stock">${Number(p.stock)>0?'موجود در انبار':'ناموجود'}</span></div><div class="shop-product-actions"><button class="btn secondary small" ${p.stock<1?'disabled':''} onclick="openStoreChat('${p.id}')">پرسش از فروشنده</button><button class="btn small" ${p.stock<1?'disabled':''} onclick="addShopItem('${p.id}')">افزودن به سبد</button></div></article>`).join(''):'فعلاً محصول تأییدشده‌ای در فروشگاه نیست.';renderShopCart()}
 function addShopItem(id){const p=ironShopProducts.find(x=>x.id===id);if(!p||p.stock<1)return toast('این محصول موجود نیست');const c=JSON.parse(localStorage.getItem('ironShopCart')||'[]');const old=c.find(x=>x.id===id);if(old){if(old.qty>=p.stock)return toast('بیشتر از موجودی نمی‌توانی سفارش بدهی');old.qty++}else c.push({id,qty:1});localStorage.setItem('ironShopCart',JSON.stringify(c));renderShopCart();toast('به سبد خرید اضافه شد')}
 function renderShopCart(){const c=JSON.parse(localStorage.getItem('ironShopCart')||'[]');const el=document.getElementById('shopCart');if(!el)return;let total=0;el.innerHTML=c.length?c.map(x=>{const p=ironShopProducts.find(y=>y.id===x.id);if(!p)return '';total+=Number(p.price_toman)*x.qty;return `<div class="row between" style="padding:7px 0"><span>${safe(p.name)} × ${x.qty}</span><button class="btn secondary small" onclick="removeShopItem('${p.id}')">حذف</button></div>`}).join('')+`<b>جمع اولیه: ${total.toLocaleString('fa-IR')} تومان</b><p class="muted">تخفیف نهایی پس از بررسی کد در سرور محاسبه می‌شود.</p>`:'سبد خرید خالی است.'}
 function removeShopItem(id){const c=JSON.parse(localStorage.getItem('ironShopCart')||'[]').filter(x=>x.id!==id);localStorage.setItem('ironShopCart',JSON.stringify(c));renderShopCart()}
