@@ -101,6 +101,8 @@ body.dark{--bg:#101d32;--surface:#172943;--text:#edf4ff;--muted:#a9bdd5;--soft:#
 @media(max-width:420px){.anatomy-panel{padding:11px 8px}.anatomy-views{gap:5px}.anatomy-view{padding:7px 1px 0}.anatomy-svg{max-height:350px}.anatomy-heading h2{font-size:17px}.anatomy-legend{font-size:8px}}
 
 #foodItems{max-height:none;overflow:visible}#foodLibraryPage .card{margin:10px 0;padding:14px}#foodItems>.card{margin:10px 0;padding:14px}
+
+.coach-panel-shell{display:grid;gap:12px}.coach-panel-tabs{display:flex;gap:7px;overflow-x:auto;padding:7px;background:var(--surface);border:1px solid var(--line);border-radius:15px;position:sticky;top:66px;z-index:20;scrollbar-width:thin}.coach-panel-tabs button{flex:0 0 auto;border:1px solid var(--line);background:var(--soft);color:var(--text);border-radius:11px;padding:10px 13px;font-size:12px;white-space:nowrap}.coach-panel-tabs button.active{background:var(--accent);color:#fff;border-color:transparent}.coach-subpage{display:grid;gap:10px;min-width:0}.coach-shortcuts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.coach-shortcuts .plan-option{text-align:right;min-width:0}.coach-shortcuts .plan-option b{font-size:13px}.coach-shortcuts .plan-option small{font-size:11px;line-height:1.7}@media(max-width:390px){.coach-shortcuts{grid-template-columns:1fr}.coach-panel-tabs{top:58px}}
 </style>
 </head>
 <body><div id="ironIntro" class="iron-intro" aria-label="IRONNOVA"><div class="intro-grid"></div><div class="intro-light"></div><div class="intro-orbit"></div><div class="intro-particles"></div><div class="intro-scan"></div><div class="intro-art">
@@ -232,17 +234,53 @@ body.dark{--bg:#101d32;--surface:#172943;--text:#edf4ff;--muted:#a9bdd5;--soft:#
 <div class="card"><input id="coachExploreSearch" placeholder="جست‌وجوی نام یا تخصص مربی..." oninput="filterCoachExplore()"><div class="row between" style="margin-top:10px"><span class="muted" id="coachExploreStatus">در حال دریافت مربیان...</span><button class="btn secondary small" onclick="loadCoachExplore()">به‌روزرسانی</button></div><div id="coachExploreGrid" style="margin-top:12px"></div></div>
 </section>
 <section id="coachPanelPage" class="hidden">
-<h1>پنل مربی و شاگرد</h1><p class="muted">درخواست نقش، اتصال امن مربی و شاگرد، مدیریت درخواست‌ها و انتشار برنامه تمرینی آنلاین.</p>
+<h1>پنل مربی و شاگرد</h1><p class="muted">فضای چندلایه برای مدیریت حساب، اتصال، برنامه‌ها، گزارش‌ها و ارتباطات.</p>
+<div class="coach-panel-shell">
+<nav class="coach-panel-tabs" aria-label="بخش‌های پنل">
+<button type="button" class="active" data-coach-tab="overview" onclick="showCoachSubpage('overview')">نمای کلی</button>
+<button type="button" data-coach-tab="account" onclick="showCoachSubpage('account')">حساب و پروفایل</button>
+<button type="button" data-coach-tab="connections" onclick="showCoachSubpage('connections')">اتصال‌ها</button>
+<button type="button" data-coach-tab="plans" onclick="showCoachSubpage('plans')">برنامه تمرینی</button>
+<button type="button" data-coach-tab="reports" onclick="showCoachSubpage('reports')">گزارش‌ها</button>
+<button type="button" data-coach-tab="messages" onclick="showCoachSubpage('messages')">پیام‌ها</button>
+<button type="button" data-coach-tab="groups" onclick="showCoachSubpage('groups')">گروه‌ها</button>
+<button type="button" data-coach-tab="admin" data-coach-admin-nav class="hidden" onclick="showCoachSubpage('admin')">مدیریت اصلی</button>
+</nav>
+<div id="coachSubpageOverview" class="coach-subpage">
+<div class="card"><h2>داشبورد مربی و شاگرد</h2><p class="muted">برای جلوگیری از شلوغی، هر ابزار در صفحه مستقل خودش قرار گرفته است.</p>
+<div class="coach-shortcuts">
+<button class="plan-option" onclick="showCoachSubpage('connections')"><b>اتصال مربی و شاگرد</b><small>دعوت، درخواست و وضعیت ارتباط</small></button>
+<button class="plan-option" onclick="showCoachSubpage('plans')"><b>برنامه‌های تمرینی</b><small>ساخت، انتشار و مشاهده برنامه‌ها</small></button>
+<button class="plan-option" onclick="showCoachSubpage('reports')"><b>گزارش و پیشرفت</b><small>تمرین، تغذیه، وزن و خواب</small></button>
+<button class="plan-option" onclick="showCoachSubpage('messages')"><b>پیام‌رسانی</b><small>گفت‌وگوی خصوصی و ارتباط مستقیم</small></button>
+<button class="plan-option" onclick="showCoachSubpage('groups')"><b>گفت‌وگوی گروهی</b><small>گروه‌های شاگردان تأییدشده</small></button>
+<button class="plan-option" onclick="showCoachSubpage('account')"><b>حساب و پروفایل</b><small>نقش کاربری و اطلاعات مربی</small></button>
+</div></div>
+</div>
+<div id="coachSubpageAccount" class="coach-subpage hidden">
 <div class="card"><h2>حساب کاربری</h2><div class="field"><label>نام نمایشی</label><input id="icName" placeholder="نام مربی یا شاگرد"></div><div class="field"><label>نقش</label><select id="icRole"><option value="student">شاگرد</option><option value="coach">مربی</option></select></div><button class="btn" onclick="icSaveRole()">ثبت نقش</button><div id="icStatus" class="muted" style="margin-top:10px"></div></div>
-<section id="ironMainAdminPanel" class="card hidden"><h2>مدیریت اصلی IRONNOVA</h2><p class="muted">فقط مدیر اصلی می‌تواند درخواست مربیان را بررسی کند.</p><button class="btn secondary" onclick="refreshIronCoachRequests()">به‌روزرسانی درخواست‌ها</button><div id="ironCoachRequests" style="margin-top:12px"></div><div class="divider"></div><h3>مدیریت دسترسی مدیر</h3><div class="field"><label>شناسه حساب کاربر (UUID)</label><input id="ironAdminTarget" placeholder="UUID کاربر"></div><div class="row"><button class="btn grow" onclick="setIronAdminAccess(true)">افزودن مدیر</button><button class="btn secondary grow" onclick="setIronAdminAccess(false)">لغو دسترسی مدیر</button></div><div id="ironAdminStatus" class="muted" style="margin-top:8px"></div></section>
 <div id="icCoachProfileCard" class="card hidden"><h2>پروفایل مربی</h2><div class="field"><label>نام کامل</label><input id="icCoachFullName" placeholder="نام و نام خانوادگی"></div><div class="field"><label>تخصص</label><input id="icCoachSpecialty" placeholder="مثلاً مربی بدنسازی"></div><div class="field"><label>معرفی کوتاه</label><textarea id="icCoachBio" rows="3"></textarea></div><div class="field"><label>مدارک و سوابق</label><textarea id="icCoachCredentials" rows="2"></textarea></div><div class="field"><label>شماره تماس</label><input id="icCoachPhone" inputmode="tel"></div><div class="field"><label>لینک عکس پروفایل (اختیاری)</label><input id="icCoachPhoto" placeholder="https://..."></div><button class="btn" onclick="saveIronCoachProfile()">ذخیره پروفایل مربی</button><div id="icCoachProfileStatus" class="muted"></div></div>
-<div class="card"><h2>دعوت و اتصال</h2><button class="btn" onclick="icCreateInvite()">ساخت کد دعوت (مربی تأییدشده)</button><div id="icInvite" style="margin:10px 0"></div><div class="field"><label>کد دعوت مربی</label><input id="icCode" placeholder="کد دعوت را وارد کن"></div><button class="btn secondary" onclick="icClaimInvite()">ارسال درخواست اتصال</button><div id="icLinks" class="muted" style="margin-top:12px"></div></div>
+</div>
+<div id="coachSubpageConnections" class="coach-subpage hidden">
+<div class="card"><h2>دعوت و اتصال مربی و شاگرد</h2><button class="btn" onclick="icCreateInvite()">ساخت کد دعوت (مربی تأییدشده)</button><div id="icInvite" style="margin:10px 0"></div><div class="field"><label>کد دعوت مربی</label><input id="icCode" placeholder="کد دعوت را وارد کن"></div><button class="btn secondary" onclick="icClaimInvite()">ارسال درخواست اتصال</button><div id="icLinks" class="muted" style="margin-top:12px"></div><div class="divider"></div><h3>اتصال‌های فعال و درخواست‌ها</h3><button class="btn secondary" onclick="loadIronCoachLinks()">به‌روزرسانی اتصال‌ها</button></div>
+</div>
+<div id="coachSubpagePlans" class="coach-subpage hidden">
 <div class="card"><h2>ساخت و انتشار برنامه</h2><div class="field"><label>شناسه حساب شاگرد (UUID)</label><input id="icStudent" placeholder="شناسه کاربری شاگرد"></div><div class="field"><label>عنوان برنامه</label><input id="icPlanTitle" value="برنامه تمرینی جدید"></div><div class="field"><label>محتوای برنامه</label><p class="muted">هر حرکت در یک خط؛ نام حرکت | ست | تکرار | استراحت (ثانیه). برای چند روز، تیتر «روز ۱» و «روز ۲» بنویس. نام حرکت باید در بانک حرکات باشد.</p><textarea id="icPlan" rows="7" placeholder="روز ۱&#10;پرس سینه دمبل | ۳ | ۱۰ | ۹۰&#10;لت سیم‌کش از جلو | ۳ | ۱۲ | ۶۰&#10;روز ۲&#10;اسکوات جام | ۳ | ۱۰ | ۹۰"></textarea></div><button class="btn" onclick="icPublishPlan()">انتشار برنامه</button></div>
 <div class="card"><h2>برنامه‌های مربی من</h2><button class="btn secondary" onclick="loadMyCoachPlans()">به‌روزرسانی برنامه‌ها</button><div id="icMyPlans" style="margin-top:12px"></div></div>
+</div>
+<div id="coachSubpageReports" class="coach-subpage hidden">
 <div class="card"><h2>گزارش‌های ثبت‌شده</h2><button class="btn secondary" onclick="loadMyStudentLogs()">به‌روزرسانی گزارش‌ها</button><div id="icStudentLogs" style="margin-top:12px"></div></div>
+<div class="card"><h2>ثبت گزارش شاگرد</h2><select id="icLogType"><option value="workout">تمرین</option><option value="nutrition">تغذیه</option><option value="weight">وزن</option><option value="sleep">خواب</option><option value="note">یادداشت</option></select><textarea id="icLog" rows="3" placeholder="گزارش امروز"></textarea><button class="btn" onclick="icAddLog()">ثبت گزارش</button></div>
+</div>
+<div id="coachSubpageMessages" class="coach-subpage hidden">
 <div class="card"><h2>پیام‌رسان مربی و شاگرد</h2><p class="muted">گفت‌وگوی خصوصی فقط بین دو حسابی که اتصالشان تأیید شده باشد.</p><div class="field"><label>شناسه حساب طرف گفت‌وگو (UUID)</label><input id="icMessagePartner" placeholder="شناسه مربی یا شاگرد"></div><button class="btn secondary" onclick="loadIronMessages()">نمایش گفت‌وگو</button><div id="icMessages" style="margin:12px 0;max-height:320px;overflow:auto"></div><div class="field"><label>پیام</label><textarea id="icMessageBody" rows="3" maxlength="4000" placeholder="پیام خودت را بنویس..."></textarea></div><button class="btn" onclick="sendIronMessage()">ارسال پیام</button></div>
-<div class="card"><h2>ثبت گزارش شاگرد</h2><select id="icLogType"><option value="workout">تمرین</option><option value="nutrition">تغذیه</option><option value="weight">وزن</option><option value="sleep">خواب</option><option value="note">یادداشت</option></select><textarea id="icLog" rows="3" placeholder="گزارش امروز"></textarea><button class="btn" onclick="icAddLog()">ثبت گزارش</button>
+</div>
+<div id="coachSubpageGroups" class="coach-subpage hidden">
 <div class="card"><h2>گفت‌وگوی گروهی</h2><p class="muted">مربی می‌تواند فقط شاگردان متصل و تأییدشده خودش را به گروه اضافه کند.</p><section id="icGroupCreateCard" class="hidden"><div class="field"><label>نام گروه</label><input id="icGroupName" placeholder="مثلاً گروه تمرین صبح"></div><div class="field"><label>شناسه شاگردها (هر UUID در یک خط یا با ویرگول)</label><textarea id="icGroupStudents" rows="4" placeholder="UUID شاگرد اول&#10;UUID شاگرد دوم"></textarea></div><button class="btn" onclick="createIronGroup()">ساخت گروه</button></section><button class="btn secondary small" onclick="loadIronGroups()">به‌روزرسانی گروه‌ها</button><div id="icGroups" style="margin:10px 0"></div><div class="field"><label>شناسه گروه انتخاب‌شده</label><input id="icSelectedGroupId" placeholder="گروهی را از فهرست انتخاب کن" readonly></div><div id="icGroupMessages" style="max-height:300px;overflow:auto"></div><div class="field"><label>پیام گروه</label><textarea id="icGroupMessageBody" rows="3" maxlength="4000" placeholder="پیام گروهی..."></textarea></div><button class="btn" onclick="sendIronGroupMessage()">ارسال به گروه</button></div>
+</div>
+<div id="coachSubpageAdmin" class="coach-subpage hidden">
+<section id="ironMainAdminPanel" class="card hidden"><h2>مدیریت اصلی IRONNOVA</h2><p class="muted">فقط مدیر اصلی می‌تواند درخواست مربیان را بررسی کند.</p><button class="btn secondary" onclick="refreshIronCoachRequests()">به‌روزرسانی درخواست‌ها</button><div id="ironCoachRequests" style="margin-top:12px"></div><div class="divider"></div><h3>مدیریت دسترسی مدیر</h3><div class="field"><label>شناسه حساب کاربر (UUID)</label><input id="ironAdminTarget" placeholder="UUID کاربر"></div><div class="row"><button class="btn grow" onclick="setIronAdminAccess(true)">افزودن مدیر</button><button class="btn secondary grow" onclick="setIronAdminAccess(false)">لغو دسترسی مدیر</button></div><div id="ironAdminStatus" class="muted" style="margin-top:8px"></div></section>
+</div>
 </div>
 </section>
 <section id="foodLibraryPage" class="hidden">
@@ -292,6 +330,7 @@ async function loadCloudData(uid){cloudReady=false;setCloudStatus('در حال �
 function handleAuthSession(s){const uid=s&&s.user?s.user.id:null;showAuthSession(s);if(!uid){currentUserId=null;cloudReady=false;clearTimeout(cloudTimer);icLoadRole();return}icLoadRole();if(uid===currentUserId&&cloudReady)return;currentUserId=uid;loadCloudData(uid)}
 function toast(s){const e=document.getElementById('toast');e.textContent=s;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2400)}
 function toggleSidebar(force){const sb=document.getElementById('sidebar'),shade=document.getElementById('sidebarShade');const open=typeof force==='boolean'?force:!sb.classList.contains('open');sb.classList.toggle('open',open);shade.classList.toggle('open',open)}
+function showCoachSubpage(key){const allowed=['overview','account','connections','plans','reports','messages','groups','admin'];if(!allowed.includes(key))key='overview';allowed.forEach(k=>{const el=document.getElementById('coachSubpage'+k.charAt(0).toUpperCase()+k.slice(1));if(el)el.classList.toggle('hidden',k!==key)});document.querySelectorAll('[data-coach-tab]').forEach(b=>b.classList.toggle('active',b.dataset.coachTab===key));const page=document.getElementById('coachPanelPage');if(page)page.scrollIntoView({block:'start',behavior:'smooth'})}
 function showPage(p){['home','workout','library','homeWorkout','corrective','progress','coach','nutrition','profile','admin','coachExplore','coachPanel','foodLibrary','music','shop','education'].forEach(x=>document.getElementById(x+'Page').classList.toggle('hidden',x!==p));document.querySelectorAll('.side-nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===p));toggleSidebar(false);if(p==='admin')renderAdmin();if(p==='coachExplore')loadCoachExplore();if(p==='coachPanel'){loadIronAdminPanel();loadIronCoachLinks();loadMyCoachPlans();loadMyStudentLogs();loadIronCoachProfile();icLoadRole();loadIronGroups()}if(p==='library'&&!exerciseCatalog.length)loadExerciseCatalog();if(p==='library')renderLibrary();if(p==='homeWorkout')renderHomeExercises();if(p==='corrective')renderCorrective();if(p==='nutrition')renderNutrition();if(p==='foodLibrary'){renderMealBaskets();renderFoodLibrary();renderFoodDatabase()}if(p==='shop'){renderShop();loadShopOrders();loadShopAdmin()}if(p==='education'){renderIronEducation();loadEducationAdmin()}if(p==='progress')renderProgress();if(p==='coach'){document.getElementById('coachWeight').value=data.weight;document.getElementById('nutWeight').value=data.weight}window.scrollTo(0,0)}
 function safe(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function openWorkoutExerciseDetail(id){const workout=data.exercises.find(x=>Number(x.id)===Number(id));if(!workout)return;const found=exerciseCatalog.find(x=>String(x.name||'').trim()===String(workout.name||'').trim());if(found){openExerciseDetail(found.id);return}document.getElementById('detailContent').innerHTML='<h2>'+safe(workout.name)+'</h2><p>برای اجرای صحیح این حرکت، دامنه حرکت را کنترل کن، از تاب دادن بدن خودداری کن و وزنه‌ای انتخاب کن که فرم صحیح حفظ شود.</p><p><b>برنامه فعلی:</b> '+safe(workout.sets)+' ست × '+safe(workout.reps)+' تکرار</p>';document.getElementById('detailBackdrop').classList.add('open')}
@@ -705,11 +744,12 @@ async function sendIronMessage(){const partner=document.getElementById('icMessag
 
 async function loadIronAdminPanel(){
  const panel=document.getElementById('ironMainAdminPanel');
+ const adminNav=document.querySelector('[data-coach-admin-nav]');
  const {data:{user}}=await supabaseClient.auth.getUser();
- if(!user){panel.classList.add('hidden');return}
+ if(!user){panel.classList.add('hidden');adminNav?.classList.add('hidden');return}
  const {data,error}=await supabaseClient.from('iron_admins_v2').select('is_main_admin').eq('user_id',user.id).maybeSingle();
- if(error||!data?.is_main_admin){panel.classList.add('hidden');return}
- panel.classList.remove('hidden');await refreshIronCoachRequests();
+ if(error||!data?.is_main_admin){panel.classList.add('hidden');adminNav?.classList.add('hidden');return}
+ panel.classList.remove('hidden');adminNav?.classList.remove('hidden');await refreshIronCoachRequests();
 }
 async function refreshIronCoachRequests(){
  const out=document.getElementById('ironCoachRequests');
