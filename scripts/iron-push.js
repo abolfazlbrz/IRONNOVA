@@ -28,10 +28,15 @@ if (client && Capacitor.isNativePlatform()) {
 
   PushNotifications.addListener('pushNotificationReceived', notification => {
     console.info('IRONNOVA push received:', notification?.title || '');
+    if (typeof window.toast === 'function') {
+      const message = [notification?.title, notification?.body].filter(Boolean).join(' · ');
+      if (message) window.toast(message);
+    }
   });
 
   async function registerForUser(user) {
     if (!user?.id || registeringUserId === user.id) return;
+    registeringUserId = user.id;
     try {
       const permission = await PushNotifications.checkPermissions();
       let receive = permission.receive;
@@ -40,9 +45,9 @@ if (client && Capacitor.isNativePlatform()) {
       }
       if (receive !== 'granted') {
         console.info('IRONNOVA notifications permission not granted.');
+        registeringUserId = null;
         return;
       }
-      registeringUserId = user.id;
       await PushNotifications.register();
     } catch (error) {
       registeringUserId = null;
