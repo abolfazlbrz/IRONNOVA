@@ -38,6 +38,8 @@ const required = [
   'NativeAudio',
   'applyReferencePlan',
   'saveCurrentProgram',
+  'validateSmartPlanLimits',
+  'correctiveArt',
   'referenceLocked',
   'intro-orbit',
   'intro-shockwave',
