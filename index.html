@@ -277,6 +277,46 @@ main.app .workout-music-panel{margin:8px 0!important;padding:12px!important}
  main.app .home-feature-grid{gap:6px!important;margin-top:6px!important}
  main.app .home-training-layers,main.app .home-nutrition-layers{gap:6px!important;margin:6px 0 8px!important}
 }
+
+/* Home dashboard: clean two-row circular shortcut grid */
+main.app .home-feature-grid{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:12px 7px!important;align-items:start!important}
+main.app .home-feature-grid>.home-workout-program-launch,
+main.app .home-feature-grid>.home-feature-tile,
+main.app .home-feature-grid>.home-shop-launch,
+main.app .home-feature-grid>.home-nutrition-hub{grid-column:auto!important;min-width:0!important;width:100%!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;gap:6px!important;text-align:center!important;color:var(--text)!important}
+main.app .home-feature-grid>.home-nutrition-hub{display:contents!important}
+main.app .home-feature-grid .home-feature-tile{display:flex!important}
+main.app .home-feature-grid .home-feature-tile>span,
+main.app .home-feature-grid .home-workout-program-art,
+main.app .home-feature-grid .home-nutrition-main-art,
+main.app .home-feature-grid .home-shop-art{width:58px!important;height:58px!important;min-width:58px!important;flex:0 0 58px!important;display:grid!important;place-items:center!important;border-radius:50%!important;background:var(--soft)!important;border:1px solid color-mix(in srgb,var(--accent) 35%,var(--line))!important;box-shadow:0 4px 12px #0002!important;padding:9px!important;overflow:hidden!important}
+main.app .home-feature-grid .home-workout-program-art svg,
+main.app .home-feature-grid .home-nutrition-main-art svg,
+main.app .home-feature-grid .home-shop-art svg{width:100%!important;height:100%!important}
+main.app .home-feature-grid .home-feature-tile>span{grid-row:auto!important;font-size:25px!important;line-height:1!important}
+main.app .home-feature-grid .home-workout-program-copy,
+main.app .home-feature-grid .home-nutrition-main-copy,
+main.app .home-feature-grid .home-shop-copy{display:contents!important}
+main.app .home-feature-grid .home-feature-tile b,
+main.app .home-feature-grid .home-workout-program-copy b,
+main.app .home-feature-grid .home-nutrition-main-copy b,
+main.app .home-feature-grid .home-shop-copy b{display:block!important;grid-column:auto!important;font-size:10px!important;line-height:1.5!important;margin:0!important;color:var(--text)!important;overflow-wrap:anywhere}
+main.app .home-feature-grid .home-feature-tile small,
+main.app .home-feature-grid .home-workout-program-copy small,
+main.app .home-feature-grid .home-nutrition-main-copy small,
+main.app .home-feature-grid .home-shop-copy small,
+main.app .home-feature-grid .home-workout-program-arrow,
+main.app .home-feature-grid .home-nutrition-chevron,
+main.app .home-feature-grid .home-shop-chevron{display:none!important}
+main.app .home-feature-grid .home-nutrition-launch{width:100%!important;min-width:0!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;gap:6px!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;text-align:center!important}
+main.app .home-feature-grid .home-nutrition-layers{grid-column:1/-1!important;width:100%!important;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:7px!important}
+main.app .home-feature-grid .home-nutrition-layers.hidden{display:none!important}
+main.app .home-feature-grid .home-nutrition-layer{min-width:0!important}
+main.app .home-feature-grid>.home-workout-program-launch:active,
+main.app .home-feature-grid>.home-shop-launch:active,
+main.app .home-feature-grid .home-feature-tile:active,
+main.app .home-feature-grid .home-nutrition-launch:active{transform:scale(.97)!important}
+@media(max-width:380px){main.app .home-feature-grid{gap:10px 4px!important}main.app .home-feature-grid .home-feature-tile>span,main.app .home-feature-grid .home-workout-program-art,main.app .home-feature-grid .home-nutrition-main-art,main.app .home-feature-grid .home-shop-art{width:52px!important;height:52px!important;min-width:52px!important;flex-basis:52px!important}main.app .home-feature-grid .home-feature-tile b,main.app .home-feature-grid .home-workout-program-copy b,main.app .home-feature-grid .home-nutrition-main-copy b,main.app .home-feature-grid .home-shop-copy b{font-size:9px!important}}
 </style>
 </head>
 <body><div id="ironIntro" class="iron-intro" aria-label="IRONNOVA">
