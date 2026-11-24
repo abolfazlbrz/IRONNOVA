@@ -26,9 +26,42 @@ body.dark{--bg:#101d32;--surface:#172943;--text:#edf4ff;--muted:#a9bdd5;--soft:#
 @media(max-width:760px){.dashboard-layout{display:block}.sidebar{position:fixed;z-index:40;right:0;top:0;height:100dvh;width:min(290px,84vw);transform:translateX(110%);transition:transform .22s;box-shadow:0 0 35px #0002}.sidebar.open{transform:translateX(0)}.sidebar-shade.open{display:block;position:fixed;inset:0;background:#0007;z-index:35}.app{padding:12px 13px 40px}.menu-toggle{display:block}.top{gap:10px}.top-left{display:flex;align-items:center;gap:10px}.nav{display:none}}@media(max-width:390px){.coach-grid,.food-grid{grid-template-columns:1fr}}
 
 /* IRONNOVA feature modules */
-#coachPanelPage .card,#foodLibraryPage .card,#musicPage .card,#shopPage .card{margin:12px 0}
+/* Compact, consistent page rhythm */
+.app{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+.app>section:not(.hidden){display:block}
+.app>section:not(.hidden)>h1:first-child{margin-top:4px}
+.card{margin:9px 0;padding:14px}
+#coachPanelPage .card,#foodLibraryPage .card,#musicPage .card,#shopPage .card{margin:9px 0}
 #coachPanelPage textarea,#musicPage input,#foodLibraryPage input{width:100%;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--text)}
 #foodItems{max-height:62vh;overflow:auto}
+#musicPage .music-shell{padding:16px;background:linear-gradient(145deg,var(--surface),var(--soft));border:1px solid var(--line);border-radius:22px}
+.music-head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.music-art{width:66px;height:66px;flex:0 0 66px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(145deg,#287be0,#173b64);color:#fff;font-size:30px;box-shadow:0 10px 24px #173b6430}
+.music-meta{min-width:0;flex:1}.music-meta b{display:block;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.music-meta small{color:var(--muted)}
+.music-progress{width:100%;accent-color:var(--accent);margin:12px 0 2px}
+.music-times{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);direction:ltr}
+.music-controls{display:flex;align-items:center;justify-content:center;gap:14px;margin:12px 0}
+.music-controls button{border:0;border-radius:50%;width:42px;height:42px;background:var(--soft);color:var(--text);font-size:17px}
+.music-controls button.primary-play{width:54px;height:54px;background:var(--accent);color:#fff;font-size:21px}
+.music-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.music-tools label{display:inline-flex;align-items:center;gap:7px;background:var(--soft);border-radius:12px;padding:10px 13px;color:var(--text);font-size:12px;font-weight:bold;cursor:pointer}
+.music-tools input[type=file]{display:none}
+.music-track{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--line);border-radius:13px;margin-top:7px;background:var(--surface)}
+.music-track.active{border-color:var(--accent);background:var(--soft)}
+.music-track button{border:0;background:transparent;color:var(--text);text-align:right;flex:1;min-width:0}
+.music-track button b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
+.music-track button small{color:var(--muted);font-size:10px}
+.music-track .track-play{width:34px;height:34px;border-radius:11px;background:var(--soft);color:var(--accent)}
+#shopItems{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.shop-product{display:flex;flex-direction:column;justify-content:space-between;min-width:0;padding:12px;border:1px solid var(--line);border-radius:16px;background:var(--surface);gap:10px}
+.shop-product .product-icon{height:76px;border-radius:12px;background:var(--soft);display:grid;place-items:center;font-size:30px}
+.shop-product b{font-size:13px;line-height:1.7}.shop-product .muted{line-height:1.7}
+.shop-product .btn{width:100%;padding:10px 8px}
+#coachExploreGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.coach-profile-tile{border:1px solid var(--line);border-radius:17px;background:var(--surface);overflow:hidden}
+.coach-profile-tile .coach-photo{height:112px;background:linear-gradient(145deg,var(--soft),var(--surface));display:grid;place-items:center;color:var(--accent);font-size:38px}
+.coach-profile-tile .coach-info{padding:11px}.coach-profile-tile b{font-size:13px}.coach-profile-tile p{font-size:11px;line-height:1.7;color:var(--muted);min-height:34px;margin:5px 0}
+@media(max-width:390px){#shopItems,#coachExploreGrid{grid-template-columns:1fr}}
 </style>
 </head>
 <body><div class="dashboard-layout">
@@ -42,6 +75,7 @@ body.dark{--bg:#101d32;--surface:#172943;--text:#edf4ff;--muted:#a9bdd5;--soft:#
 <button data-page="nutrition" onclick="showPage('nutrition')"><span class="ico">🥗</span>تغذیه و کالری</button>
 <button data-page="progress" onclick="showPage('progress')"><span class="ico">▥</span>آمار و پیشرفت</button>
 <button data-page="profile" onclick="showPage('profile')"><span class="ico">♙</span>پروفایل و تنظیمات</button>
+<button data-page="coachExplore" onclick="showPage('coachExplore')"><span class="ico">🔎</span>اکسپلور مربیان</button>
 <button data-page="coachPanel" onclick="showPage('coachPanel')"><span class="ico">👨‍🏫</span>پنل مربی و شاگرد</button>
 <button data-page="foodLibrary" onclick="showPage('foodLibrary')"><span class="ico">🍎</span>بانک جامع غذا</button>
 <button data-page="music" onclick="showPage('music')"><span class="ico">🎵</span>موزیک پلیر</button>
@@ -119,6 +153,11 @@ body.dark{--bg:#101d32;--surface:#172943;--text:#edf4ff;--muted:#a9bdd5;--soft:#
 
 <section id="adminPage" class="hidden"><h1>مدیریت حرکات برنامه</h1><div class="admin-note">این بخش فقط حرکات برنامه شخصی امروز را تغییر می‌دهد؛ بانک حرکات جداگانه باقی می‌ماند.</div><div class="card"><h2>افزودن حرکت</h2><div class="field"><label>نام حرکت</label><input id="newName" placeholder="مثلاً اسکوات هالتر"></div><div class="field"><label>تعداد ست</label><input id="newSets" type="number" value="3" min="1"></div><div class="field"><label>تکرار</label><input id="newReps" placeholder="۱۰ تا ۱۲"></div><div class="field"><label>لینک تصویر یا GIF (اختیاری)</label><input id="newGif" placeholder="https://..."></div><button class="btn" onclick="addExercise()">افزودن حرکت</button></div><div class="card"><h2>حرکات فعلی</h2><div id="adminExercises"></div></div></section>
 
+<section id="coachExplorePage" class="hidden">
+<h1>اکسپلور مربیان</h1>
+<p class="muted">مربی‌های تأییدشده را ببین، تخصص و سوابقشان را بررسی کن و برای اتصال درخواست بده.</p>
+<div class="card"><input id="coachExploreSearch" placeholder="جست‌وجوی نام یا تخصص مربی..." oninput="filterCoachExplore()"><div class="row between" style="margin-top:10px"><span class="muted" id="coachExploreStatus">در حال دریافت مربیان...</span><button class="btn secondary small" onclick="loadCoachExplore()">به‌روزرسانی</button></div><div id="coachExploreGrid" style="margin-top:12px"></div></div>
+</section>
 <section id="coachPanelPage" class="hidden">
 <h1>پنل مربی و شاگرد</h1><p class="muted">درخواست نقش، اتصال امن مربی و شاگرد، مدیریت درخواست‌ها و انتشار برنامه تمرینی آنلاین.</p>
 <div class="card"><h2>حساب کاربری</h2><div class="field"><label>نام نمایشی</label><input id="icName" placeholder="نام مربی یا شاگرد"></div><div class="field"><label>نقش</label><select id="icRole"><option value="student">شاگرد</option><option value="coach">مربی</option></select></div><button class="btn" onclick="icSaveRole()">ثبت نقش</button><div id="icStatus" class="muted" style="margin-top:10px"></div></div>
@@ -134,7 +173,18 @@ body.dark{--bg:#101d32;--surface:#172943;--text:#edf4ff;--muted:#a9bdd5;--soft:#
 </div>
 </section>
 <section id="foodLibraryPage" class="hidden"><h1>بانک غذا و کالری</h1><p class="muted">مقادیر کالری تقریبی‌اند. واحد و مقدار را انتخاب کن و به دفتر تغذیه اضافه کن.</p><div class="card"><input id="foodSearch" placeholder="جست‌وجوی غذا..." oninput="renderFoodLibrary()"><div id="foodItems"></div></div></section>
-<section id="musicPage" class="hidden"><h1>IRON MUSIC</h1><p class="muted">فایل‌های موسیقی موجود در گوشی خودت را انتخاب کن. فایل‌ها روی دستگاه پخش می‌شوند.</p><div class="card"><input id="musicFiles" type="file" accept="audio/*" multiple onchange="loadMusicFiles(event)"><div id="musicList"></div><audio id="musicAudio" controls style="width:100%;margin-top:14px"></audio></div></section>
+<section id="musicPage" class="hidden">
+<div class="row between"><div><div class="eyebrow">IRON AUDIO EXPERIENCE</div><h1>IRON MUSIC</h1></div><span class="pill">PLAYER</span></div>
+<p class="muted">موسیقی‌های گوشی را اضافه کن؛ پخش، توقف، رد کردن آهنگ و نوار زمان در همین صفحه.</p>
+<div class="music-shell">
+<div class="music-head"><div class="music-art">♫</div><div class="music-meta"><b id="musicNowTitle">هنوز آهنگی انتخاب نشده</b><small id="musicNowSub">کتابخانه شخصی تو</small></div></div>
+<audio id="musicAudio" preload="metadata"></audio>
+<input id="musicProgress" class="music-progress" type="range" min="0" max="1000" value="0" oninput="seekIronTrack(this.value)">
+<div class="music-times"><span id="musicCurrentTime">00:00</span><span id="musicDuration">00:00</span></div>
+<div class="music-controls"><button onclick="toggleIronShuffle()" id="musicShuffle" aria-label="پخش تصادفی">⤨</button><button onclick="prevIronTrack()" aria-label="آهنگ قبلی">◀|</button><button class="primary-play" id="musicPlay" onclick="toggleIronPlayback()" aria-label="پخش یا توقف">▶</button><button onclick="nextIronTrack()" aria-label="آهنگ بعدی">|▶</button><button onclick="toggleIronRepeat()" id="musicRepeat" aria-label="تکرار">↻</button></div>
+<div class="music-tools"><label for="musicFiles">＋ افزودن موسیقی</label><input id="musicFiles" type="file" accept="audio/*,.mp3,.m4a,.aac,.wav,.ogg,.flac" multiple onchange="loadMusicFiles(event)"><span class="muted" id="musicCount">۰ آهنگ</span></div>
+<div id="musicList" style="margin-top:12px"><div class="muted">هنوز فایلی اضافه نشده است.</div></div>
+</div></section>
 <section id="shopPage" class="hidden"><h1>فروشگاه IRONNOVA</h1><p class="muted">محصولات و سفارش‌ها از پایگاه داده دریافت می‌شوند. پرداخت آنلاین هنوز متصل نشده است.</p><div class="card"><h2>محصولات</h2><div id="shopItems">در حال بارگذاری...</div></div><div class="card"><h2>سبد خرید</h2><div id="shopCart"></div><div class="field"><label>نام گیرنده</label><input id="shopShipName" placeholder="نام و نام خانوادگی"></div><div class="field"><label>شماره تماس</label><input id="shopShipPhone" inputmode="tel" placeholder="09xxxxxxxxx"></div><div class="field"><label>نشانی کامل و کد پستی</label><textarea id="shopShipAddress" rows="3" placeholder="استان، شهر، خیابان، پلاک، واحد و کد پستی"></textarea></div><button class="btn" onclick="shopCheckout()">ثبت سفارش</button><p class="muted">ثبت سفارش به معنی پرداخت نیست. وضعیت سفارش در حساب ذخیره می‌شود و پرداخت باید جداگانه تأیید شود.</p></div><div class="card"><h2>سفارش‌های من</h2><button class="btn secondary small" onclick="loadShopOrders()">به‌روزرسانی</button><div id="shopOrders" style="margin-top:10px"></div></div><div class="card"><h2>ارسال رسید کارت‌به‌کارت</h2><p class="muted">پس از ثبت سفارش، شناسه سفارش را وارد و تصویر یا PDF رسید را بارگذاری کن. فایل خصوصی ذخیره می‌شود و فقط تو و مدیر اصلی به آن دسترسی دارید.</p><div class="field"><label>شناسه کامل سفارش</label><input id="shopReceiptOrderId" placeholder="UUID سفارش"></div><div class="field"><label>فایل رسید (حداکثر ۵ مگابایت)</label><input id="shopReceiptFile" type="file" accept="image/jpeg,image/png,image/webp,application/pdf"></div><button class="btn" onclick="submitShopReceipt()">ارسال رسید برای بررسی</button></div><section id="shopAdmin" class="card hidden"><h2>مدیریت فروشگاه</h2><div class="field"><label>نام محصول</label><input id="shopAdminName"></div><div class="field"><label>دسته‌بندی</label><input id="shopAdminCategory" value="عمومی"></div><div class="field"><label>قیمت به تومان</label><input id="shopAdminPrice" type="number" min="0"></div><div class="field"><label>موجودی</label><input id="shopAdminStock" type="number" min="0" value="0"></div><div class="field"><label>توضیحات</label><textarea id="shopAdminDescription" rows="2"></textarea></div><button class="btn" onclick="adminAddShopProduct()">افزودن محصول</button><div id="shopAdminOrders" style="margin-top:12px"></div></section></section>
 <section id="educationPage" class="hidden"><h1>آموزش و ویدئو</h1><p class="muted">ویدئوهای آموزشی منتشرشده توسط مدیریت IRONNOVA.</p><div class="field"><input id="educationSearch" placeholder="جست‌وجوی آموزش..." oninput="renderIronEducation()"></div><div id="educationList"></div><section id="educationAdmin" class="card hidden"><h2>مدیریت محتوای آموزشی</h2><div class="field"><label>عنوان</label><input id="educationTitle"></div><div class="field"><label>دسته‌بندی</label><input id="educationCategory" value="تمرین"></div><div class="field"><label>لینک HTTPS ویدئو</label><input id="educationUrl" placeholder="https://..."></div><div class="field"><label>تصویر بندانگشتی (اختیاری)</label><input id="educationThumb" placeholder="https://..."></div><div class="field"><label>توضیحات</label><textarea id="educationDescription" rows="3"></textarea></div><button class="btn" onclick="adminAddEducation()">انتشار آموزش</button></section></section>
 </main></div>
@@ -160,7 +210,7 @@ async function loadCloudData(uid){cloudReady=false;setCloudStatus('در حال �
 function handleAuthSession(s){const uid=s&&s.user?s.user.id:null;showAuthSession(s);if(!uid){currentUserId=null;cloudReady=false;clearTimeout(cloudTimer);icLoadRole();return}icLoadRole();if(uid===currentUserId&&cloudReady)return;currentUserId=uid;loadCloudData(uid)}
 function toast(s){const e=document.getElementById('toast');e.textContent=s;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2400)}
 function toggleSidebar(force){const sb=document.getElementById('sidebar'),shade=document.getElementById('sidebarShade');const open=typeof force==='boolean'?force:!sb.classList.contains('open');sb.classList.toggle('open',open);shade.classList.toggle('open',open)}
-function showPage(p){['home','workout','library','homeWorkout','corrective','progress','coach','nutrition','profile','admin','coachPanel','foodLibrary','music','shop','education'].forEach(x=>document.getElementById(x+'Page').classList.toggle('hidden',x!==p));document.querySelectorAll('.side-nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===p));toggleSidebar(false);if(p==='admin')renderAdmin();if(p==='coachPanel'){loadIronAdminPanel();loadIronCoachLinks();loadMyCoachPlans();loadMyStudentLogs();loadIronCoachProfile();icLoadRole();loadIronGroups()}if(p==='library'&&!exerciseCatalog.length)loadExerciseCatalog();if(p==='library')renderLibrary();if(p==='homeWorkout')renderHomeExercises();if(p==='corrective')renderCorrective();if(p==='nutrition')renderNutrition();if(p==='foodLibrary')renderFoodLibrary();if(p==='shop'){renderShop();loadShopOrders();loadShopAdmin()}if(p==='education'){renderIronEducation();loadEducationAdmin()}if(p==='progress')renderProgress();if(p==='coach'){document.getElementById('coachWeight').value=data.weight;document.getElementById('nutWeight').value=data.weight}window.scrollTo(0,0)}
+function showPage(p){['home','workout','library','homeWorkout','corrective','progress','coach','nutrition','profile','admin','coachExplore','coachPanel','foodLibrary','music','shop','education'].forEach(x=>document.getElementById(x+'Page').classList.toggle('hidden',x!==p));document.querySelectorAll('.side-nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===p));toggleSidebar(false);if(p==='admin')renderAdmin();if(p==='coachExplore')loadCoachExplore();if(p==='coachPanel'){loadIronAdminPanel();loadIronCoachLinks();loadMyCoachPlans();loadMyStudentLogs();loadIronCoachProfile();icLoadRole();loadIronGroups()}if(p==='library'&&!exerciseCatalog.length)loadExerciseCatalog();if(p==='library')renderLibrary();if(p==='homeWorkout')renderHomeExercises();if(p==='corrective')renderCorrective();if(p==='nutrition')renderNutrition();if(p==='foodLibrary')renderFoodLibrary();if(p==='shop'){renderShop();loadShopOrders();loadShopAdmin()}if(p==='education'){renderIronEducation();loadEducationAdmin()}if(p==='progress')renderProgress();if(p==='coach'){document.getElementById('coachWeight').value=data.weight;document.getElementById('nutWeight').value=data.weight}window.scrollTo(0,0)}
 function safe(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function openWorkoutExerciseDetail(id){const workout=data.exercises.find(x=>Number(x.id)===Number(id));if(!workout)return;const found=exerciseCatalog.find(x=>String(x.name||'').trim()===String(workout.name||'').trim());if(found){openExerciseDetail(found.id);return}document.getElementById('detailContent').innerHTML='<h2>'+safe(workout.name)+'</h2><p>برای اجرای صحیح این حرکت، دامنه حرکت را کنترل کن، از تاب دادن بدن خودداری کن و وزنه‌ای انتخاب کن که فرم صحیح حفظ شود.</p><p><b>برنامه فعلی:</b> '+safe(workout.sets)+' ست × '+safe(workout.reps)+' تکرار</p>';document.getElementById('detailBackdrop').classList.add('open')}
 function itemHTML(e,compact=false){const img=e.gif?`<img src="${safe(e.gif)}" alt="نمایش اجرای ${safe(e.name)}">`:`<div style="width:102px;height:88px;border-radius:13px;background:var(--soft);display:grid;place-items:center;color:var(--accent);font-size:30px;flex-shrink:0">🏋️</div>`;return `<div class="card"><div class="exercise">${img}<div class="info"><h3>${safe(e.name)}</h3><div class="muted">${e.sets} ست × ${safe(e.reps)} تکرار</div><button class="pill" style="border:0;background:var(--soft);color:var(--accent)" onclick="openWorkoutExerciseDetail(${Number(e.id)})">آموزش حرکت</button></div>${compact?'':`<input class="check" type="checkbox" ${e.done?'checked':''} aria-label="انجام شد" onchange="toggleDone(${Number(e.id)},this.checked)">`}</div>${compact?'':`<div class="row between" style="margin-top:10px"><span class="muted">وزنه (کیلوگرم)</span><input style="max-width:110px" type="number" min="0" placeholder="مثلاً ۲۰" value="${safe(e.weight||'')}" onchange="setWeight(${Number(e.id)},this.value)"></div>`}</div>`}
@@ -357,12 +407,66 @@ const ironFoods=[
 ];
 function renderFoodLibrary(){const el=document.getElementById('foodItems');if(!el)return;const q=(document.getElementById('foodSearch')?.value||'').trim();el.innerHTML=ironFoods.filter(x=>x[0].includes(q)).map(f=>{const i=ironFoods.indexOf(f),is100=/^100\s*(گرم|میلی‌لیتر)/.test(f[2]),unit=is100?(f[2].includes('میلی')?'میلی‌لیتر':'گرم'):'سهم';return `<div class="row between" style="padding:10px 0;border-bottom:1px solid var(--line);gap:8px"><div class="grow"><b>${safe(f[0])}</b><div class="muted">${f[1]} کالری · ${safe(f[2])}</div></div><input id="ironFoodQty${i}" type="number" min="0.1" max="3000" step="0.1" value="${is100?100:1}" style="width:76px"><span class="muted">${unit}</span><button class="btn small" onclick="addIronFood(${i},document.getElementById('ironFoodQty${i}').value)">افزودن</button></div>`}).join('')||'غذایی پیدا نشد.'}
 function addIronFood(i,quantity){const f=ironFoods[i];if(!f)return;const amount=Number(quantity),is100=/^100\s*(گرم|میلی‌لیتر)/.test(f[2]);if(!Number.isFinite(amount)||amount<=0||amount>3000)return toast('مقدار معتبر وارد کن');const calories=Math.round(f[1]*(is100?amount/100:amount));const unit=is100?(f[2].includes('میلی')?'میلی‌لیتر':'گرم'):'سهم';const matched=findFood(f[0]);let macros={protein:0,carbs:0,fat:0,fiber:0};if(matched&&is100)macros=foodValues(matched,amount);data.foodLogs.push({id:Date.now()+Math.random(),date:dayStamp(),name:f[0],grams:is100?amount:100,portion:is100?`${amount} ${unit}`:`${amount} × ${f[2]}`,calories,...macros,meal:'میان‌وعده'});save();renderNutrition();toast('خوراکی به دفتر تغذیه اضافه شد')}
-let ironAudioUrls=[];
-function loadMusicFiles(e){const files=[...(e.target.files||[])];ironAudioUrls.forEach(URL.revokeObjectURL);ironAudioUrls=files.map(f=>URL.createObjectURL(f));const list=document.getElementById('musicList');list.innerHTML=files.map((f,i)=>`<button class="plan-option" style="width:100%;margin-top:8px" onclick="playIronTrack(${i})">${f.name}</button>`).join('');if(files.length)playIronTrack(0)}
-function playIronTrack(i){const a=document.getElementById('musicAudio');if(a&&ironAudioUrls[i]){a.src=ironAudioUrls[i];a.play().catch(()=>toast('برای پخش، دکمه پخش را بزن'))}}
+
+let ironCoachExploreCache=[];
+async function loadCoachExplore(){
+ const grid=document.getElementById('coachExploreGrid'),status=document.getElementById('coachExploreStatus');if(!grid||!status)return;
+ status.textContent='در حال دریافت مربیان تأییدشده...';grid.innerHTML='';
+ const {data:roles,error:roleError}=await supabaseClient.from('iron_account_roles_v2').select('user_id').eq('role','coach').eq('status','approved');
+ if(roleError){status.textContent='دریافت فهرست مربیان ممکن نشد؛ دسترسی خواندن فهرست در پایگاه داده فعال نیست.';return}
+ const ids=(roles||[]).map(x=>x.user_id).filter(Boolean);
+ if(!ids.length){status.textContent='هنوز مربی تأییدشده‌ای برای نمایش وجود ندارد.';return}
+ const {data,error}=await supabaseClient.from('iron_coach_profiles_v2').select('user_id,full_name,specialty,bio,credentials,photo_url').in('user_id',ids);
+ if(error){status.textContent='خطا در دریافت پروفایل مربیان: '+error.message;return}
+ ironCoachExploreCache=data||[];renderCoachExplore(ironCoachExploreCache);
+}
+function renderCoachExplore(rows){
+ const grid=document.getElementById('coachExploreGrid'),status=document.getElementById('coachExploreStatus');if(!grid)return;
+ status.textContent=rows.length.toLocaleString('fa-IR')+' مربی تأییدشده';
+ grid.innerHTML=rows.length?rows.map(c=>`<article class="coach-profile-tile"><div class="coach-photo">${c.photo_url?'<img src="'+safe(c.photo_url)+'" alt="" style="width:100%;height:112px;object-fit:cover">':'👨‍🏫'}</div><div class="coach-info"><b>${safe(c.full_name||'مربی IRONNOVA')}</b><div class="pill">${safe(c.specialty||'مربی بدنسازی')}</div><p>${safe(c.bio||c.credentials||'اطلاعات تکمیلی در پروفایل مربی ثبت نشده است.')}</p><button class="btn small" style="width:100%" onclick="requestCoachConnection('${safe(c.user_id)}')">درخواست اتصال</button></div></article>`).join(''):'نتیجه‌ای برای نمایش پیدا نشد.';
+}
+function filterCoachExplore(){const q=(document.getElementById('coachExploreSearch').value||'').trim().toLocaleLowerCase();renderCoachExplore(ironCoachExploreCache.filter(c=>[c.full_name,c.specialty,c.bio,c.credentials].join(' ').toLocaleLowerCase().includes(q)))}
+async function requestCoachConnection(id){
+ const {data:{user}}=await supabaseClient.auth.getUser();if(!user){toast('برای درخواست اتصال ابتدا وارد حساب شو');return}
+ const {data,error}=await supabaseClient.rpc('iron_create_invite');
+ if(error){toast('ساخت درخواست ممکن نشد: '+error.message);return}
+ toast('برای اتصال به این مربی، کد دعوت اختصاصی او لازم است. از پروفایل مربی درخواست کد دعوت کن.');
+}
+let ironAudioUrls=[],ironMusicFiles=[],ironMusicIndex=0,ironShuffle=false,ironRepeat=false;
+const ironFmtTime=n=>{if(!Number.isFinite(n)||n<0)return '00:00';const m=Math.floor(n/60),sec=Math.floor(n%60);return String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0')};
+function loadMusicFiles(e){
+ const incoming=[...(e.target.files||[])].filter(f=>f.type.startsWith('audio/')||/\.(mp3|m4a|aac|wav|ogg|flac|opus)$/i.test(f.name));
+ if(!incoming.length){toast('فایل صوتی معتبری انتخاب نشد');return}
+ incoming.forEach(f=>{ironMusicFiles.push(f);ironAudioUrls.push(URL.createObjectURL(f))});
+ e.target.value='';renderIronMusicList();if(ironMusicFiles.length===incoming.length)playIronTrack(0);else toast(incoming.length+' آهنگ اضافه شد');
+}
+function renderIronMusicList(){
+ const list=document.getElementById('musicList');if(!list)return;
+ document.getElementById('musicCount').textContent=ironMusicFiles.length.toLocaleString('fa-IR')+' آهنگ';
+ list.innerHTML=ironMusicFiles.length?ironMusicFiles.map((f,i)=>`<div class="music-track ${i===ironMusicIndex?'active':''}"><button class="track-play" onclick="playIronTrack(${i})">${i===ironMusicIndex?'♫':'▶'}</button><button onclick="playIronTrack(${i})"><b>${safe(f.name)}</b><small>${(f.size/1048576).toFixed(1)} MB</small></button><button class="track-play" onclick="removeIronTrack(${i})" aria-label="حذف از فهرست">×</button></div>`).join(''):'<div class="muted">هنوز فایلی اضافه نشده است.</div>';
+}
+function playIronTrack(i){
+ const a=document.getElementById('musicAudio');if(!a||!ironAudioUrls[i])return;
+ ironMusicIndex=i;a.src=ironAudioUrls[i];document.getElementById('musicNowTitle').textContent=ironMusicFiles[i].name;document.getElementById('musicNowSub').textContent='آهنگ '+(i+1).toLocaleString('fa-IR')+' از '+ironMusicFiles.length.toLocaleString('fa-IR');renderIronMusicList();
+ a.play().then(()=>document.getElementById('musicPlay').textContent='Ⅱ').catch(()=>{document.getElementById('musicPlay').textContent='▶';toast('این فرمت یا فایل روی دستگاه پشتیبانی نشد')});
+}
+function toggleIronPlayback(){const a=document.getElementById('musicAudio');if(!ironMusicFiles.length){toast('اول موسیقی اضافه کن');return}if(a.paused)playIronTrack(ironMusicIndex);else{a.pause();document.getElementById('musicPlay').textContent='▶'}}
+function nextIronTrack(){if(!ironMusicFiles.length)return;let i=ironShuffle?Math.floor(Math.random()*ironMusicFiles.length):(ironMusicIndex+1)%ironMusicFiles.length;playIronTrack(i)}
+function prevIronTrack(){const a=document.getElementById('musicAudio');if(a.currentTime>3){a.currentTime=0;return}playIronTrack((ironMusicIndex-1+ironMusicFiles.length)%ironMusicFiles.length)}
+function toggleIronShuffle(){ironShuffle=!ironShuffle;document.getElementById('musicShuffle').style.color=ironShuffle?'var(--accent)':'var(--text)'}
+function toggleIronRepeat(){ironRepeat=!ironRepeat;document.getElementById('musicRepeat').style.color=ironRepeat?'var(--accent)':'var(--text)'}
+function seekIronTrack(v){const a=document.getElementById('musicAudio');if(a.duration)a.currentTime=(Number(v)/1000)*a.duration}
+function removeIronTrack(i){URL.revokeObjectURL(ironAudioUrls[i]);ironAudioUrls.splice(i,1);ironMusicFiles.splice(i,1);const a=document.getElementById('musicAudio');if(!ironMusicFiles.length){a.pause();a.removeAttribute('src');document.getElementById('musicNowTitle').textContent='هنوز آهنگی انتخاب نشده';document.getElementById('musicPlay').textContent='▶';ironMusicIndex=0}else{if(i===ironMusicIndex)playIronTrack(Math.min(i,ironMusicFiles.length-1));else if(i<ironMusicIndex)ironMusicIndex--;renderIronMusicList()}}
+const ironAudio=document.getElementById('musicAudio');
+ironAudio.addEventListener('timeupdate',()=>{if(!ironAudio.duration)return;document.getElementById('musicProgress').value=Math.round(ironAudio.currentTime/ironAudio.duration*1000);document.getElementById('musicCurrentTime').textContent=ironFmtTime(ironAudio.currentTime)});
+ironAudio.addEventListener('loadedmetadata',()=>{document.getElementById('musicDuration').textContent=ironFmtTime(ironAudio.duration)});
+ironAudio.addEventListener('play',()=>document.getElementById('musicPlay').textContent='Ⅱ');
+ironAudio.addEventListener('pause',()=>document.getElementById('musicPlay').textContent='▶');
+ironAudio.addEventListener('ended',()=>{if(ironRepeat){ironAudio.currentTime=0;ironAudio.play()}else if(ironShuffle||ironMusicIndex<ironMusicFiles.length-1)nextIronTrack();else document.getElementById('musicPlay').textContent='▶'});
+
 const ironProducts=[['شیکر ورزشی',250000],['کش تمرینی',180000],['دستکش بدنسازی',420000],['قمقمه ورزشی',220000],['طناب ورزشی',160000]];
 let ironShopProducts=[];
-async function renderShop(){const el=document.getElementById('shopItems');if(!el)return;el.textContent='در حال دریافت محصولات...';const {data,error}=await supabaseClient.from('iron_store_products_v2').select('id,name,description,category,price_toman,stock,image_url').eq('is_active',true).order('created_at',{ascending:false});if(error){el.textContent='خطا در دریافت محصولات: '+error.message;return}ironShopProducts=data||[];el.innerHTML=ironShopProducts.length?ironShopProducts.map(p=>`<div class="row between" style="padding:12px 0;border-bottom:1px solid var(--line);gap:10px"><div class="grow"><b>${safe(p.name)}</b><div class="muted">${Number(p.price_toman).toLocaleString('fa-IR')} تومان · موجودی ${Number(p.stock)}</div><small class="muted">${safe(p.description||p.category||'')}</small></div><button class="btn small" ${p.stock<1?'disabled':''} onclick="addShopItem('${p.id}')">افزودن</button></div>`).join(''):'فعلاً محصول فعالی ثبت نشده است.';renderShopCart()}
+async function renderShop(){const el=document.getElementById('shopItems');if(!el)return;el.textContent='در حال دریافت محصولات...';const {data,error}=await supabaseClient.from('iron_store_products_v2').select('id,name,description,category,price_toman,stock,image_url').eq('is_active',true).order('created_at',{ascending:false});if(error){el.textContent='خطا در دریافت محصولات: '+error.message;return}ironShopProducts=data||[];el.innerHTML=ironShopProducts.length?ironShopProducts.map(p=>`<article class="shop-product"><div><div class="product-icon">🏋️</div><b>${safe(p.name)}</b><div class="muted">${Number(p.price_toman).toLocaleString('fa-IR')} تومان</div><small class="muted">${safe(p.description||p.category||'')}</small><div class="pill">${Number(p.stock)>0?'موجود در انبار':'ناموجود'}</div></div><button class="btn small" ${p.stock<1?'disabled':''} onclick="addShopItem('${p.id}')">افزودن به سبد</button></article>`).join(''):'فعلاً محصول فعالی ثبت نشده است.';renderShopCart()}
 function addShopItem(id){const p=ironShopProducts.find(x=>x.id===id);if(!p||p.stock<1)return toast('این محصول موجود نیست');const c=JSON.parse(localStorage.getItem('ironShopCart')||'[]');const old=c.find(x=>x.id===id);if(old){if(old.qty>=p.stock)return toast('بیشتر از موجودی نمی‌توانی سفارش بدهی');old.qty++}else c.push({id,qty:1});localStorage.setItem('ironShopCart',JSON.stringify(c));renderShopCart();toast('به سبد خرید اضافه شد')}
 function renderShopCart(){const c=JSON.parse(localStorage.getItem('ironShopCart')||'[]');const el=document.getElementById('shopCart');if(!el)return;let total=0;el.innerHTML=c.length?c.map(x=>{const p=ironShopProducts.find(y=>y.id===x.id);if(!p)return '';total+=Number(p.price_toman)*x.qty;return `<div class="row between" style="padding:7px 0"><span>${safe(p.name)} × ${x.qty}</span><button class="btn secondary small" onclick="removeShopItem('${p.id}')">حذف</button></div>`}).join('')+`<b>جمع: ${total.toLocaleString('fa-IR')} تومان</b>`:'سبد خرید خالی است.'}
 function removeShopItem(id){const c=JSON.parse(localStorage.getItem('ironShopCart')||'[]').filter(x=>x.id!==id);localStorage.setItem('ironShopCart',JSON.stringify(c));renderShopCart()}
