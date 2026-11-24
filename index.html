@@ -952,7 +952,7 @@ async function loadIronChatPartners(){
  if(error){el.textContent='دریافت فهرست گفت‌وگوها ناموفق بود: '+error.message;return}
  const partners=[...new Set((data||[]).map(x=>x.coach_id===user.id?x.student_id:x.coach_id))];const {data:myRole}=await supabaseClient.from('iron_account_roles_v2').select('role').eq('user_id',user.id).maybeSingle();
  if(!partners.length){el.innerHTML='<div class="muted">هنوز اتصال تأییدشده‌ای برای گفت‌وگو وجود ندارد.</div>';return}
- el.innerHTML='<div class="eyebrow">گفت‌وگوهای شما</div>'+partners.map(id=>'<button class="comm-contact '+(id===ironSelectedChatPartner?'active':'')+'" onclick="selectIronChatPartner(\''+id+'\')">گفت‌وگوی خصوصی <small style="display:block;color:var(--muted);margin-top:4px">'+safe(id)+'</small></button>').join('');
+ el.innerHTML='<div class="eyebrow">گفت‌وگوهای شما</div>'+partners.map((id,index)=>'<button class="comm-contact '+(id===ironSelectedChatPartner?'active':'')+'" onclick="selectIronChatPartner('+JSON.stringify(id)+')">'+(myRole?.role==='coach'?'شاگرد':'مربی')+' شماره '+(index+1).toLocaleString('fa-IR')+' <small style="display:block;color:var(--muted);margin-top:4px">گفت‌وگوی خصوصی امن</small></button>').join('');
 }
 async function selectIronChatPartner(id){
  ironSelectedChatPartner=id;document.getElementById('icMessagePartner').value=id;document.getElementById('ironChatTitle').textContent='گفت‌وگوی خصوصی · '+id;await loadIronChatPartners();await loadIronMessages();
