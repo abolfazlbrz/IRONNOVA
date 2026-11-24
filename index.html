@@ -917,7 +917,7 @@ async function loadCommunicationCenter(){
 }
 function communicationCard(type,x){
  const key=type+':'+x.id,unread=!ironCommReadSet.has(key),expanded=ironCommExpanded.has(key);
- return '<article class="comm-item '+(unread?'unread':'')+'"><div class="comm-meta"><span>'+(type==='public'?'اطلاعیه مدیریت':'پیام مربی')+'</span><time>'+new Date(x.created_at).toLocaleString('fa-IR')+'</time></div><b>'+safe(x.title)+'</b><div class="comm-body '+(expanded?'':'hidden')+'" id="comm-body-'+x.id+'">'+safe(x.body)+'</div><button class="btn secondary small" style="margin-top:8px" onclick="toggleCommunication(''+type+'',''+x.id+'')">'+(expanded?'بستن پیام':'مشاهده پیام')+'</button></article>';
+ return '<article class="comm-item '+(unread?'unread':'')+'"><div class="comm-meta"><span>'+(type==='public'?'اطلاعیه مدیریت':'پیام مربی')+'</span><time>'+new Date(x.created_at).toLocaleString('fa-IR')+'</time></div><b>'+safe(x.title)+'</b><div class="comm-body '+(expanded?'':'hidden')+'" id="comm-body-'+x.id+'">'+safe(x.body)+'</div><button class="btn secondary small" style="margin-top:8px" onclick="toggleCommunication('+JSON.stringify(type)+','+JSON.stringify(x.id)+')">'+(expanded?'بستن پیام':'مشاهده پیام')+'</button></article>';
 }
 function coachCloudCard(x){
  const key='coach:'+x.id,unread=!ironCommReadSet.has(key),expanded=ironCommExpanded.has(key);
