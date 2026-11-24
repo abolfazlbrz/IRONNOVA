@@ -199,6 +199,43 @@ main.app section>h2{margin-bottom:9px}
 @media(max-height:680px){.iron-intro{background-size:auto 76vh;background-position:center 1vh}.intro-bottom{bottom:calc(env(safe-area-inset-bottom) + 74px)}.intro-skip{bottom:calc(env(safe-area-inset-bottom) + 14px);padding:9px 20px}}
 @media(prefers-reduced-motion:reduce){.intro-progress i{animation-duration:.4s}.iron-intro{transition:none}}
 
+
+/* IRONNOVA mobile access + compact spacing fix */
+@media(max-width:760px){
+  .menu-toggle{
+    position:fixed!important;
+    right:14px!important;
+    bottom:calc(14px + env(safe-area-inset-bottom))!important;
+    z-index:46!important;
+    box-shadow:0 8px 24px #0007;
+  }
+  main.app{
+    padding-bottom:calc(88px + env(safe-area-inset-bottom))!important;
+  }
+  main.app>section:not(.hidden){
+    margin-block:0!important;
+    padding-block-start:0!important;
+    min-height:0!important;
+    height:auto!important;
+  }
+  main.app>section:not(.hidden)>:first-child{
+    margin-top:0!important;
+  }
+  main.app>section:not(.hidden)>h1:first-child{
+    margin:0 0 8px!important;
+  }
+  main.app>section:not(.hidden)>p:first-of-type{
+    margin:4px 0 8px!important;
+  }
+  main.app .field{
+    margin-block:7px!important;
+  }
+  main.app .card{
+    margin-block:6px!important;
+    padding:12px!important;
+  }
+}
+
 </style>
 </head>
 <body><div id="ironIntro" class="iron-intro" aria-label="IRONNOVA">
