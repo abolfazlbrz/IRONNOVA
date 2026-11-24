@@ -61,7 +61,7 @@ def main():
         values = res / "values"
         values.mkdir(parents=True, exist_ok=True)
         (values / "ic_launcher_background.xml").write_text(
-            '<resources><color name="ic_launcher_background">#071009</color></resources>',
+            '<resources><color name="ic_launcher_background">#FFFFFF</color></resources>',
             encoding="utf-8")
     print("IRONNOVA blue dumbbell icons generated.")
 
