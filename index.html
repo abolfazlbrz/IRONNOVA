@@ -45,7 +45,9 @@ body.dark{--bg:#101d32;--surface:#172943;--text:#edf4ff;--muted:#a9bdd5;--soft:#
 /* IRONNOVA feature modules */
 #coachPanelPage .card,#foodLibraryPage .card,#musicPage .card,#shopPage .card{margin:12px 0}
 #coachPanelPage textarea,#musicPage input,#foodLibraryPage input{width:100%;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--text)}
-#foodItems{max-height:62vh;overflow:auto}
+#foodItems{max-height:none;overflow:visible}
+#foodLibraryPage .card{margin:10px 0;padding:14px}
+#foodItems>.card{margin:10px 0;padding:14px}
 
 /* IRONNOVA premium cinematic intro */
 .iron-intro{position:fixed;inset:0;z-index:1000;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 42%,#24362b 0%,#101713 48%,#070b08 100%);color:#f4f6fa;isolation:isolate;transition:opacity .65s ease,visibility .65s ease}
