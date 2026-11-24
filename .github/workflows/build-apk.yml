@@ -26,6 +26,12 @@ jobs:
       - name: Validate inline JavaScript
         run: node scripts/check-inline-js.mjs
 
+      - name: Validate Android native audio source
+        run: |
+          node --check scripts/prepare-android.mjs
+          node --input-type=module --check < native-audio-bridge.js
+          grep -q '@CapacitorPlugin(name = "NativeAudio")' android-native/NativeAudioPlugin.java
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
