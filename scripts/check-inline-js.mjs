@@ -32,6 +32,8 @@ const required = [
   'IRONNOVA_REFERENCE_PLAN',
   'workoutProgramsPage',
   'weightloss',
+  'bodybuilding',
+  'weightgain',
   'budget',
   'NativeAudio',
   'applyReferencePlan',
