@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1846595330",
+    "project_id": "ironnova",
+    "storage_bucket": "ironnova.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1846595330:android:035a3ea65d4203892b7c1b",
+        "android_client_info": {
+          "package_name": "com.ironnova.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCLYazQr5fVD1qWrFNY4DHXSrlwRcCsynQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
