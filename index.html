@@ -184,24 +184,30 @@ main.app section>h2{margin-bottom:9px}
 .food-recipe-icon,.meal-basket-art{font-size:30px;align-self:flex-start;filter:drop-shadow(0 0 10px #5aff6b55)}
 .food-recipe-card b,.meal-basket-tile b{font-size:13px;line-height:1.6}.food-recipe-card small,.meal-basket-tile small{font-size:10px;color:#aab8ad;line-height:1.7}.food-card-arrow{font-size:10px;color:#76ff64;margin-top:auto}.food-detail-card{border-color:rgba(100,255,110,.28);background:linear-gradient(145deg,#17251d,#0b100d)}.meal-item-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-top:1px solid var(--line)}
 @media(min-width:700px){.food-recipe-grid,.meal-basket-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+/* Approved IRONNOVA cinematic splash */
+.iron-intro{position:fixed;inset:0;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;overflow:hidden;background:#050805 url('./assets/ironnova-splash.webp') center top/100% auto no-repeat;color:#f4fff5;isolation:isolate;transition:opacity .65s ease,visibility .65s ease}
+.iron-intro::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:linear-gradient(180deg,transparent 0%,transparent 55%,rgba(5,8,5,.35) 68%,#050805 84%,#050805 100%)}
+.iron-intro.is-leaving{opacity:0;visibility:hidden;pointer-events:none}
+.intro-bottom{position:absolute;z-index:1;left:18px;right:18px;bottom:calc(env(safe-area-inset-bottom) + 100px);display:flex;flex-direction:column;align-items:center;gap:13px;text-align:center}
+.intro-kicker{font-size:10px;font-weight:800;letter-spacing:3px;color:#d6e5d5;text-shadow:0 2px 10px #000}
+.intro-progress{width:min(230px,62vw);height:4px;margin:0;background:#ffffff25;border-radius:99px;overflow:hidden;box-shadow:0 0 14px #0008}
+.intro-progress i{display:block;width:100%;height:100%;border-radius:99px;background:linear-gradient(90deg,#58d91f,#a6ff42);transform:scaleX(0);transform-origin:left;animation:introLoad 3.3s cubic-bezier(.2,.7,.2,1) .25s forwards;box-shadow:0 0 14px #73ff3c}
+.intro-skip{position:absolute;z-index:2;left:50%;bottom:calc(env(safe-area-inset-bottom) + 25px);transform:translateX(-50%);white-space:nowrap;border:1px solid #8cff5b70;background:linear-gradient(135deg,#152519ef,#071009f2);color:#f4fff5;border-radius:999px;padding:12px 25px;font-size:13px;font-weight:800;box-shadow:0 8px 28px #0009,0 0 18px #67ff3820;backdrop-filter:blur(12px)}
+.intro-skip span{color:#8cff43;margin-right:8px}
+@media(min-width:700px){.iron-intro{background-size:auto min(86vh,1050px);background-position:center 2vh}.intro-bottom{bottom:calc(env(safe-area-inset-bottom) + 110px)}}
+@media(max-height:680px){.iron-intro{background-size:auto 76vh;background-position:center 1vh}.intro-bottom{bottom:calc(env(safe-area-inset-bottom) + 74px)}.intro-skip{bottom:calc(env(safe-area-inset-bottom) + 14px);padding:9px 20px}}
+@media(prefers-reduced-motion:reduce){.intro-progress i{animation-duration:.4s}.iron-intro{transition:none}}
+
 </style>
 </head>
-<body><div id="ironIntro" class="iron-intro" aria-label="IRONNOVA"><div class="intro-grid"></div><div class="intro-light"></div><div class="intro-orbit"></div><div class="intro-particles"></div><div class="intro-scan"></div><div class="intro-art">
-<svg class="intro-arm" viewBox="0 0 620 470" role="img" aria-label="دست عضلانی در حال بالا بردن دمبل"><defs>
-<linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f2c6a3"/><stop offset=".42" stop-color="#b96f50"/><stop offset=".72" stop-color="#713d35"/><stop offset="1" stop-color="#2b2028"/></linearGradient>
-<linearGradient id="skinHi" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffd9b7"/><stop offset="1" stop-color="#a95746"/></linearGradient>
-<linearGradient id="steel" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#303d4c"/><stop offset=".22" stop-color="#e6edf5"/><stop offset=".48" stop-color="#65788e"/><stop offset=".75" stop-color="#f7fbff"/><stop offset="1" stop-color="#263647"/></linearGradient>
-<radialGradient id="muscle"><stop stop-color="#f35a55"/><stop offset=".62" stop-color="#a92330"/><stop offset="1" stop-color="#541c2c"/></radialGradient>
-<filter id="armShadow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="13"/></filter>
-</defs>
-<ellipse cx="315" cy="390" rx="190" ry="34" fill="#ef343c" opacity=".2" filter="url(#armShadow)"/>
-<g class="intro-dumbbell"><rect x="72" y="183" width="476" height="34" rx="17" fill="url(#steel)" stroke="#e6edf5" stroke-width="3"/><rect x="48" y="139" width="72" height="122" rx="17" fill="url(#steel)" stroke="#aebdce" stroke-width="4"/><rect x="500" y="139" width="72" height="122" rx="17" fill="url(#steel)" stroke="#aebdce" stroke-width="4"/><path d="M65 151v98M555 151v98" stroke="#fff" stroke-opacity=".45" stroke-width="5"/></g>
-<g class="intro-forearm"><path d="M245 390 C214 350 191 304 178 267 C166 232 157 211 170 193 C185 172 211 180 228 203 L278 267 C295 285 315 290 331 278 C351 264 371 244 390 227 C409 209 430 209 444 225 C459 242 451 261 436 278 C402 316 363 355 326 388 C300 411 268 412 245 390Z" fill="url(#skin)" stroke="#402b32" stroke-width="7"/>
-<path d="M192 218 C213 252 234 284 253 311 C273 340 299 351 325 334 C351 317 382 282 414 255" fill="none" stroke="url(#skinHi)" stroke-width="13" stroke-linecap="round" opacity=".65"/>
-</g>
-<g class="intro-bicep"><path d="M245 383 C218 354 210 321 218 289 C226 254 254 224 285 212 C314 201 345 216 354 244 C365 277 351 319 333 350 C314 382 276 405 245 383Z" fill="url(#muscle)" stroke="#4d1b2b" stroke-width="8"/><path d="M247 355 C255 316 276 266 307 239 C326 256 331 285 318 316 C303 347 278 365 247 355Z" fill="#f47769" opacity=".65"/><path d="M265 365 C286 346 306 315 320 278" fill="none" stroke="#ffd0b4" stroke-opacity=".55" stroke-width="6" stroke-linecap="round"/><path d="M232 330 C237 290 253 261 280 241" fill="none" stroke="#571d2d" stroke-width="7" stroke-linecap="round"/></g>
-<g class="intro-hand"><path d="M390 244 C397 222 411 198 427 185 C441 173 456 180 457 194 C457 205 445 219 439 232 C454 214 474 191 489 196 C505 201 496 219 485 235 C501 220 519 212 528 225 C535 236 518 251 505 264 C521 256 537 257 541 270 C544 284 521 300 501 312 C484 324 466 331 445 322 L409 300 C395 291 384 266 390 244Z" fill="url(#skin)" stroke="#352832" stroke-width="7"/><path d="M416 223 C425 211 435 200 442 195M441 239 C456 224 469 211 480 207M462 260 C480 246 493 238 503 236M477 282 C493 274 507 268 518 267" fill="none" stroke="#ffd4b7" stroke-width="5" stroke-linecap="round" opacity=".7"/><path d="M385 247 C367 231 357 219 356 207 C355 193 368 186 380 195 L410 222" fill="none" stroke="#8f4b40" stroke-width="20" stroke-linecap="round"/></g><g class="intro-burst" fill="none" stroke="#a6e66b" stroke-width="5" stroke-linecap="round"><path d="M286 205V165M235 226L205 198M337 224L369 194M224 285L182 278M347 286L390 278M246 354L219 386M326 355L351 389"/><circle cx="286" cy="296" r="68" stroke-width="3" stroke-dasharray="9 12"/><path d="M286 188l-8 20 16 0zM197 258l18-4-7 15zM372 257l-18-4 7 15z" fill="#a6e66b" stroke="none"/></g>
-</svg><div class="intro-shockwave"></div></div><div class="intro-copy"><div class="intro-kicker">TRAIN SMART · GET STRONGER</div><div class="intro-wordmark">IRON<span>NOVA</span></div><div class="intro-line">DISCIPLINE BUILDS STRENGTH</div><div class="intro-progress"><i></i></div></div><button class="intro-skip" onclick="closeIronIntro()">ورود به برنامه <span>←</span></button></div><div class="dashboard-layout">
+<body><div id="ironIntro" class="iron-intro" aria-label="IRONNOVA">
+  <div class="intro-bottom">
+    <div class="intro-kicker">TRAIN SMART · GET STRONGER</div>
+    <div class="intro-progress"><i></i></div>
+  </div>
+  <button class="intro-skip" onclick="closeIronIntro()">ورود به برنامه <span>←</span></button>
+</div><div class="dashboard-layout">
 <aside class="sidebar" id="sidebar"><div class="side-brand">IRONNOVA</div><div class="side-sub">TRAIN SMART · GET STRONGER</div><div class="side-title">داشبورد</div><nav class="side-nav">
 <button class="active" data-page="home" onclick="showPage('home')"><span class="ico">⌂</span>خانه</button>
 <button data-page="workout" onclick="showPage('workout')"><span class="ico">🏋️</span>برنامه تمرینی</button>
@@ -1185,5 +1191,5 @@ supabaseClient.auth.getSession().then(({data:r,error})=>{if(error)setAuthMessage
 supabaseClient.auth.onAuthStateChange((_event,session)=>setTimeout(()=>handleAuthSession(session),0));
 if('serviceWorker'in navigator&&!window.Capacitor?.isNativePlatform?.())window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 function closeIronIntro(){const el=document.getElementById('ironIntro');if(!el||el.classList.contains('is-leaving'))return;el.classList.add('is-leaving');setTimeout(()=>el.remove(),700)}
-window.addEventListener('load',()=>{const intro=document.getElementById('ironIntro');if(intro)setTimeout(closeIronIntro,3800)});
+window.addEventListener('load',()=>{const intro=document.getElementById('ironIntro');if(intro)setTimeout(closeIronIntro,4300)});
 </script><script>if(window.Capacitor?.isNativePlatform?.()){const s=document.createElement('script');s.src='./iron-push.js';s.defer=true;document.head.appendChild(s)}</script></body></html>

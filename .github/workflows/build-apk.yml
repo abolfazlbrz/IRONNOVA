@@ -20,6 +20,12 @@ jobs:
         with:
           node-version: 20
 
+      - name: Install icon generator dependency
+        run: python3 -m pip install --disable-pip-version-check Pillow
+
+      - name: Generate IRONNOVA app icons
+        run: python3 scripts/generate-icons.py
+
       - name: Validate inline JavaScript
         run: node scripts/check-inline-js.mjs
 
@@ -49,6 +55,9 @@ jobs:
 
       - name: Create Android project
         run: npx cap add android
+
+      - name: Generate Android launcher icons
+        run: python3 scripts/generate-icons.py --android-res android/app/src/main/res
 
       - name: Add Firebase Android configuration
         run: cp google-services.json android/app/google-services.json
