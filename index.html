@@ -494,6 +494,10 @@ function buildSmartPlan(){
   daysList=Array.from({length:days},(_,i)=>safeNames.slice(0,Math.min(safeNames.length,days===3?3:4)));
   safetyNote='<div class="admin-note"><b>محدودیت کمر در انتخاب حرکات اعمال شد.</b><br>حرکات دارای خم‌شدن یا چرخش تنه، بارگذاری مستقیم ستون فقرات و حرکات پرفشار از برنامه حذف شدند. این فهرست هم تأیید پزشکی محسوب نمی‌شود؛ فقط حرکاتی را انجام بده که پزشک یا فیزیوتراپیست برای وضعیتت مجاز دانسته و با بروز درد یا علائم عصبی تمرین را متوقف کن.</div>';
  }
+ if(limit==='other'&&limitDetails.trim()){
+  result.innerHTML='<div class="admin-note">محدودیت جسمی در دسته «سایر/نامشخص» ثبت شده است. برای جلوگیری از پیشنهاد حرکت ناسازگار، برنامه خودکار ساخته نشد. ابتدا محدودیت و حرکات مجاز را با پزشک یا فیزیوتراپیست مشخص کن.</div>';
+  return;
+ }
  if(limit==='shoulder'){
   const blocked=/(پرس سینه|شنا|پرس سرشانه|نشر|فیس پول|فلای|بارفیکس|لت|پشت بازو بالای سر)/;
   daysList=daysList.map(day=>day.filter(name=>!blocked.test(name)));
@@ -517,10 +521,11 @@ function buildSmartPlan(){
 function validateSmartPlanLimits(plan){
  const limit=document.getElementById('coachLimit')?.value||'none',details=document.getElementById('coachLimitDetails')?.value||'';
  const names=plan.flatMap(d=>(d.exercises||[]).map(e=>String(e.name||'')));
+ if(limit==='other'&&details.trim()){toast('محدودیت نامشخص است؛ ابتدا حرکات مجاز را با متخصص مشخص کن.');return false}
  if(limit==='back'&&/(دیسک|فتق|بیرون.?زدگی|سیاتیک|بی.?حسی|گزگز|ضعف|درد تیرکشنده|جراحی|شکستگی)/i.test(details)){toast('با این توضیحات مربوط به کمر، ساخت خودکار برنامه متوقف شد. ابتدا حرکات مجاز را با پزشک یا فیزیوتراپیست مشخص کن.');return false}
  if(limit==='back'){const safe=['پرس سینه دستگاه با تکیه‌گاه کامل','قایقی دستگاه با تکیه‌گاه سینه','جلو پا دستگاه با تکیه‌گاه','پشت پا نشسته با تکیه‌گاه','جلو بازو سیم‌کش نشسته با تکیه‌گاه','پشت بازو سیم‌کش با تنه ثابت','پرس سینه کش نشسته با تکیه‌گاه','جلو بازو کش نشسته با تکیه‌گاه','پشت بازو کش با تنه ثابت'];if(names.some(n=>!safe.includes(n))){toast('برنامه نهایی شامل حرکتی خارج از فهرست محافظه‌کارانه محدودیت کمر است و ذخیره نشد.');return false}}
- if(limit==='shoulder'&&names.some(n=>/(پرس سرشانه|نشر جانب|نشر خم|شنا|دیپ|پرس بالای سر|پشت بازو بالای سر)/i.test(n))){toast('برنامه شامل حرکت نامتناسب با محدودیت شانه است و ذخیره نشد.');return false}
- if(limit==='knee'&&names.some(n=>/(اسکوات|لانج|پرش|دویدن|پرس پا|جلو پا دستگاه|استپ آپ)/i.test(n))){toast('برنامه شامل حرکت نامتناسب با محدودیت زانو است و ذخیره نشد.');return false}
+ if(limit==='shoulder'&&names.some(n=>/(پرس سینه|شنا|پرس سرشانه|نشر|فیس پول|فلای|بارفیکس|لت|پشت بازو بالای سر)/i.test(n))){toast('برنامه شامل حرکت نامتناسب با محدودیت شانه است و ذخیره نشد.');return false}
+ if(limit==='knee'&&names.some(n=>/(پرس پا|اسکوات|لانج|جلو پا|استپ‌آپ|ددلیفت رومانیایی|پل باسن)/i.test(n))){toast('برنامه شامل حرکت نامتناسب با محدودیت زانو است و ذخیره نشد.');return false}
  if(limit==='wrist'&&names.some(n=>/(شنا|پلانک|دیپ|مچ هالتر)/i.test(n))){toast('برنامه شامل حرکت فشار مستقیم روی مچ است و ذخیره نشد.');return false}
  if(limit==='neck'&&names.some(n=>/(شراگ|پل گردن|پرس پشت گردن|پشت گردن)/i.test(n))){toast('برنامه شامل حرکت نامتناسب با محدودیت گردن است و ذخیره نشد.');return false}
  return true
