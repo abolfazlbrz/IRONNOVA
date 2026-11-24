@@ -935,6 +935,8 @@ async function initCommunicationRealtime(){
  .on('postgres_changes',{event:'*',schema:'public',table:'iron_public_announcements_v1'},()=>loadCommunicationCenter())
  .on('postgres_changes',{event:'*',schema:'public',table:'iron_coach_broadcasts_v1'},()=>loadCommunicationCenter())
  .on('postgres_changes',{event:'INSERT',schema:'public',table:'iron_messages_v2'},payload=>{if(payload.new?.coach_id===user.id||payload.new?.student_id===user.id){loadIronMessages();loadIronChatPartners();loadCommunicationCenter();}})
+ .on('postgres_changes',{event:'INSERT',schema:'public',table:'iron_coach_group_messages_v2'},payload=>{const selected=document.getElementById('icSelectedGroupId')?.value;if(payload.new?.group_id===selected)loadIronGroupMessages()})
+ .on('postgres_changes',{event:'INSERT',schema:'public',table:'iron_student_logs'},payload=>{loadMyStudentLogs();if(payload.new?.student_id!==user.id)toast('گزارش تمرین جدید از یکی از شاگردها دریافت شد')})
  .subscribe();
 }
 async function loadCommunicationCenter(){
