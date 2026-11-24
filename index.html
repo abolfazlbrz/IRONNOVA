@@ -47,8 +47,14 @@ body.dark{--bg:#101d32;--surface:#172943;--text:#edf4ff;--muted:#a9bdd5;--soft:#
 .app{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
 .app>section:not(.hidden){display:block}
 .app>section:not(.hidden)>h1:first-child{margin-top:4px}
-.card{margin:9px 0;padding:14px}
-#coachPanelPage .card,#foodLibraryPage .card,#musicPage .card,#shopPage .card{margin:9px 0}
+.card{margin:7px 0;padding:13px}
+#coachPanelPage .card,#foodLibraryPage .card,#musicPage .card,#shopPage .card{margin:7px 0}
+#coachPanelPage>.card,#coachPanelPage>section.card{margin-block:7px}
+#coachPanelPage .field{margin:9px 0}
+#coachPanelPage .field input,#coachPanelPage .field select,#coachPanelPage .field textarea{min-width:0;max-width:100%;box-sizing:border-box}
+#musicPage .music-tools{margin-top:10px}
+#musicPage .music-tools label{min-height:42px;box-sizing:border-box}
+#musicPage .music-tools input[type=file]{display:none!important}
 #coachPanelPage textarea,#musicPage input,#foodLibraryPage input{width:100%;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--text)}
 #foodItems{max-height:62vh;overflow:auto}
 #musicPage .music-shell{padding:16px;background:linear-gradient(145deg,var(--surface),var(--soft));border:1px solid var(--line);border-radius:22px}
@@ -503,34 +509,100 @@ function requestCoachConnection(id){
 let ironAudioUrls=[],ironMusicFiles=[],ironMusicIndex=0,ironShuffle=false,ironRepeat=false;
 const ironFmtTime=n=>{if(!Number.isFinite(n)||n<0)return '00:00';const m=Math.floor(n/60),sec=Math.floor(n%60);return String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0')};
 function loadMusicFiles(e){
- const incoming=[...(e.target.files||[])].filter(f=>f.type.startsWith('audio/')||/\.(mp3|m4a|aac|wav|ogg|flac|opus)$/i.test(f.name));
- if(!incoming.length){toast('فایل صوتی معتبری انتخاب نشد');return}
- incoming.forEach(f=>{ironMusicFiles.push(f);ironAudioUrls.push(URL.createObjectURL(f))});
- e.target.value='';renderIronMusicList();if(ironMusicFiles.length===incoming.length)playIronTrack(0);else toast(incoming.length+' آهنگ اضافه شد');
+ const picker=e&&e.target,selected=Array.from(picker&&picker.files||[]);
+ if(!selected.length)return;
+ const incoming=selected.filter(f=>/\\.(mp3|m4a|aac|wav|ogg|oga|opus|flac|webm)$/i.test(f.name)||/^audio\\//i.test(f.type||''));
+ if(!incoming.length){toast('فایل صوتی قابل شناسایی انتخاب نشد');picker.value='';return}
+ let added=0,duplicates=0;
+ incoming.forEach(f=>{
+  const duplicate=ironMusicFiles.some(x=>x.name===f.name&&x.size===f.size&&x.lastModified===f.lastModified);
+  if(duplicate){duplicates++;return}
+  ironMusicFiles.push(f);
+  ironAudioUrls.push(URL.createObjectURL(f));
+  added++;
+ });
+ picker.value='';
+ renderIronMusicList();
+ if(added&&ironMusicFiles.length===added){
+  playIronTrack(0);
+ }else if(added){
+  toast(added.toLocaleString('fa-IR')+' آهنگ به فهرست اضافه شد');
+ }else if(duplicates){
+  toast('این فایل‌ها قبلاً به فهرست اضافه شده‌اند');
+ }
 }
 function renderIronMusicList(){
  const list=document.getElementById('musicList');if(!list)return;
- document.getElementById('musicCount').textContent=ironMusicFiles.length.toLocaleString('fa-IR')+' آهنگ';
- list.innerHTML=ironMusicFiles.length?ironMusicFiles.map((f,i)=>`<div class="music-track ${i===ironMusicIndex?'active':''}"><button class="track-play" onclick="playIronTrack(${i})">${i===ironMusicIndex?'♫':'▶'}</button><button onclick="playIronTrack(${i})"><b>${safe(f.name)}</b><small>${(f.size/1048576).toFixed(1)} MB</small></button><button class="track-play" onclick="removeIronTrack(${i})" aria-label="حذف از فهرست">×</button></div>`).join(''):'<div class="muted">هنوز فایلی اضافه نشده است.</div>';
+ const count=document.getElementById('musicCount');
+ if(count)count.textContent=ironMusicFiles.length.toLocaleString('fa-IR')+' آهنگ';
+ list.innerHTML=ironMusicFiles.length?ironMusicFiles.map((f,i)=>`<div class="music-track ${i===ironMusicIndex?'active':''}"><button class="track-play" onclick="playIronTrack(${i})" aria-label="پخش آهنگ">${i===ironMusicIndex?'♫':'▶'}</button><button onclick="playIronTrack(${i})"><b>${safe(f.name)}</b><small>${(f.size/1048576).toFixed(1)} MB</small></button><button class="track-play" onclick="removeIronTrack(${i})" aria-label="حذف از فهرست">×</button></div>`).join(''):'<div class="muted">هنوز فایلی اضافه نشده است.</div>';
 }
-function playIronTrack(i){
- const a=document.getElementById('musicAudio');if(!a||!ironAudioUrls[i])return;
- ironMusicIndex=i;a.src=ironAudioUrls[i];document.getElementById('musicNowTitle').textContent=ironMusicFiles[i].name;document.getElementById('musicNowSub').textContent='آهنگ '+(i+1).toLocaleString('fa-IR')+' از '+ironMusicFiles.length.toLocaleString('fa-IR');renderIronMusicList();
- a.play().then(()=>document.getElementById('musicPlay').textContent='Ⅱ').catch(()=>{document.getElementById('musicPlay').textContent='▶';toast('این فرمت یا فایل روی دستگاه پشتیبانی نشد')});
+async function playIronTrack(i){
+ const a=document.getElementById('musicAudio');
+ if(!a||!ironAudioUrls[i]||!ironMusicFiles[i])return;
+ ironMusicIndex=i;
+ const title=document.getElementById('musicNowTitle'),sub=document.getElementById('musicNowSub'),play=document.getElementById('musicPlay');
+ if(title)title.textContent=ironMusicFiles[i].name;
+ if(sub)sub.textContent='آهنگ '+(i+1).toLocaleString('fa-IR')+' از '+ironMusicFiles.length.toLocaleString('fa-IR');
+ if(play)play.textContent='…';
+ renderIronMusicList();
+ a.pause();
+ a.removeAttribute('src');
+ a.src=ironAudioUrls[i];
+ a.load();
+ try{
+  await a.play();
+ }catch(err){
+  if(play)play.textContent='▶';
+  const reason=err&&err.name==='NotSupportedError'?'فرمت یا کُدک این فایل در پخش‌کننده اندروید پشتیبانی نمی‌شود. فایل MP3 یا M4A را امتحان کن.':err&&err.name==='NotAllowedError'?'اجازه پخش از طرف سیستم صادر نشد؛ دوباره دکمه پخش را بزن.':'پخش فایل انجام نشد؛ ممکن است فایل خراب یا ناقص باشد.';
+  toast(reason);
+ }
 }
-function toggleIronPlayback(){const a=document.getElementById('musicAudio');if(!ironMusicFiles.length){toast('اول موسیقی اضافه کن');return}if(a.paused)playIronTrack(ironMusicIndex);else{a.pause();document.getElementById('musicPlay').textContent='▶'}}
-function nextIronTrack(){if(!ironMusicFiles.length)return;let i=ironShuffle?Math.floor(Math.random()*ironMusicFiles.length):(ironMusicIndex+1)%ironMusicFiles.length;playIronTrack(i)}
-function prevIronTrack(){const a=document.getElementById('musicAudio');if(a.currentTime>3){a.currentTime=0;return}playIronTrack((ironMusicIndex-1+ironMusicFiles.length)%ironMusicFiles.length)}
-function toggleIronShuffle(){ironShuffle=!ironShuffle;document.getElementById('musicShuffle').style.color=ironShuffle?'var(--accent)':'var(--text)'}
-function toggleIronRepeat(){ironRepeat=!ironRepeat;document.getElementById('musicRepeat').style.color=ironRepeat?'var(--accent)':'var(--text)'}
-function seekIronTrack(v){const a=document.getElementById('musicAudio');if(a.duration)a.currentTime=(Number(v)/1000)*a.duration}
-function removeIronTrack(i){URL.revokeObjectURL(ironAudioUrls[i]);ironAudioUrls.splice(i,1);ironMusicFiles.splice(i,1);const a=document.getElementById('musicAudio');if(!ironMusicFiles.length){a.pause();a.removeAttribute('src');document.getElementById('musicNowTitle').textContent='هنوز آهنگی انتخاب نشده';document.getElementById('musicPlay').textContent='▶';ironMusicIndex=0}else{if(i===ironMusicIndex)playIronTrack(Math.min(i,ironMusicFiles.length-1));else if(i<ironMusicIndex)ironMusicIndex--;renderIronMusicList()}}
+function toggleIronPlayback(){
+ const a=document.getElementById('musicAudio');
+ if(!ironMusicFiles.length){toast('اول از دکمه افزودن موسیقی فایل انتخاب کن');return}
+ if(a.paused){if(!a.src)playIronTrack(ironMusicIndex);else a.play().catch(()=>playIronTrack(ironMusicIndex))}
+ else a.pause();
+}
+function nextIronTrack(){
+ if(!ironMusicFiles.length)return;
+ let i=ironShuffle&&ironMusicFiles.length>1?Math.floor(Math.random()*ironMusicFiles.length):(ironMusicIndex+1)%ironMusicFiles.length;
+ if(ironShuffle&&ironMusicFiles.length>1&&i===ironMusicIndex)i=(i+1)%ironMusicFiles.length;
+ playIronTrack(i);
+}
+function prevIronTrack(){
+ const a=document.getElementById('musicAudio');if(!ironMusicFiles.length)return;
+ if(a.currentTime>3){a.currentTime=0;return}
+ playIronTrack((ironMusicIndex-1+ironMusicFiles.length)%ironMusicFiles.length);
+}
+function toggleIronShuffle(){ironShuffle=!ironShuffle;const b=document.getElementById('musicShuffle');if(b)b.style.color=ironShuffle?'var(--accent)':'var(--text)';}
+function toggleIronRepeat(){ironRepeat=!ironRepeat;const b=document.getElementById('musicRepeat');if(b)b.style.color=ironRepeat?'var(--accent)':'var(--text)';}
+function seekIronTrack(v){const a=document.getElementById('musicAudio');if(a&&Number.isFinite(a.duration)&&a.duration>0)a.currentTime=(Number(v)/1000)*a.duration;}
+function removeIronTrack(i){
+ if(!ironMusicFiles[i])return;
+ const a=document.getElementById('musicAudio'),wasCurrent=i===ironMusicIndex,wasPlaying=!a.paused;
+ if(wasCurrent){a.pause();a.removeAttribute('src');a.load()}
+ URL.revokeObjectURL(ironAudioUrls[i]);ironAudioUrls.splice(i,1);ironMusicFiles.splice(i,1);
+ if(!ironMusicFiles.length){
+  ironMusicIndex=0;
+  ['musicNowTitle','musicNowSub','musicCurrentTime','musicDuration'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=id==='musicNowTitle'?'هنوز آهنگی انتخاب نشده':id==='musicNowSub'?'کتابخانه شخصی تو':'00:00'});
+  const progress=document.getElementById('musicProgress');if(progress)progress.value=0;
+  const play=document.getElementById('musicPlay');if(play)play.textContent='▶';
+ }else{
+  if(wasCurrent){ironMusicIndex=Math.min(i,ironMusicFiles.length-1);if(wasPlaying)playIronTrack(ironMusicIndex);else{const title=document.getElementById('musicNowTitle');if(title)title.textContent=ironMusicFiles[ironMusicIndex].name;}}
+  else if(i<ironMusicIndex)ironMusicIndex--;
+ }
+ renderIronMusicList();
+}
 const ironAudio=document.getElementById('musicAudio');
-ironAudio.addEventListener('timeupdate',()=>{if(!ironAudio.duration)return;document.getElementById('musicProgress').value=Math.round(ironAudio.currentTime/ironAudio.duration*1000);document.getElementById('musicCurrentTime').textContent=ironFmtTime(ironAudio.currentTime)});
-ironAudio.addEventListener('loadedmetadata',()=>{document.getElementById('musicDuration').textContent=ironFmtTime(ironAudio.duration)});
-ironAudio.addEventListener('play',()=>document.getElementById('musicPlay').textContent='Ⅱ');
-ironAudio.addEventListener('pause',()=>document.getElementById('musicPlay').textContent='▶');
-ironAudio.addEventListener('ended',()=>{if(ironRepeat){ironAudio.currentTime=0;ironAudio.play()}else if(ironShuffle||ironMusicIndex<ironMusicFiles.length-1)nextIronTrack();else document.getElementById('musicPlay').textContent='▶'});
+if(ironAudio){
+ ironAudio.addEventListener('timeupdate',()=>{if(!Number.isFinite(ironAudio.duration)||ironAudio.duration<=0)return;const p=document.getElementById('musicProgress'),t=document.getElementById('musicCurrentTime');if(p)p.value=Math.round(ironAudio.currentTime/ironAudio.duration*1000);if(t)t.textContent=ironFmtTime(ironAudio.currentTime)});
+ ironAudio.addEventListener('loadedmetadata',()=>{const d=document.getElementById('musicDuration');if(d)d.textContent=ironFmtTime(ironAudio.duration)});
+ ironAudio.addEventListener('play',()=>{const b=document.getElementById('musicPlay');if(b)b.textContent='Ⅱ'});
+ ironAudio.addEventListener('pause',()=>{const b=document.getElementById('musicPlay');if(b)b.textContent='▶'});
+ ironAudio.addEventListener('error',()=>{const b=document.getElementById('musicPlay');if(b)b.textContent='▶'});
+ ironAudio.addEventListener('ended',()=>{if(ironRepeat){ironAudio.currentTime=0;ironAudio.play().catch(()=>toast('تکرار این فایل ممکن نشد'))}else if(ironShuffle||ironMusicIndex<ironMusicFiles.length-1)nextIronTrack();else{const b=document.getElementById('musicPlay');if(b)b.textContent='▶'}});
+}
 
 const ironProducts=[['شیکر ورزشی',250000],['کش تمرینی',180000],['دستکش بدنسازی',420000],['قمقمه ورزشی',220000],['طناب ورزشی',160000]];
 let ironShopProducts=[];
