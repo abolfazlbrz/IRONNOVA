@@ -44,6 +44,19 @@ jobs:
       - name: Create Android project
         run: npx cap add android
 
+      - name: Add Android media permissions
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('android/app/src/main/AndroidManifest.xml')
+          s = p.read_text()
+          permissions = ['<uses-permission android:name="android.permission.RECORD_AUDIO" />', '<uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />']
+          for permission in permissions:
+              if permission not in s:
+                  s = s.replace('<application', permission + '\n    <application', 1)
+          p.write_text(s)
+          PY
+
       - name: Sync Android
         run: npx cap sync android
 
