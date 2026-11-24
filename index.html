@@ -659,7 +659,7 @@ function ironAudioFileSupported(file){
 function loadMusicFiles(e){
  const picker=e&&e.target,selected=Array.from(picker&&picker.files||[]);
  if(!selected.length)return;
- const incoming=selected.filter(f=>/\.(mp3|m4a|aac|wav|ogg|oga|opus|flac|webm)$/i.test(f.name)||/^audio\//i.test((f.type||'').toLowerCase()));
+ const incoming=selected.filter(ironAudioFileSupported);
  if(!incoming.length){toast('فایل صوتی قابل شناسایی انتخاب نشد');picker.value='';return}
  let added=0,duplicates=0;
  incoming.forEach(f=>{
