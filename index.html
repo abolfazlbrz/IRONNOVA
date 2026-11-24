@@ -766,8 +766,8 @@ function loadMusicFiles(e){
  if(list)list.innerHTML=valid.map((file,i)=>'<button class="plan-option" style="width:100%;margin-top:8px" onclick="playIronTrack('+i+')">'+safe(file.name)+' · '+(file.size/1048576).toFixed(1)+' MB</button>').join('');
  setIronMusicStatus(valid.length+' آهنگ آماده است. برای پخش، روی نام آهنگ بزن.'+(rejected?' '+rejected+' فایل غیرصوتی یا ناسازگار کنار گذاشته شد.':''));
 }
-function restoreMusicAudio(){const a=document.getElementById('musicAudio'),home=document.getElementById('musicAudioHome');if(a&&home&&a.parentElement!==home)home.appendChild(a)}
-function mountWorkoutAudio(){const a=document.getElementById('musicAudio'),mount=document.getElementById('runMusicMount');if(a&&mount&&a.parentElement!==mount)mount.appendChild(a)}
+function restoreMusicAudio(){const a=document.getElementById('musicAudio'),home=document.getElementById('musicAudioHome'),panel=document.getElementById('nativeMusicPanel'),music=document.getElementById('musicPage');if(a&&home&&a.parentElement!==home)home.appendChild(a);if(panel&&music&&panel.parentElement!==music)music.appendChild(panel)}
+function mountWorkoutAudio(){const a=document.getElementById('musicAudio'),mount=document.getElementById('runMusicMount'),panel=document.getElementById('nativeMusicPanel');if(a&&mount&&a.parentElement!==mount)mount.appendChild(a);if(panel&&mount&&panel.parentElement!==mount)mount.appendChild(panel)}
 function playIronTrack(i){
  const a=document.getElementById('musicAudio'),file=ironMusicFiles[i];
  if(!a||!ironAudioUrls[i]||!file)return toast('ابتدا یک فایل موسیقی انتخاب کن');
