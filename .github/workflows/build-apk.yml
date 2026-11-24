@@ -6,6 +6,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
@@ -23,6 +26,12 @@ jobs:
       - name: Validate inline JavaScript
         run: node scripts/check-inline-js.mjs
 
+      - name: Validate Android native audio source
+        run: |
+          node --check scripts/prepare-android.mjs
+          node --input-type=module --check < native-audio-bridge.js
+          grep -q '@CapacitorPlugin(name = "NativeAudio")' android-native/NativeAudioPlugin.java
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -36,6 +45,9 @@ jobs:
         run: |
           mkdir -p www
           cp index.html www/
+          cp native-audio-bridge.js www/
+          mkdir -p www/capacitor-core
+          cp -r node_modules/@capacitor/core/dist/. www/capacitor-core/
           [ ! -d assets ] || cp -r assets www/
           [ ! -f manifest.webmanifest ] || cp manifest.webmanifest www/
           [ ! -f service-worker.js ] || cp service-worker.js www/
@@ -43,6 +55,9 @@ jobs:
 
       - name: Create Android project
         run: npx cap add android
+
+      - name: Register native audio plugin
+        run: node scripts/prepare-android.mjs
 
       - name: Sync Android
         run: npx cap sync android
