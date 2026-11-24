@@ -119,7 +119,7 @@ main.app>section:not(.hidden){display:block;min-height:0;height:auto}
 .coach-panel-shell{display:grid;gap:12px}.coach-panel-tabs{display:flex;gap:7px;overflow-x:auto;padding:7px;background:var(--surface);border:1px solid var(--line);border-radius:15px;position:sticky;top:66px;z-index:20;scrollbar-width:thin}.coach-panel-tabs button{flex:0 0 auto;border:1px solid var(--line);background:var(--soft);color:var(--text);border-radius:11px;padding:10px 13px;font-size:12px;white-space:nowrap}.coach-panel-tabs button.active{background:var(--accent);color:#fff;border-color:transparent}.coach-subpage{display:grid;gap:10px;min-width:0}.coach-shortcuts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.coach-shortcuts .plan-option{text-align:right;min-width:0}.coach-shortcuts .plan-option b{font-size:13px}.coach-shortcuts .plan-option small{font-size:11px;line-height:1.7}@media(max-width:390px){.coach-shortcuts{grid-template-columns:1fr}.coach-panel-tabs{top:58px}}
 
 /* Approved APK visual language + compact page spacing */
-:root{--bg:#101713;--surface:#19241d;--text:#f1f7f0;--muted:#a6b5a8;--accent:#a6e66b;--soft:#26372b;--line:#344638;--shadow:0 14px 36px #0005}
+:root{--bg:#f4faff;--surface:#ffffff;--text:#19364f;--muted:#688096;--accent:#58b9e9;--soft:#e7f5fd;--line:#cfe6f3;--shadow:0 10px 28px #2b79a51a}
 body{background:radial-gradient(ellipse at 50% -18%,color-mix(in srgb,var(--accent) 13%,var(--bg)) 0%,var(--bg) 58%);background-attachment:fixed}
 .top{padding:8px 2px 15px;border-bottom:1px solid color-mix(in srgb,var(--line) 75%,transparent)}
 .brand{text-shadow:0 0 22px color-mix(in srgb,var(--accent) 22%,transparent)}
@@ -127,7 +127,7 @@ body{background:radial-gradient(ellipse at 50% -18%,color-mix(in srgb,var(--acce
 .btn{transition:transform .16s,filter .16s,box-shadow .16s}
 .btn:active{transform:scale(.975);filter:brightness(.96)}
 .btn:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-input,select,textarea{background:color-mix(in srgb,var(--surface) 86%,#000 14%);border:1px solid var(--line);border-radius:12px;color:var(--text);padding:11px 12px;min-height:42px}
+input,select,textarea{background:var(--surface);border:1px solid var(--line);border-radius:12px;color:var(--text);padding:11px 12px;min-height:42px}
 textarea{line-height:1.9}
 .nav{background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid color-mix(in srgb,var(--line) 75%,var(--accent) 25%);padding-bottom:calc(7px + env(safe-area-inset-bottom))}
 .nav button{transition:color .18s,transform .18s}
@@ -345,6 +345,20 @@ body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.
 body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.mono) .anatomy-panel{background:linear-gradient(145deg,#ffffff,#eaf7ff)!important;color:#19364f!important;border-color:#cfe6f3!important}
 body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.mono) .anatomy-view{background:#f7fbff!important;color:#19364f!important;border-color:#d7eaf5!important}
 
+
+/* IRONNOVA recovery + enforced sky-blue default */
+:root{color-scheme:light;--bg:#f4faff;--surface:#fff;--text:#19364f;--muted:#688096;--accent:#58b9e9;--soft:#e7f5fd;--line:#cfe6f3;--shadow:0 10px 28px #2b79a51a}
+body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.mono){background:linear-gradient(180deg,#eef8ff 0%,#f8fcff 55%,#fff 100%);color:#19364f}
+body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.mono) input,body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.mono) select,body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.mono) textarea{background:#fff!important;color:#19364f!important;border-color:#cfe6f3!important}
+body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.mono) .iron-intro{background:#eaf6ff url('./assets/ironnova-splash.webp') center 18%/cover no-repeat!important;color:#173b56}
+body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.mono) .iron-intro::before{background:linear-gradient(180deg,rgba(239,249,255,.02) 0%,rgba(239,249,255,.02) 54%,rgba(239,249,255,.72) 73%,#eaf6ff 100%)}
+body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.mono) .intro-bottom{color:#173b56}
+body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.mono) .intro-kicker,body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.mono) .intro-line{color:#315d7b;text-shadow:0 1px 5px #fff}
+body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.mono) .intro-progress{background:#9ccfe9}
+body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.mono) .intro-progress i{background:linear-gradient(90deg,#78cff4,#258fc9);box-shadow:0 0 12px #58b9e955}
+body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.mono) .intro-skip{background:#ffffffed;color:#23658c;border:1px solid #a9d9ef;box-shadow:0 6px 18px #2b79a51a}
+/* Keep inline SVG controls visible on pale cards */
+.home-training-launch svg,.home-layer-tile svg,.social-links svg{color:#258fc9}
 </style>
 </head>
 <body><div id="ironIntro" class="iron-intro" aria-label="IRONNOVA">
@@ -353,7 +367,7 @@ body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.
     <div class="intro-progress"><i></i></div>
   </div>
   <button class="intro-skip" onclick="closeIronIntro()">ورود به برنامه <span>←</span></button>
-</div><div class="dashboard-layout">
+</div><script>setTimeout(function(){var s=document.getElementById('ironIntro');if(s){s.classList.add('is-leaving');setTimeout(function(){s.remove()},750)}},8000);</script><div class="dashboard-layout">
 <aside class="sidebar" id="sidebar"><div class="side-brand">IRONNOVA</div><div class="side-sub">TRAIN SMART · GET STRONGER</div><div class="side-title">داشبورد</div><nav class="side-nav">
 <button class="active" data-page="home" onclick="showPage('home')"><span class="ico">⌂</span>خانه</button>
 <button data-page="workout" onclick="showPage('workout')"><span class="ico">🏋️</span>برنامه تمرینی</button>
@@ -653,7 +667,7 @@ const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 window.ironSupabaseClient=supabaseClient;
 const initial=[{id:1,name:'پرس سینه هالتر',sets:4,reps:'۱۰ تا ۱۲',gif:'assets/bench-press.gif',done:false,weight:''},{id:2,name:'پرس بالا سینه دمبل',sets:3,reps:'۱۰ تا ۱۲',gif:'',done:false,weight:''},{id:3,name:'پشت بازو طنابی',sets:3,reps:'۱۲ تا ۱۵',gif:'',done:false,weight:''},{id:4,name:'پشت بازو تک دمبل بالای سر',sets:3,reps:'۱۲',gif:'',done:false,weight:''},{id:5,name:'شنا دست جمع',sets:3,reps:'تا ناتوانی',gif:'',done:false,weight:''}];
 const themes=[['blue','سفید و آبی آسمانی','#58b9e9','#f4faff'],['green','مشکی و سبز','#a6e66b','#101713'],['red','مشکی و قرمز','#ef5350','#171313'],['purple','سفید و بنفش','#8756d8','#f7f3fc'],['orange','سفید و نارنجی','#eb8734','#fff7ef'],['pink','سفید و صورتی','#e85c91','#fff3f7'],['navy','سرمه‌ای و آبی','#54a9ff','#101d32'],['mono','مشکی و سفید','#ffffff','#101010']];
-let data=JSON.parse(localStorage.getItem('ironTrack')||'null')||{exercises:initial,name:'ورزشکار',weight:63,theme:'blue',weightLogs:[],sessions:[]};
+let data=JSON.parse(localStorage.getItem('ironTrack')||'null')||{exercises:initial,name:'ورزشکار',weight:63,theme:'blue',weightLogs:[],sessions:[]};if(data.theme==='green')data.theme='blue';
 data.weightLogs=Array.isArray(data.weightLogs)?data.weightLogs:[];data.sessions=Array.isArray(data.sessions)?data.sessions:[];data.foodLogs=Array.isArray(data.foodLogs)?data.foodLogs:[];data.physicalLimits=data.physicalLimits||{};data.nutritionTargets=data.nutritionTargets||null;data.planName=data.planName||'سینه و پشت بازو';
 let currentUserId=null,cloudReady=false,cloudTimer=null,cloudBusy=false,cloudAgain=false;
 function setCloudStatus(m){setAuthMessage(m)}
