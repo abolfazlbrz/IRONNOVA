@@ -1008,7 +1008,7 @@ async function selectIronChatPartner(id){
  ironSelectedChatPartner=id;document.getElementById('icMessagePartner').value=id;document.getElementById('ironChatTitle').textContent='گفت‌وگوی خصوصی امن';await loadIronChatPartners();await loadIronMessages();
 }
 
-async async function loadIronMessages(){
+async function loadIronMessages(){
 const partner=document.getElementById('icMessagePartner').value.trim(),out=document.getElementById('icMessages');if(!/^[0-9a-f-]{36}$/i.test(partner)){out.textContent='یک گفت‌وگوی معتبر را انتخاب کن.';return}
 const {data:{user}}=await supabaseClient.auth.getUser();if(!user){out.textContent='ابتدا وارد حساب شو.';return}
 const filter='and(coach_id.eq.'+user.id+',student_id.eq.'+partner+'),and(coach_id.eq.'+partner+',student_id.eq.'+user.id+')';
