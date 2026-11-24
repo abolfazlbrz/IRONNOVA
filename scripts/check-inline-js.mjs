@@ -39,6 +39,8 @@ const required = [
   'applyReferencePlan',
   'saveCurrentProgram',
   'validateSmartPlanLimits',
+  'loadAdminCoachContent',
+  'adminDeleteCoachContent',
   'correctiveArt',
   'referenceLocked',
   'intro-orbit',
