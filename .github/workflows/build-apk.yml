@@ -47,6 +47,9 @@ jobs:
       - name: Create Android project
         run: npx cap add android
 
+      - name: Register native audio plugin
+        run: node scripts/prepare-android.mjs
+
       - name: Sync Android
         run: npx cap sync android
 
