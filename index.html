@@ -417,12 +417,47 @@ function buildSmartPlan(){
  const level=document.getElementById('coachLevel').value,goal=document.getElementById('coachGoal').value,days=+document.getElementById('coachDays').value,h=+document.getElementById('coachHeight').value,w=+(document.getElementById('coachWeight').value||data.weight),age=+document.getElementById('coachAge').value,place=document.getElementById('coachPlace').value,limit=document.getElementById('coachLimit').value,limitDetails=document.getElementById('coachLimitDetails').value.trim();
  if(limit!=='none'&&limitDetails.length<3){toast('لطفاً نوع و توضیح محدودیت جسمی را کامل بنویس');return}
  if(h<120||h>230||w<30||w>250||age<16||age>90){toast('مشخصات را بررسی کن');return}
+ const result=document.getElementById('coachResult');result.classList.remove('hidden');
+ const normalizedDetails=limitDetails.replace(/[يى]/g,'ی').replace(/ك/g,'ک').replace(/[\u200c\u200f]/g,' ').toLowerCase();
+ const discOrNerveIssue=/(دیسک|ديسك|بیرون\s*زدگی|فتق|سیاتیک|عصب|بی\s*حسی|گزگز|ضعف\s*(پا|عضله)|درد\s*تیرکشنده)/.test(normalizedDetails);
+ if(limit==='back'&&discOrNerveIssue){
+  result.innerHTML='<div class="admin-note" style="border:1px solid var(--accent);padding:14px;border-radius:14px"><b>⚠️ ساخت برنامه متوقف شد؛ محدودیت کمر جدی ثبت شده است.</b><p>در توضیحات به دیسک یا علائم عصبی اشاره شده. ساخت برنامه عمومی و حدس‌زدن حرکت جایگزین می‌تواند خطرناک باشد؛ حتی بعضی حرکات دستگاهی هم ممکن است علائم را تشدید کنند.</p><p>تا وقتی پزشک یا فیزیوتراپیست، حرکات مجاز و ممنوع را مشخص نکرده، مربی هوشمند برنامه تمرینی تولید نمی‌کند. پس از دریافت فهرست حرکات مجاز، همان محدودیت‌ها باید در برنامه اعمال شوند.</p><b>محدودیت ثبت‌شده:</b> '+safe(limitDetails)+'</div>';
+  return;
+ }
+ if(limit==='other'){
+  result.innerHTML='<div class="admin-note" style="border:1px solid var(--accent);padding:14px;border-radius:14px"><b>برای این محدودیت هنوز برنامه امنی قابل تولید نیست.</b><p>نوع محدودیت را از فهرست دقیق انتخاب کن. اگر در گزینه‌ها نیست، تا ارزیابی متخصص و مشخص‌شدن حرکات مجاز، برنامه خودکار ساخته نمی‌شود.</p><b>توضیحات:</b> '+safe(limitDetails)+'</div>';
+  return;
+ }
  const sets=level==='beginner'?2:level==='intermediate'?3:4,reps=goal==='strength'?'۵ تا ۸':'۸ تا ۱۲';
  const gym={full:[['پرس سینه دستگاه','لت سیم‌کش','پرس پا','پرس سرشانه دستگاه','پشت پا دستگاه','پلانک'],['پرس بالا سینه دمبل','قایقی سیم‌کش','اسکوات اسمیت','جلو پا دستگاه','نشر جانب دمبل','کرانچ'],['پرس سینه هالتر','لت دست جمع','ددلیفت رومانیایی دمبل','هیپ تراست','جلو بازو سیم‌کش','پشت بازو طنابی']],upper:[['پرس سینه دستگاه','لت سیم‌کش','پرس سرشانه دمبل','قایقی سیم‌کش','جلو بازو دمبل','پشت بازو طنابی'],['پرس بالا سینه دمبل','بارفیکس کمکی','نشر جانب','فیس پول','جلو بازو چکشی','پشت بازو بالای سر']],lower:[['پرس پا','ددلیفت رومانیایی دمبل','جلو پا دستگاه','پشت پا خوابیده','ساق پا','پلنک'],['هیپ تراست','لانج','اسکوات جام','پشت پا نشسته','ساق پا نشسته','ددباگ']]};
  const home={full:[['شنا استاندارد','پارویی تک‌دست دمبل','اسکوات وزن بدن','پل باسن','پرس سرشانه دمبل','ددباگ'],['شنا شیب مثبت','پارویی کش نشسته','لانج معکوس','پل باسن تک پا','نشر جانب دمبل','پلانک'],['شنا زانو','فیس پول کش','اسکوات جام','ددلیفت رومانیایی دمبل','جلو بازو دمبل','برد داگ']],upper:[['شنا استاندارد','پارویی تک‌دست دمبل','پرس سرشانه دمبل','پارویی کش نشسته','جلو بازو دمبل','پشت بازو بالای سر دمبل'],['شنا شیب مثبت','فیس پول کش','نشر جانب دمبل','نشر خم دمبل','جلو بازو چکشی','شنا دست جمع']],lower:[['اسکوات وزن بدن','لانج معکوس','پل باسن','ددلیفت رومانیایی دمبل','ساق پا ایستاده','ددباگ'],['اسکوات جام','استپ‌آپ روی سطح ثابت','پل باسن تک پا','پشت پا کش','ساق پا نشسته','برد داگ']]};
  const source=place==='home'?home:gym;let daysList=days===3?source.full:days===4?[source.upper[0],source.lower[0],source.upper[1],source.lower[1]]:[source.upper[0],source.lower[0],source.upper[1],source.lower[1],source.full[2]];
- const goalText={gain:'افزایش وزن و عضله',muscle:'عضله‌سازی',strength:'قدرت',fatloss:'کاهش چربی'}[goal];const plan=daysList.map((names,i)=>({day:i+1,exercises:names.map(name=>({name,sets,reps}))}));const limitLabels={shoulder:'شانه',back:'کمر',knee:'زانو',other:'سایر / نامشخص'};const warn=limit!=='none'?'<div class="admin-note"><b>محدودیت ثبت‌شده:</b> '+safe(limitLabels[limit]||limit)+'<br><b>توضیحات:</b> '+safe(limitDetails)+'<br>این برنامه خودکار تشخیص پزشکی نمی‌دهد و تضمین نمی‌کند همه حرکات نامناسب حذف شوند. حرکت دردناک را انجام نده و برای آسیب فعال ارزیابی متخصص بگیر.</div>':'';
- const result=document.getElementById('coachResult');result.classList.remove('hidden');result.innerHTML=`<b>برنامه ${days} روزه · ${goalText} · ${place==='home'?'خانه':'باشگاه'}</b>${warn}${plan.map(d=>`<p><b>روز ${d.day}</b><br>${d.exercises.map(e=>`${e.name} · ${e.sets} ست · ${e.reps}`).join('<br>')}</p>`).join('')}<button class="btn" style="width:100%" onclick='applySmartPlan(${JSON.stringify(plan)})'>جایگزینی برنامه فعلی</button>`;
+ let safetyNote='';
+ if(limit==='back'){
+  const backSafeGym=['پرس سینه دستگاه با تکیه‌گاه کامل','قایقی دستگاه با تکیه‌گاه سینه','جلو پا دستگاه با تکیه‌گاه','پشت پا نشسته با تکیه‌گاه','جلو بازو سیم‌کش نشسته با تکیه‌گاه','پشت بازو سیم‌کش با تنه ثابت'];
+  const backSafeHome=['پرس سینه کش نشسته با تکیه‌گاه','جلو بازو کش نشسته با تکیه‌گاه','پشت بازو کش با تنه ثابت'];
+  const safeNames=place==='home'?backSafeHome:backSafeGym;
+  daysList=Array.from({length:days},(_,i)=>safeNames.slice(0,Math.min(safeNames.length,days===3?3:4)));
+  safetyNote='<div class="admin-note"><b>محدودیت کمر در انتخاب حرکات اعمال شد.</b><br>حرکات دارای خم‌شدن یا چرخش تنه، بارگذاری مستقیم ستون فقرات و حرکات پرفشار از برنامه حذف شدند. این فهرست هم تأیید پزشکی محسوب نمی‌شود؛ فقط حرکاتی را انجام بده که پزشک یا فیزیوتراپیست برای وضعیتت مجاز دانسته و با بروز درد یا علائم عصبی تمرین را متوقف کن.</div>';
+ }
+ if(limit==='shoulder'){
+  const blocked=/(پرس سینه|شنا|پرس سرشانه|نشر|فیس پول|فلای|بارفیکس|لت|پشت بازو بالای سر)/;
+  daysList=daysList.map(day=>day.filter(name=>!blocked.test(name)));
+  safetyNote='<div class="admin-note"><b>محدودیت شانه اعمال شد.</b><br>حرکات فشاری و کششی بالاتنه که ممکن است شانه را درگیر کنند از این برنامه حذف شدند. حرکات باقی‌مانده را فقط در صورت مجازبودن توسط متخصص و بدون درد انجام بده.</div>';
+ }
+ if(limit==='knee'){
+  const blocked=/(پرس پا|اسکوات|لانج|جلو پا|استپ‌آپ|ددلیفت رومانیایی|پل باسن)/;
+  daysList=daysList.map(day=>day.filter(name=>!blocked.test(name)));
+  safetyNote='<div class="admin-note"><b>محدودیت زانو اعمال شد.</b><br>حرکات زانو-محور و حرکاتی که ممکن است بار زانو را افزایش دهند از برنامه حذف شدند. حرکات باقی‌مانده را فقط در صورت مجازبودن توسط متخصص و بدون درد انجام بده.</div>';
+ }
+ const goalText={gain:'افزایش وزن و عضله',muscle:'عضله‌سازی',strength:'قدرت',fatloss:'کاهش چربی'}[goal];
+ const plan=daysList.map((names,i)=>({day:i+1,exercises:names.map(name=>({name,sets:limit==='back'?Math.min(sets,2):sets,reps:limit==='back'?'۱۰ تا ۱۲':reps}))})).filter(d=>d.exercises.length);
+ if(!plan.length||plan.some(d=>!d.exercises.length)){
+  result.innerHTML='<div class="admin-note">با فیلتر محدودیت جسمی، حرکت کافی و قابل‌قبولی برای ساخت برنامه باقی نماند. برنامه ساخته نشد تا حرکت نامناسب به‌زور جایگزین نشود. برای تنظیم حرکات مجاز با متخصص مشورت کن.</div>';
+  return;
+ }
+ const limitLabels={shoulder:'شانه',back:'کمر',knee:'زانو'};const warn=limit!=='none'?'<div class="admin-note"><b>محدودیت ثبت‌شده:</b> '+safe(limitLabels[limit]||limit)+'<br><b>توضیحات:</b> '+safe(limitDetails)+'</div>':'';
+ result.innerHTML='<b>برنامه '+days+' روزه · '+goalText+' · '+(place==='home'?'خانه':'باشگاه')+'</b>'+warn+safetyNote+plan.map(d=>'<p><b>روز '+d.day+'</b><br>'+d.exercises.map(e=>e.name+' · '+e.sets+' ست · '+e.reps).join('<br>')+'</p>').join('')+'<button class="btn" style="width:100%" onclick=\'applySmartPlan('+JSON.stringify(plan)+')\'>جایگزینی برنامه فعلی</button>';
 }
 
 function applySmartPlan(plan){
