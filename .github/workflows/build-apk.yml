@@ -54,6 +54,9 @@ jobs:
       - name: Bundle native push bridge
         run: npx esbuild scripts/iron-push.js --bundle --format=iife --outfile=www/iron-push.js
 
+      - name: Bundle native Android back handler
+        run: npx esbuild scripts/iron-back.js --bundle --format=iife --outfile=www/iron-back.js
+
       - name: Create Android project
         run: npx cap add android
 
