@@ -426,11 +426,11 @@ function renderCoachExplore(rows){
  grid.innerHTML=rows.length?rows.map(c=>`<article class="coach-profile-tile"><div class="coach-photo">${c.photo_url?'<img src="'+safe(c.photo_url)+'" alt="" style="width:100%;height:112px;object-fit:cover">':'👨‍🏫'}</div><div class="coach-info"><b>${safe(c.full_name||'مربی IRONNOVA')}</b><div class="pill">${safe(c.specialty||'مربی بدنسازی')}</div><p>${safe(c.bio||c.credentials||'اطلاعات تکمیلی در پروفایل مربی ثبت نشده است.')}</p><button class="btn small" style="width:100%" onclick="requestCoachConnection('${safe(c.user_id)}')">درخواست اتصال</button></div></article>`).join(''):'نتیجه‌ای برای نمایش پیدا نشد.';
 }
 function filterCoachExplore(){const q=(document.getElementById('coachExploreSearch').value||'').trim().toLocaleLowerCase();renderCoachExplore(ironCoachExploreCache.filter(c=>[c.full_name,c.specialty,c.bio,c.credentials].join(' ').toLocaleLowerCase().includes(q)))}
-async function requestCoachConnection(id){
- const {data:{user}}=await supabaseClient.auth.getUser();if(!user){toast('برای درخواست اتصال ابتدا وارد حساب شو');return}
- const {data,error}=await supabaseClient.rpc('iron_create_invite');
- if(error){toast('ساخت درخواست ممکن نشد: '+error.message);return}
- toast('برای اتصال به این مربی، کد دعوت اختصاصی او لازم است. از پروفایل مربی درخواست کد دعوت کن.');
+function requestCoachConnection(id){
+ const coach=ironCoachExploreCache.find(x=>x.user_id===id);if(!coach)return;
+ showPage('coachPanel');
+ const code=document.getElementById('icCode');if(code)code.focus();
+ toast('برای اتصال امن، کد دعوت اختصاصی همین مربی را دریافت و در کادر کد دعوت وارد کن.');
 }
 let ironAudioUrls=[],ironMusicFiles=[],ironMusicIndex=0,ironShuffle=false,ironRepeat=false;
 const ironFmtTime=n=>{if(!Number.isFinite(n)||n<0)return '00:00';const m=Math.floor(n/60),sec=Math.floor(n%60);return String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0')};
