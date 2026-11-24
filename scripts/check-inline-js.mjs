@@ -37,7 +37,6 @@ const required = [
   'intro-shockwave',
   'resetCoachForVerification',
   'pickNativeMusic',
-  'NativeAudioPlugin',
   'nativeMusicPanel',
   'iron_store_send_message_v2',
   'setWeights',
