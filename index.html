@@ -723,6 +723,17 @@ body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.
  </div>
  <div id="ironInstallStatsStatus" class="muted" style="font-size:12px;margin-top:5px">آمار پس از اولین اجرای نسخه جدید ثبت می‌شود.</div>
 </section>
+<section id="ironAiAssistantCard" class="card hidden" style="margin:14px 0;padding:16px;border:1px solid var(--line);border-radius:18px">
+ <div class="row" style="align-items:center;justify-content:space-between;gap:10px">
+  <div><h3 style="margin:0">🤖 دستیار هوشمند IRONNOVA</h3><p class="muted" style="margin:5px 0 0;font-size:12px">همکار هوش مصنوعی مدیر اصلی · دسترسی محدود و امن</p></div>
+  <button class="btn secondary small" type="button" onclick="clearIronAiChat()">گفت‌وگوی جدید</button>
+ </div>
+ <div id="ironAiMessages" aria-live="polite" style="display:flex;flex-direction:column;gap:9px;max-height:360px;overflow:auto;padding:12px 2px;margin-top:8px">
+  <div style="align-self:flex-start;max-width:92%;padding:11px 13px;border-radius:14px;background:var(--soft);line-height:1.7">سلام. من دستیار هوشمند IRONNOVA هستم. می‌توانم در تحلیل، عیب‌یابی و برنامه‌ریزی کمک کنم. در این نسخه فقط پاسخ‌گو هستم و هیچ تغییری در داده‌ها یا تنظیمات برنامه بدون سازوکار تأیید انجام نمی‌دهم.</div>
+ </div>
+ <div class="field" style="margin:8px 0"><textarea id="ironAiInput" rows="3" maxlength="3000" placeholder="درخواستت را برای دستیار بنویس..." style="width:100%;resize:vertical"></textarea></div>
+ <div class="row" style="align-items:center;gap:10px"><button id="ironAiSend" class="btn grow" type="button" onclick="sendIronAiMessage()">ارسال پیام</button><span id="ironAiStatus" class="muted" style="font-size:11px">فقط مدیر اصلی به این بخش دسترسی دارد.</span></div>
+</section>
 <div class="coach-shortcuts">
 <button class="plan-option" onclick="showCoachSubpage('connections')"><b>اتصال مربی و شاگرد</b><small>دعوت، درخواست و وضعیت ارتباط</small></button>
 <button class="plan-option" onclick="showCoachSubpage('plans')"><b>برنامه‌های تمرینی</b><small>ساخت، انتشار و مشاهده برنامه‌ها</small></button>
@@ -1599,12 +1610,44 @@ async function loadIronAdminPanel(){
  const panel=document.getElementById('ironMainAdminPanel');
  const adminNav=document.querySelector('[data-coach-admin-nav]');
  const statsCard=document.getElementById('ironInstallStatsCard');
+ const aiCard=document.getElementById('ironAiAssistantCard');
  const {data:{user}}=await supabaseClient.auth.getUser();
- if(!user){panel.classList.add('hidden');adminNav?.classList.add('hidden');statsCard?.classList.add('hidden');return}
+ if(!user){panel.classList.add('hidden');adminNav?.classList.add('hidden');statsCard?.classList.add('hidden');aiCard?.classList.add('hidden');return}
  const {data,error}=await supabaseClient.from('iron_admins_v2').select('is_main_admin').eq('user_id',user.id).maybeSingle();
- if(error||!data?.is_main_admin){panel.classList.add('hidden');adminNav?.classList.add('hidden');statsCard?.classList.add('hidden');return}
- panel.classList.remove('hidden');adminNav?.classList.remove('hidden');statsCard?.classList.remove('hidden');
+ if(error||!data?.is_main_admin){panel.classList.add('hidden');adminNav?.classList.add('hidden');statsCard?.classList.add('hidden');aiCard?.classList.add('hidden');return}
+ panel.classList.remove('hidden');adminNav?.classList.remove('hidden');statsCard?.classList.remove('hidden');aiCard?.classList.remove('hidden');
  await Promise.all([refreshIronCoachRequests(),loadIronInstallStats()]);
+}
+let ironAiHistory=[],ironAiBusy=false;
+function ironAiAddBubble(role,content){
+ const wrap=document.getElementById('ironAiMessages');if(!wrap)return;
+ const bubble=document.createElement('div');bubble.style.cssText='align-self:'+(role==='user'?'flex-end':'flex-start')+';max-width:94%;padding:11px 13px;border-radius:14px;line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere;background:'+(role==='user'?'var(--accent)':'var(--soft)')+';color:'+(role==='user'?'#102c3d':'var(--text)');
+ bubble.textContent=content;wrap.appendChild(bubble);wrap.scrollTop=wrap.scrollHeight;
+}
+function clearIronAiChat(){
+ ironAiHistory=[];const wrap=document.getElementById('ironAiMessages');if(wrap)wrap.innerHTML='';
+ ironAiAddBubble('assistant','گفت‌وگوی تازه شروع شد. درباره وضعیت IRONNOVA، رفع اشکال یا برنامه‌ریزی سؤال کن.');
+ const status=document.getElementById('ironAiStatus');if(status)status.textContent='گفت‌وگوی جدید آماده است.';
+}
+async function sendIronAiMessage(){
+ if(ironAiBusy)return;
+ const input=document.getElementById('ironAiInput'),button=document.getElementById('ironAiSend'),status=document.getElementById('ironAiStatus');
+ const message=(input?.value||'').trim();if(!message){if(status)status.textContent='اول پیام را بنویس.';return}
+ if(message.length>3000){if(status)status.textContent='پیام بیش از حد طولانی است.';return}
+ const {data:{session}}=await supabaseClient.auth.getSession();
+ if(!session?.access_token){if(status)status.textContent='برای استفاده از دستیار ابتدا وارد حساب مدیر شو.';return}
+ ironAiBusy=true;if(button){button.disabled=true;button.textContent='در حال پاسخ...'}
+ input.value='';ironAiAddBubble('user',message);ironAiHistory.push({role:'user',content:message});
+ if(status)status.textContent='در حال دریافت پاسخ امن از سرور...';
+ try{
+  const response=await fetch(SUPABASE_URL+'/functions/v1/ironnova-ai-assistant',{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+session.access_token},body:JSON.stringify({messages:ironAiHistory.slice(-12)})});
+  const payload=await response.json().catch(()=>({}));
+  if(!response.ok)throw new Error(payload.error||('خطای سرور ('+response.status+')'));
+  const answer=String(payload.answer||'پاسخی دریافت نشد.').slice(0,12000);
+  ironAiHistory.push({role:'assistant',content:answer});ironAiAddBubble('assistant',answer);
+  if(status)status.textContent='پاسخ دریافت شد.';
+ }catch(error){ironAiHistory.pop();ironAiAddBubble('assistant','ارسال پیام ناموفق بود: '+(error?.message||'خطای ناشناخته'));if(status)status.textContent='اتصال دستیار برقرار نشد.'}
+ finally{ironAiBusy=false;if(button){button.disabled=false;button.textContent='ارسال پیام'};input?.focus()}
 }
 async function registerIronInstall(){
  try{
