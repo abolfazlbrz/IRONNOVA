@@ -41,18 +41,59 @@ jobs:
 
       - name: Assemble and verify high-resolution IRONNOVA splash
         run: |
-          test -d .github/splash-parts
-          cat .github/splash-parts/*.b64 | base64 --decode > assets/ironnova-splash.webp
           python3 - <<'PY'
           from pathlib import Path
+          from io import BytesIO
+          import base64
+          import string
           from PIL import Image
+
+          folder = Path('.github/splash-parts')
+          files = sorted(folder.glob('*.b64'), key=lambda p: p.name)
+          parts = {p.name: p.read_text().strip() for p in files}
+          ordered = [parts[p.name] for p in files]
+          encoded = ''.join(ordered)
+
+          # One character was lost while transferring segment 08c. Restore it
+          # against the actual WebP decoder before packaging, never ship a broken image.
+          if len(encoded) != 113796:
+              target = '08c.b64'
+              broken = parts[target]
+              prefix = ''.join(parts[p.name] for p in files if p.name < target)
+              suffix = ''.join(parts[p.name] for p in files if p.name > target)
+              alphabet = string.ascii_letters + string.digits + '+/'
+              recovered = None
+              for position in range(len(broken) + 1):
+                  left, right = broken[:position], broken[position:]
+                  for char in alphabet:
+                      candidate = prefix + left + char + right + suffix
+                      try:
+                          raw = base64.b64decode(candidate, validate=True)
+                          if len(raw) != 85346:
+                              continue
+                          with Image.open(BytesIO(raw)) as image:
+                              if image.format != 'WEBP' or image.size != (941, 1672):
+                                  continue
+                              image.load()
+                          recovered = raw
+                          break
+                      except Exception:
+                          continue
+                  if recovered is not None:
+                      break
+              if recovered is None:
+                  raise SystemExit('Could not restore splash payload; refusing to build a broken APK')
+              Path('assets/ironnova-splash.webp').write_bytes(recovered)
+          else:
+              raw = base64.b64decode(encoded, validate=True)
+              Path('assets/ironnova-splash.webp').write_bytes(raw)
+
           p = Path('assets/ironnova-splash.webp')
-          with Image.open(p) as image:
-              image.verify()
           with Image.open(p) as image:
               assert image.format == 'WEBP', image.format
               assert image.size == (941, 1672), image.size
-          assert p.stat().st_size >= 70000, p.stat().st_size
+              image.load()
+          assert p.stat().st_size == 85346, p.stat().st_size
           print(f'Verified IRONNOVA splash: 941x1672, {p.stat().st_size} bytes')
           PY
 
