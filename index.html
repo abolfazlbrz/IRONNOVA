@@ -1218,24 +1218,24 @@ function ironAudioFileSupported(file){
  if(mime.startsWith('video/'))return false;
  return IRON_AUDIO_EXTENSIONS.has(ext)||IRON_AUDIO_MIMES.has(mime);
 }
-function loadMusicFiles(e){
+async function loadMusicFiles(e){
  const picker=e&&e.target,selected=Array.from(picker&&picker.files||[]);
  if(!selected.length)return;
  const incoming=selected.filter(ironAudioFileSupported);
  if(!incoming.length){toast('فایل صوتی قابل شناسایی انتخاب نشد');picker.value='';return}
  let added=0,duplicates=0;
- incoming.forEach(f=>{
+ for(const f of incoming){
   const duplicate=ironMusicFiles.some(x=>x.name===f.name&&x.size===f.size&&x.lastModified===f.lastModified);
-  if(duplicate){duplicates++;return}
+  if(duplicate){duplicates++;continue}
   ironMusicFiles.push(f);
   ironAudioUrls.push(URL.createObjectURL(f));
-  persistIronMusicFile(f);
+  await persistIronMusicFile(f);
   added++;
- });
+ }
  picker.value='';
  renderIronMusicList();
  if(added){
-  toast(added.toLocaleString('fa-IR')+' آهنگ اضافه شد؛ برای پخش روی نام آن بزن');
+  toast(added.toLocaleString('fa-IR')+' آهنگ اضافه شد و در کتابخانه گوشی ذخیره شد');
  }else if(duplicates){
   toast('این فایل‌ها قبلاً به فهرست اضافه شده‌اند');
  }
