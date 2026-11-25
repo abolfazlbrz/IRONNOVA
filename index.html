@@ -359,6 +359,49 @@ body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.
 body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.mono) .intro-skip{background:#ffffffed;color:#23658c;border:1px solid #a9d9ef;box-shadow:0 6px 18px #2b79a51a}
 /* Keep inline SVG controls visible on pale cards */
 .home-training-launch svg,.home-layer-tile svg,.social-links svg{color:#258fc9}
+
+/* Final visual cleanup: clear icon artwork, sky-blue surfaces and full-quality poster */
+body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.mono) .iron-intro{
+  background:#eaf6ff url('./assets/ironnova-splash.webp') center center/cover no-repeat!important;
+  image-rendering:auto;
+}
+body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.mono) .iron-intro::before{
+  background:linear-gradient(180deg,rgba(8,31,52,.05) 0%,transparent 58%,rgba(234,246,255,.12) 100%)!important;
+}
+body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.mono) .intro-kicker{
+  color:#173b56!important;text-shadow:0 1px 6px #ffffffcc!important;
+}
+body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.mono) .home-shop-launch{
+  background:linear-gradient(135deg,#fff 0%,#eff9ff 55%,#e3f4fd 100%)!important;
+  border-color:#bfe2f3!important;box-shadow:0 10px 26px #2b79a51a!important;
+}
+body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.mono) .home-nutrition-launch{
+  background:linear-gradient(135deg,#fff 0%,#edf8ff 60%,#e3f4fd 100%)!important;
+  border-color:#bfe2f3!important;box-shadow:0 10px 26px #2b79a51a!important;
+}
+body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.mono) .home-workout-program-launch{
+  background:linear-gradient(125deg,#fff 0%,#eef8ff 65%,#e4f4fd 100%)!important;
+  border-color:#bfe2f3!important;box-shadow:0 10px 26px #2b79a51a!important;
+}
+.home-hub .home-training-art,.home-hub .home-workout-program-art,
+.home-hub .home-nutrition-main-art,.home-hub .home-shop-art{
+  background:transparent!important;box-shadow:none!important;overflow:visible!important;
+}
+.home-hub svg,.home-hub svg image{background:transparent!important}
+.home-hub .home-feature-tile>span{
+  background:transparent!important;border-radius:50%!important;box-shadow:none!important;
+}
+.home-hub svg [stroke="#a6e66b"],.home-hub svg [stroke="#4c8e42"],
+.home-hub svg [stroke="#5d9f45"]{stroke:#258fc9!important}
+.home-hub svg [fill="#a6e66b"],.home-hub svg [fill="#4c8e42"],
+.home-hub svg [fill="#5d9f45"]{fill:#58b9e9!important}
+.home-hub svg stop[stop-color="#a6e66b"],.home-hub svg stop[stop-color="#4c8e42"],
+.home-hub svg stop[stop-color="#5d9f45"]{stop-color:#58b9e9!important}
+.home-hub .home-shop-copy .home-shop-enter{color:#367fa9!important}
+.home-hub .home-training-art svg,.home-hub .home-nutrition-main-art svg,
+.home-hub .home-shop-art svg,.home-hub .home-workout-program-art svg{
+  filter:drop-shadow(0 4px 9px #2b79a51a);
+}
 </style>
 </head>
 <body><div id="ironIntro" class="iron-intro" aria-label="IRONNOVA">
