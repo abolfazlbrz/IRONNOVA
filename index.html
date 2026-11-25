@@ -712,17 +712,6 @@ body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.
 </nav>
 <div id="coachSubpageOverview" class="coach-subpage">
 <div class="card"><h2>داشبورد مربی و شاگرد</h2><p class="muted">برای جلوگیری از شلوغی، هر ابزار در صفحه مستقل خودش قرار گرفته است.</p>
-<section id="ironInstallStatsCard" class="card hidden" style="margin:14px 0 16px;padding:16px;border:1px solid var(--line)">
- <div class="row" style="align-items:center;justify-content:space-between;gap:10px">
-  <div><h3 style="margin:0">آمار نصب IRONNOVA</h3><p class="muted" style="margin:5px 0 0">تعداد نصب‌های یکتای ثبت‌شده روی دستگاه‌های اندرویدی</p></div>
-  <button class="btn secondary small" type="button" onclick="loadIronInstallStats()">به‌روزرسانی</button>
- </div>
- <div style="display:flex;align-items:baseline;gap:9px;margin-top:14px">
-  <strong id="ironInstallTotal" style="font-size:34px;line-height:1.2;font-variant-numeric:tabular-nums">—</strong>
-  <span class="muted">نصب ثبت‌شده</span>
- </div>
- <div id="ironInstallStatsStatus" class="muted" style="font-size:12px;margin-top:5px">آمار پس از اولین اجرای نسخه جدید ثبت می‌شود.</div>
-</section>
 <div class="coach-shortcuts">
 <button class="plan-option" onclick="showCoachSubpage('connections')"><b>اتصال مربی و شاگرد</b><small>دعوت، درخواست و وضعیت ارتباط</small></button>
 <button class="plan-option" onclick="showCoachSubpage('plans')"><b>برنامه‌های تمرینی</b><small>ساخت، انتشار و مشاهده برنامه‌ها</small></button>
@@ -754,7 +743,18 @@ body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.
 <div class="card"><h2>گفت‌وگوی گروهی</h2><p class="muted">مربی می‌تواند فقط شاگردان متصل و تأییدشده خودش را به گروه اضافه کند.</p><section id="icGroupCreateCard" class="hidden"><div class="field"><label>نام گروه</label><input id="icGroupName" placeholder="مثلاً گروه تمرین صبح"></div><div class="field"><label>شناسه شاگردها (هر UUID در یک خط یا با ویرگول)</label><textarea id="icGroupStudents" rows="4" placeholder="UUID شاگرد اول&#10;UUID شاگرد دوم"></textarea></div><button class="btn" onclick="createIronGroup()">ساخت گروه</button></section><button class="btn secondary small" onclick="loadIronGroups()">به‌روزرسانی گروه‌ها</button><div id="icGroups" style="margin:10px 0"></div><div class="field"><label>شناسه گروه انتخاب‌شده</label><input id="icSelectedGroupId" placeholder="گروهی را از فهرست انتخاب کن" readonly></div><div id="icGroupMessages" style="max-height:300px;overflow:auto"></div><div class="field"><label>پیام گروه</label><textarea id="icGroupMessageBody" rows="3" maxlength="4000" placeholder="پیام گروهی..."></textarea></div><div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn secondary small" onclick="this.parentElement.nextElementSibling.click()">＋ رسانه</button><button class="btn secondary small" data-scope="group" id="icVoiceGroup" onclick="ironToggleVoice(this.dataset.scope)">🎙 ویس</button><button class="btn" onclick="sendIronGroupMessage()">ارسال به گروه</button></div><input id="icGroupMedia" type="file" accept="image/*,video/mp4,video/webm,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.txt" hidden onchange="ironUploadChatMedia(this.dataset.scope,this)" data-scope="group"></div>
 </div>
 <div id="coachSubpageAdmin" class="coach-subpage hidden">
-<section id="ironMainAdminPanel" class="card hidden"><h2>مدیریت اصلی IRONNOVA</h2><p class="muted">فقط مدیر اصلی می‌تواند درخواست مربیان را بررسی کند.</p><button class="btn secondary" onclick="refreshIronCoachRequests()">به‌روزرسانی درخواست‌ها</button><div id="ironCoachRequests" style="margin-top:12px"></div><div class="divider"></div><h3>مدیریت دسترسی مدیر</h3><div class="field"><label>شناسه حساب کاربر (UUID)</label><input id="ironAdminTarget" placeholder="UUID کاربر"></div><div class="row"><button class="btn grow" onclick="setIronAdminAccess(true)">افزودن مدیر</button><button class="btn secondary grow" onclick="setIronAdminAccess(false)">لغو دسترسی مدیر</button></div><div id="ironAdminStatus" class="muted" style="margin-top:8px"></div></section>
+<section id="ironMainAdminPanel" class="card hidden"><h2>مدیریت اصلی IRONNOVA</h2><p class="muted">فقط مدیر اصلی می‌تواند درخواست مربیان را بررسی کند.</p>
+<section id="ironInstallStatsCard" class="card hidden" style="margin:14px 0 16px;padding:16px;border:1px solid var(--line)">
+ <div class="row" style="align-items:center;justify-content:space-between;gap:10px">
+  <div><h3 style="margin:0">آمار نصب IRONNOVA</h3><p class="muted" style="margin:5px 0 0">تعداد نصب‌های یکتای ثبت‌شده روی دستگاه‌های اندرویدی</p></div>
+  <button class="btn secondary small" type="button" onclick="loadIronInstallStats()">به‌روزرسانی</button>
+ </div>
+ <div style="display:flex;align-items:baseline;gap:9px;margin-top:14px">
+  <strong id="ironInstallTotal" style="font-size:34px;line-height:1.2;font-variant-numeric:tabular-nums">—</strong>
+  <span class="muted">نصب ثبت‌شده</span>
+ </div>
+ <div id="ironInstallStatsStatus" class="muted" style="font-size:12px;margin-top:5px">آمار پس از اولین اجرای نسخه جدید ثبت می‌شود.</div>
+</section><button class="btn secondary" onclick="refreshIronCoachRequests()">به‌روزرسانی درخواست‌ها</button><div id="ironCoachRequests" style="margin-top:12px"></div><div class="divider"></div><h3>مدیریت دسترسی مدیر</h3><div class="field"><label>شناسه حساب کاربر (UUID)</label><input id="ironAdminTarget" placeholder="UUID کاربر"></div><div class="row"><button class="btn grow" onclick="setIronAdminAccess(true)">افزودن مدیر</button><button class="btn secondary grow" onclick="setIronAdminAccess(false)">لغو دسترسی مدیر</button></div><div id="ironAdminStatus" class="muted" style="margin-top:8px"></div></section>
 </div>
 </div>
 </section>
@@ -1497,34 +1497,42 @@ async function loadCommunicationCenter(){
 }
 function communicationCard(type,x){
  const key=type+':'+x.id,unread=!ironCommReadSet.has(key),expanded=ironCommExpanded.has(key);
- return '<article class="comm-item '+(unread?'unread':'')+'"><div class="comm-meta"><span>'+(type==='public'?'اطلاعیه مدیریت':'پیام مربی')+'</span><time>'+new Date(x.created_at).toLocaleString('fa-IR')+'</time></div><b>'+safe(x.title)+'</b><div class="comm-body '+(expanded?'':'hidden')+'" id="comm-body-'+x.id+'">'+safe(x.body)+'</div><button class="btn secondary small" style="margin-top:8px" onclick="toggleCommunication('+JSON.stringify(type)+','+JSON.stringify(x.id)+')">'+(expanded?'بستن پیام':'مشاهده پیام')+'</button></article>';
+ return '<article class="comm-item '+(unread?'unread':'')+'"><div class="comm-meta"><span>'+(type==='public'?'اطلاعیه مدیریت':'پیام مربی')+'</span><time>'+new Date(x.created_at).toLocaleString('fa-IR')+'</time></div><b>'+safe(x.title)+'</b><div class="comm-body '+(expanded?'':'hidden')+'" id="comm-body-'+type+'-'+x.id+'">'+safe(x.body)+'</div><button class="btn secondary small" style="margin-top:8px" aria-expanded="'+String(expanded)+'" onclick="toggleCommunication('+JSON.stringify(type)+','+JSON.stringify(x.id)+')">'+(expanded?'بستن پیام':'مشاهده پیام')+'</button></article>';
 }
 function coachCloudCard(x){
  const key='coach:'+x.id,unread=!ironCommReadSet.has(key),expanded=ironCommExpanded.has(key);
- return '<div class="comm-cloud-wrap"><button class="comm-cloud" onclick="toggleCommunication(\'coach\',\''+x.id+'\')"><span>سخنان حضرت مربی<small>'+new Date(x.created_at).toLocaleDateString('fa-IR')+'</small></span></button></div>'+(expanded?'<div class="comm-cloud-message"><div class="comm-meta"><b>'+safe(x.title||'سخنان حضرت مربی')+'</b><time>'+new Date(x.created_at).toLocaleString('fa-IR')+'</time></div>'+safe(x.body)+'</div>':'')+(unread?'<div class="muted" style="text-align:center">پیام جدید مربی · برای خواندن ابر را لمس کن</div>':'');
+ return '<div class="comm-cloud-wrap"><button class="comm-cloud" aria-expanded="'+String(expanded)+'" onclick="toggleCommunication(\'coach\',\''+x.id+'\')"><span>سخنان حضرت مربی<small>'+new Date(x.created_at).toLocaleDateString('fa-IR')+'</small></span></button></div>'+(expanded?'<div class="comm-cloud-message" id="comm-body-coach-'+x.id+'"><div class="comm-meta"><b>'+safe(x.title||'سخنان حضرت مربی')+'</b><time>'+new Date(x.created_at).toLocaleString('fa-IR')+'</time></div>'+safe(x.body)+'</div>':'')+(unread?'<div class="muted" style="text-align:center">پیام جدید مربی · برای خواندن ابر را لمس کن</div>':'');
 }
 async function toggleCommunication(type,id){
  const key=type+':'+id,opening=!ironCommExpanded.has(key);
  if(opening)ironCommExpanded.add(key);else ironCommExpanded.delete(key);
- const body=document.getElementById('comm-body-'+id);
- if(body)body.classList.toggle('hidden',!opening);
  if(opening&&!ironCommReadSet.has(key)){
-  try{const {data:{user}}=await supabaseClient.auth.getUser();if(user){const {error}=await supabaseClient.from('iron_communication_reads_v1').upsert({communication_type:type,communication_id:id,user_id:user.id},{onConflict:'communication_type,communication_id,user_id'});if(!error)ironCommReadSet.add(key)}}
-  catch(error){console.warn('Communication read status could not be saved:',error?.message||error)}
+  try{
+   const {data:{user}}=await supabaseClient.auth.getUser();
+   if(user){
+    const {error}=await supabaseClient.from('iron_communication_reads_v1').upsert({communication_type:type,communication_id:id,user_id:user.id},{onConflict:'communication_type,communication_id,user_id'});
+    if(!error)ironCommReadSet.add(key);
+    else console.warn('Communication read status could not be saved:',error.message);
+   }
+  }catch(error){console.warn('Communication read status could not be saved:',error?.message||error)}
  }
- loadCommunicationCenter();
+ await loadCommunicationCenter();
+ const body=document.getElementById('comm-body-'+type+'-'+id);
+ if(body){body.classList.toggle('hidden',!opening);body.scrollIntoView({behavior:'smooth',block:'nearest'})}
+ const button=body?.parentElement?.querySelector('button');
+ if(button){button.setAttribute('aria-expanded',String(opening));button.textContent=opening?'بستن پیام':'مشاهده پیام'}
 }
 window.ironOpenPushNotification=async function(payload={}){
  const data=payload?.data||payload||{};
- const rawType=String(data.communication_type||data.type||data.kind||'public').toLowerCase();
+ const rawType=String(data.communication_type||data.communicationType||data.message_type||data.notification_type||data.type||data.kind||'public').toLowerCase();
  const type=rawType.includes('coach')?'coach':'public';
- const id=String(data.communication_id||data.announcement_id||data.message_id||data.id||'').trim();
+ const id=String(data.communication_id||data.communicationId||data.announcement_id||data.message_id||data.notification_id||data.id||'').trim();
  showPage('home');
  await loadCommunicationCenter();
  if(id){
   ironCommExpanded.add(type+':'+id);
   await loadCommunicationCenter();
-  const card=document.getElementById('comm-body-'+id);
+  const card=document.getElementById('comm-body-'+type+'-'+id);
   if(card){card.classList.remove('hidden');card.scrollIntoView({behavior:'smooth',block:'center'});return true}
  }
  const list=document.getElementById(type==='coach'?'commCoachCloud':'commPublicList');
