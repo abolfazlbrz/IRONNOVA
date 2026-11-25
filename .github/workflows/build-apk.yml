@@ -161,6 +161,61 @@ jobs:
               -dname "CN=Android Debug,O=Android,C=US"
           fi
 
+      - name: Build signed Release APK
+        if: env.ANDROID_KEYSTORE_BASE64 != ''
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          test -n "$ANDROID_KEYSTORE_PASSWORD"
+          test -n "$ANDROID_KEY_PASSWORD"
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/ironnova-release.jks
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p = Path('android/app/build.gradle')
+          s = p.read_text()
+          if 'signingConfigs {' not in s:
+              m = re.search(r'(?m)^\\s*buildTypes\\s*\\{', s)
+              if not m:
+                  raise SystemExit('Could not find Android buildTypes block')
+              signing = '''
+              signingConfigs {
+                  release {
+                      storeFile file('../ironnova-release.jks')
+                      storePassword System.getenv('ANDROID_KEYSTORE_PASSWORD')
+                      keyAlias 'ironnova-release'
+                      keyPassword System.getenv('ANDROID_KEY_PASSWORD')
+                  }
+              }
+
+          '''
+              s = s[:m.start()] + signing + s[m.start():]
+          m = re.search(r'(?m)^([ \\t]*)release\\s*\\{', s)
+          if not m:
+              raise SystemExit('Could not find release buildType')
+          insert_at = m.end()
+          if 'signingConfig signingConfigs.release' not in s[insert_at:insert_at+250]:
+              s = s[:insert_at] + "\\n" + m.group(1) + "    signingConfig signingConfigs.release" + s[insert_at:]
+          p.write_text(s)
+          PY
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleRelease
+          cd ..
+          jarsigner -verify -verbose -certs android/app/build/outputs/apk/release/app-release-unsigned.apk >/dev/null 2>&1 && exit 1 || true
+          keytool -list -keystore android/ironnova-release.jks -storepass "$ANDROID_KEYSTORE_PASSWORD" -alias ironnova-release >/dev/null
+          rm -f android/ironnova-release.jks
+
+      - name: Upload signed Release APK
+        if: env.ANDROID_KEYSTORE_BASE64 != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: IRONNOVA-Release-APK
+          path: android/app/build/outputs/apk/release/app-release.apk
+
       - name: Build APK
         run: |
           cd android
