@@ -46,6 +46,7 @@ jobs:
           from io import BytesIO
           import base64
           import string
+          import hashlib
           from PIL import Image
 
           folder = Path('.github/splash-parts')
@@ -71,10 +72,8 @@ jobs:
                           raw = base64.b64decode(candidate, validate=True)
                           if len(raw) != 85346:
                               continue
-                          with Image.open(BytesIO(raw)) as image:
-                              if image.format != 'WEBP' or image.size != (941, 1672):
-                                  continue
-                              image.load()
+                          if hashlib.sha256(raw).hexdigest() != '242a00d75d3fcc0c836cdd3793e19cf6fc9765659c4f1d997264724baea3768f':
+                              continue
                           recovered = raw
                           break
                       except Exception:
@@ -94,6 +93,7 @@ jobs:
               assert image.size == (941, 1672), image.size
               image.load()
           assert p.stat().st_size == 85346, p.stat().st_size
+          assert hashlib.sha256(p.read_bytes()).hexdigest() == '242a00d75d3fcc0c836cdd3793e19cf6fc9765659c4f1d997264724baea3768f'
           print(f'Verified IRONNOVA splash: 941x1672, {p.stat().st_size} bytes')
           PY
 
