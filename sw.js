@@ -1,5 +1,5 @@
-const CACHE_NAME = 'ironnova-v12-photo-cloud';
-const APP_SHELL = ['./', './index.html', './manifest.webmanifest', './assets/icon-192.png', './assets/icon-512.png', './assets/icon-maskable-512.png'];
+const CACHE_NAME = 'ironnova-v13-exercise-media';
+const APP_SHELL = ['./', './index.html', './manifest.webmanifest', './assets/icon-192.png', './assets/icon-512.png', './assets/icon-maskable-512.png', './assets/exercise-photo-catalog.json'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)).then(() => self.skipWaiting()));
 });
@@ -10,13 +10,14 @@ self.addEventListener('fetch', event => {
   const request = event.request;
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
-  const externalExerciseAsset = url.hostname === 'raw.githubusercontent.com' && url.pathname.startsWith('/yuhonas/free-exercise-db/');
-  if (externalExerciseAsset) {
+  const exerciseMedia = (url.hostname === 'raw.githubusercontent.com' && url.pathname.startsWith('/yuhonas/free-exercise-db/')) ||
+    (url.hostname === 'upload.wikimedia.org' && url.pathname.startsWith('/wikipedia/commons/'));
+  if (exerciseMedia) {
     event.respondWith(caches.open(CACHE_NAME).then(async cache => {
       const cached = await cache.match(request);
       if (cached) return cached;
       const response = await fetch(request);
-      if (response && (response.ok || response.type === 'opaque')) await cache.put(request, response.clone());
+      if (response && response.ok) await cache.put(request, response.clone());
       return response;
     }).catch(() => caches.match(request)));
     return;
