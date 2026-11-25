@@ -34,6 +34,22 @@ if (client && Capacitor.isNativePlatform()) {
     }
   });
 
+  PushNotifications.addListener('pushNotificationActionPerformed', async action => {
+    try {
+      const notification = action?.notification || {};
+      const data = notification?.data || {};
+      console.info('IRONNOVA push opened:', notification?.title || '');
+      if (typeof window.ironOpenPushNotification === 'function') {
+        await window.ironOpenPushNotification({ ...data, data });
+      } else {
+        window.location.hash = '#home';
+      }
+    } catch (error) {
+      console.error('IRONNOVA push navigation failed:', error);
+      window.location.hash = '#home';
+    }
+  });
+
   async function registerForUser(user) {
     if (!user?.id || registeringUserId === user.id) return;
     registeringUserId = user.id;
