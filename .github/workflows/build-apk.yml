@@ -38,6 +38,45 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Restore and validate offline exercise assets
+        run: |
+          mkdir -p assets
+          if [ -f IRONNOVA-exercise-assets.zip.part-00 ] || [ -f IRONNOVA-exercise-assets.zip.part-01 ]; then
+            test -f IRONNOVA-exercise-assets.zip.part-00
+            test -f IRONNOVA-exercise-assets.zip.part-01
+            cat IRONNOVA-exercise-assets.zip.part-00 IRONNOVA-exercise-assets.zip.part-01 > /tmp/IRONNOVA-exercise-assets.zip
+            unzip -oq /tmp/IRONNOVA-exercise-assets.zip -d assets
+          elif [ -f IRONNOVA-exercise-assets.zip ]; then
+            unzip -oq IRONNOVA-exercise-assets.zip -d assets
+          fi
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path("assets")
+          catalog_path = root / "iron-exercise-catalog.json"
+          photo_catalog_path = root / "exercise-photo-catalog.json"
+          media_dir = root / "iron-exercises"
+          if not catalog_path.is_file() or not photo_catalog_path.is_file() or not media_dir.is_dir():
+              raise SystemExit("ERROR: offline exercise assets are missing; refusing to build an incomplete APK.")
+          catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+          exercises = catalog.get("exercises", [])
+          if len(exercises) < 1000:
+              raise SystemExit(f"ERROR: expected at least 1000 offline exercises, found {len(exercises)}.")
+          images = [p for p in media_dir.rglob("*") if p.is_file() and p.suffix.lower() in {".webp", ".svg", ".jpg", ".jpeg", ".png"}]
+          if len(images) < 1800:
+              raise SystemExit(f"ERROR: expected at least 1800 exercise images, found {len(images)}.")
+          refs = set()
+          for item in exercises:
+              flat = (item.get("images") or {}).get("flat") or {}
+              for value in flat.values():
+                  if isinstance(value, str) and value.startswith("assets/"):
+                      refs.add(value)
+          missing = [value for value in refs if not Path(value).is_file()]
+          if missing:
+              raise SystemExit(f"ERROR: {len(missing)} catalog image paths are missing; first: {missing[0]}")
+          print(f"Validated {len(exercises)} offline exercises, {len(images)} local images and {len(refs)} referenced image paths.")
+          PY
+
       - name: Prepare web files
         run: |
           mkdir -p www
