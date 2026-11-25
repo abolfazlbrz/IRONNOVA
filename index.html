@@ -712,6 +712,17 @@ body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.
 </nav>
 <div id="coachSubpageOverview" class="coach-subpage">
 <div class="card"><h2>داشبورد مربی و شاگرد</h2><p class="muted">برای جلوگیری از شلوغی، هر ابزار در صفحه مستقل خودش قرار گرفته است.</p>
+<section id="ironInstallStatsCard" class="card hidden" style="margin:14px 0 16px;padding:16px;border:1px solid var(--line)">
+ <div class="row" style="align-items:center;justify-content:space-between;gap:10px">
+  <div><h3 style="margin:0">آمار نصب IRONNOVA</h3><p class="muted" style="margin:5px 0 0">تعداد نصب‌های یکتای ثبت‌شده روی دستگاه‌های اندرویدی</p></div>
+  <button class="btn secondary small" type="button" onclick="loadIronInstallStats()">به‌روزرسانی</button>
+ </div>
+ <div style="display:flex;align-items:baseline;gap:9px;margin-top:14px">
+  <strong id="ironInstallTotal" style="font-size:34px;line-height:1.2;font-variant-numeric:tabular-nums">—</strong>
+  <span class="muted">نصب ثبت‌شده</span>
+ </div>
+ <div id="ironInstallStatsStatus" class="muted" style="font-size:12px;margin-top:5px">آمار پس از اولین اجرای نسخه جدید ثبت می‌شود.</div>
+</section>
 <div class="coach-shortcuts">
 <button class="plan-option" onclick="showCoachSubpage('connections')"><b>اتصال مربی و شاگرد</b><small>دعوت، درخواست و وضعیت ارتباط</small></button>
 <button class="plan-option" onclick="showCoachSubpage('plans')"><b>برنامه‌های تمرینی</b><small>ساخت، انتشار و مشاهده برنامه‌ها</small></button>
@@ -744,17 +755,7 @@ body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.
 </div>
 <div id="coachSubpageAdmin" class="coach-subpage hidden">
 <section id="ironMainAdminPanel" class="card hidden"><h2>مدیریت اصلی IRONNOVA</h2><p class="muted">فقط مدیر اصلی می‌تواند درخواست مربیان را بررسی کند.</p>
-<section id="ironInstallStatsCard" class="card hidden" style="margin:14px 0 16px;padding:16px;border:1px solid var(--line)">
- <div class="row" style="align-items:center;justify-content:space-between;gap:10px">
-  <div><h3 style="margin:0">آمار نصب IRONNOVA</h3><p class="muted" style="margin:5px 0 0">تعداد نصب‌های یکتای ثبت‌شده روی دستگاه‌های اندرویدی</p></div>
-  <button class="btn secondary small" type="button" onclick="loadIronInstallStats()">به‌روزرسانی</button>
- </div>
- <div style="display:flex;align-items:baseline;gap:9px;margin-top:14px">
-  <strong id="ironInstallTotal" style="font-size:34px;line-height:1.2;font-variant-numeric:tabular-nums">—</strong>
-  <span class="muted">نصب ثبت‌شده</span>
- </div>
- <div id="ironInstallStatsStatus" class="muted" style="font-size:12px;margin-top:5px">آمار پس از اولین اجرای نسخه جدید ثبت می‌شود.</div>
-</section><button class="btn secondary" onclick="refreshIronCoachRequests()">به‌روزرسانی درخواست‌ها</button><div id="ironCoachRequests" style="margin-top:12px"></div><div class="divider"></div><h3>مدیریت دسترسی مدیر</h3><div class="field"><label>شناسه حساب کاربر (UUID)</label><input id="ironAdminTarget" placeholder="UUID کاربر"></div><div class="row"><button class="btn grow" onclick="setIronAdminAccess(true)">افزودن مدیر</button><button class="btn secondary grow" onclick="setIronAdminAccess(false)">لغو دسترسی مدیر</button></div><div id="ironAdminStatus" class="muted" style="margin-top:8px"></div></section>
+<button class="btn secondary" onclick="refreshIronCoachRequests()">به‌روزرسانی درخواست‌ها</button><div id="ironCoachRequests" style="margin-top:12px"></div><div class="divider"></div><h3>مدیریت دسترسی مدیر</h3><div class="field"><label>شناسه حساب کاربر (UUID)</label><input id="ironAdminTarget" placeholder="UUID کاربر"></div><div class="row"><button class="btn grow" onclick="setIronAdminAccess(true)">افزودن مدیر</button><button class="btn secondary grow" onclick="setIronAdminAccess(false)">لغو دسترسی مدیر</button></div><div id="ironAdminStatus" class="muted" style="margin-top:8px"></div></section>
 </div>
 </div>
 </section>
