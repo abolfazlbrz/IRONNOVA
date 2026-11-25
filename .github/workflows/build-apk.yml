@@ -195,12 +195,15 @@ jobs:
 
           '''
               s = s[:m.start()] + signing + s[m.start():]
-          m = re.search(r'(?m)^([ \t]*)release\s*\{', s)
-          if not m:
-              raise SystemExit('Could not find release buildType')
-          insert_at = m.end()
+          build_types = re.search(r'(?m)^\s*buildTypes\s*\{', s)
+          if not build_types:
+              raise SystemExit('Could not find Android buildTypes block')
+          release = re.search(r'(?m)^([ \t]*)release\s*\{', s[build_types.end():])
+          if not release:
+              raise SystemExit('Could not find release buildType inside buildTypes')
+          insert_at = build_types.end() + release.end()
           if 'signingConfig signingConfigs.release' not in s[insert_at:insert_at+250]:
-              s = s[:insert_at] + "\n" + m.group(1) + "    signingConfig signingConfigs.release" + s[insert_at:]
+              s = s[:insert_at] + "\n" + release.group(1) + "    signingConfig signingConfigs.release" + s[insert_at:]
           p.write_text(s)
           PY
           cd android
