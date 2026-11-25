@@ -1498,7 +1498,7 @@ async function toggleCommunication(type,id){
  const body=document.getElementById('comm-body-'+id);
  if(body)body.classList.toggle('hidden',!opening);
  if(opening&&!ironCommReadSet.has(key)){
-  try{const {data:{user}}=await supabaseClient.auth.getUser();if(user){const {error}=await supabaseClient.from('iron_communication_reads_v1').upsert({communication_type:type,communication_id:id,user_id:user.id},{onConflict:'user_id,communication_type,communication_id'});if(!error)ironCommReadSet.add(key)}}
+  try{const {data:{user}}=await supabaseClient.auth.getUser();if(user){const {error}=await supabaseClient.from('iron_communication_reads_v1').upsert({communication_type:type,communication_id:id,user_id:user.id},{onConflict:'communication_type,communication_id,user_id'});if(!error)ironCommReadSet.add(key)}}
   catch(error){console.warn('Communication read status could not be saved:',error?.message||error)}
  }
  loadCommunicationCenter();
