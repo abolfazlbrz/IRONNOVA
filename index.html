@@ -480,6 +480,7 @@ body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.
 <button class="active" data-page="home" onclick="showPage('home')"><span class="ico">⌂</span>خانه</button>
 <button data-page="workout" onclick="showPage('workout')"><span class="ico">🏋️</span>برنامه تمرینی</button>
 <button data-page="coach" onclick="showPage('coach')"><span class="ico">🧠</span>مربی هوشمند</button>
+<button data-page="aiAssistant" onclick="showPage('aiAssistant')"><span class="ico">🤖</span>دستیار هوشمند</button>
 <button data-page="home" onclick="showPage('home');toggleHomeTrainingHub(true)"><span class="ico">⌂</span>تمرینات</button>
 <button data-page="nutrition" onclick="showPage('nutrition')"><span class="ico">🥗</span>تغذیه و کالری</button>
 <button data-page="progress" onclick="showPage('progress')"><span class="ico">▥</span>آمار و پیشرفت</button>
@@ -591,6 +592,17 @@ body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.
 </section>
  <div class="card"><h2>برنامه امروز</h2><div id="homeExercises"></div></div>
 </section>
+<section id="aiAssistantPage" class="hidden"><div class="eyebrow">IRONNOVA AI</div><h1>دستیار هوشمند</h1><p class="muted">پاسخ‌گوی هوشمند برای پرسش‌های تمرین، تغذیه، ریکاوری و کار با برنامه</p><section id="ironAiAssistantCard" class="card" style="margin:14px 0;padding:16px;border:1px solid var(--line);border-radius:18px">
+ <div class="row" style="align-items:center;justify-content:space-between;gap:10px">
+  <div><h3 style="margin:0">🤖 دستیار هوشمند IRONNOVA</h3><p class="muted" style="margin:5px 0 0;font-size:12px">پاسخ‌گوی هوشمند تمرین، تغذیه و امکانات IRONNOVA</p></div>
+  <button class="btn secondary small" type="button" onclick="clearIronAiChat()">گفت‌وگوی جدید</button>
+ </div>
+ <div id="ironAiMessages" aria-live="polite" style="display:flex;flex-direction:column;gap:9px;max-height:360px;overflow:auto;padding:12px 2px;margin-top:8px">
+  <div style="align-self:flex-start;max-width:92%;padding:11px 13px;border-radius:14px;background:var(--soft);line-height:1.7">سلام! من دستیار هوشمند IRONNOVA هستم. درباره تمرین، تغذیه، حرکات اصلاحی و امکانات برنامه هر سؤالی داری بپرس.</div>
+ </div>
+ <div class="field" style="margin:8px 0"><textarea id="ironAiInput" rows="3" maxlength="3000" placeholder="درخواستت را برای دستیار بنویس..." style="width:100%;resize:vertical"></textarea></div>
+ <div class="row" style="align-items:center;gap:10px"><button id="ironAiSend" class="btn grow" type="button" onclick="sendIronAiMessage()">ارسال پیام</button><span id="ironAiStatus" class="muted" style="font-size:11px">برای استفاده از دستیار باید وارد حساب کاربری شوی.</span></div>
+</section></section>
 <section id="workoutPage" class="hidden"><div class="row between"><div><div class="eyebrow">DAY 01</div><h1 id="workoutTitle">سینه و پشت بازو</h1></div><span class="pill" id="workoutCount">۰ / ۵</span></div><div class="card"><h2>انتخاب برنامه آماده</h2><p class="muted">یکی از الگوهای شروع را انتخاب کن. با تأیید تو، حرکات برنامه فعلی جایگزین می‌شوند.</p><div class="plan-grid"><button class="plan-option" onclick="applyPlan('full')"><b>تمام بدن · ۳ روز</b><small>مناسب شروع و تمرین متعادل کل بدن</small></button><button class="plan-option" onclick="applyPlan('upper')"><b>بالاتنه · ۴ روز</b><small>تمرکز روی سینه، پشت، سرشانه و بازو</small></button><button class="plan-option" onclick="applyPlan('lower')"><b>پایین‌تنه · ۴ روز</b><small>تمرکز روی پا، باسن و میان‌تنه</small></button><button class="plan-option" onclick="applyPlan('push')"><b>پوش · یک جلسه</b><small>سینه، سرشانه و پشت بازو</small></button></div></div><div class="row" style="gap:8px;margin:10px 0"><button class="btn secondary grow" onclick="addWorkoutExerciseQuick()">＋ افزودن حرکت</button><button class="btn grow" onclick="startWorkoutSession()">▶ شروع تمرین مرحله‌به‌مرحله</button></div><div id="workoutExercises"></div><div id="ironSessionPanel" class="iron-session hidden"></div><button class="btn" style="width:100%;margin:10px 0" onclick="finishWorkout()">پایان تمرین و ثبت سابقه</button><button class="btn secondary" onclick="resetWorkout()">شروع مجدد تمرین</button>
 <div class="workout-music-panel" id="workoutMusicPanel"><div class="row between"><div><div class="eyebrow">IRON AUDIO EXPERIENCE</div><h2>IRON MUSIC</h2></div><span class="pill">موسیقی تمرین</span></div><p class="muted">پخش‌کننده موسیقی داخل برنامه تمرینی؛ آهنگ‌ها را اضافه کن و هنگام تمرین کنترلشان کن.</p><div class="row between"><div><div class="eyebrow">IRON AUDIO EXPERIENCE</div><h1>IRON MUSIC</h1></div><span class="pill">PLAYER</span></div>
 <p class="muted">موسیقی‌های گوشی را اضافه کن؛ پخش، توقف، رد کردن آهنگ و نوار زمان در همین صفحه.</p>
@@ -724,17 +736,7 @@ body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.
  </div>
  <div id="ironInstallStatsStatus" class="muted" style="font-size:12px;margin-top:5px">آمار پس از اولین اجرای نسخه جدید ثبت می‌شود.</div>
 </section>
-<section id="ironAiAssistantCard" class="card hidden" style="margin:14px 0;padding:16px;border:1px solid var(--line);border-radius:18px">
- <div class="row" style="align-items:center;justify-content:space-between;gap:10px">
-  <div><h3 style="margin:0">🤖 دستیار هوشمند IRONNOVA</h3><p class="muted" style="margin:5px 0 0;font-size:12px">همکار هوش مصنوعی مدیر اصلی · دسترسی محدود و امن</p></div>
-  <button class="btn secondary small" type="button" onclick="clearIronAiChat()">گفت‌وگوی جدید</button>
- </div>
- <div id="ironAiMessages" aria-live="polite" style="display:flex;flex-direction:column;gap:9px;max-height:360px;overflow:auto;padding:12px 2px;margin-top:8px">
-  <div style="align-self:flex-start;max-width:92%;padding:11px 13px;border-radius:14px;background:var(--soft);line-height:1.7">سلام. من دستیار هوشمند IRONNOVA هستم. می‌توانم در تحلیل، عیب‌یابی و برنامه‌ریزی کمک کنم. در این نسخه فقط پاسخ‌گو هستم و هیچ تغییری در داده‌ها یا تنظیمات برنامه بدون سازوکار تأیید انجام نمی‌دهم.</div>
- </div>
- <div class="field" style="margin:8px 0"><textarea id="ironAiInput" rows="3" maxlength="3000" placeholder="درخواستت را برای دستیار بنویس..." style="width:100%;resize:vertical"></textarea></div>
- <div class="row" style="align-items:center;gap:10px"><button id="ironAiSend" class="btn grow" type="button" onclick="sendIronAiMessage()">ارسال پیام</button><span id="ironAiStatus" class="muted" style="font-size:11px">فقط مدیر اصلی به این بخش دسترسی دارد.</span></div>
-</section>
+
 <div class="coach-shortcuts">
 <button class="plan-option" onclick="showCoachSubpage('connections')"><b>اتصال مربی و شاگرد</b><small>دعوت، درخواست و وضعیت ارتباط</small></button>
 <button class="plan-option" onclick="showCoachSubpage('plans')"><b>برنامه‌های تمرینی</b><small>ساخت، انتشار و مشاهده برنامه‌ها</small></button>
@@ -815,7 +817,7 @@ let ironCoachStack=[];function showCoachSubpage(key,opts={}){const allowed=['ove
 let ironPageStack=[],ironHandlingPop=false,ironLastRootBack=0,ironFoodLayer='menu';
 
 function toggleHomeTrainingHub(force){const panel=document.getElementById('homeTrainingLayers'),button=document.getElementById('homeTrainingToggle');if(!panel||!button)return;const open=typeof force==='boolean'?force:panel.classList.contains('hidden');panel.classList.toggle('hidden',!open);button.setAttribute('aria-expanded',String(open));}
-function showPage(p,opts={}){const current=[...document.querySelectorAll('.app>section[id$="Page"]:not(.hidden)')].map(x=>x.id.replace(/Page$/,'')).find(x=>x);if(!opts.fromPop&&current&&current!==p){ironPageStack.push(current);history.pushState({ironPage:p},'','#'+p)}['home','workout','library','homeWorkout','corrective','progress','coach','nutrition','profile','admin','coachExplore','coachPanel','foodLibrary','shop','education'].forEach(x=>{const page=document.getElementById(x+'Page');if(page)page.classList.toggle('hidden',x!==p)});document.querySelectorAll('.side-nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===p));toggleSidebar(false);if(p==='admin')renderAdmin();if(p==='home')loadCommunicationCenter();if(p==='coachExplore')loadCoachExplore();if(p==='coachPanel'){loadIronChatPartners();loadIronAdminPanel();loadIronCoachLinks();loadMyCoachPlans();loadMyStudentLogs();loadIronCoachProfile();icLoadRole();loadIronGroups()}if(p==='library'&&!exerciseCatalog.length)loadExerciseCatalog();if(p==='library')renderLibrary();if(p==='homeWorkout'){restorePhysicalLimits();renderHomeExercises();if(!exerciseCatalog.length)loadExerciseCatalog().then(renderHomeExercises)}if(p==='corrective'){restorePhysicalLimits();renderCorrective();if(!exerciseCatalog.length)loadExerciseCatalog().then(renderCorrective)}if(p==='nutrition')renderNutrition();if(p==='foodLibrary'){renderMealBaskets();renderFoodLibrary();renderFoodDatabase();showFoodLayer('menu',false)}if(p==='shop'){renderShop();loadShopOrders();loadShopAdmin()}if(p==='education'){renderIronEducation();loadEducationAdmin()}if(p==='progress')renderProgress();if(p==='coach'){document.getElementById('coachWeight').value=data.weight;document.getElementById('nutWeight').value=data.weight}requestAnimationFrame(()=>{window.scrollTo(0,0);document.documentElement.scrollTop=0})}
+function showPage(p,opts={}){const current=[...document.querySelectorAll('.app>section[id$="Page"]:not(.hidden)')].map(x=>x.id.replace(/Page$/,'')).find(x=>x);if(!opts.fromPop&&current&&current!==p){ironPageStack.push(current);history.pushState({ironPage:p},'','#'+p)}['home','workout','library','homeWorkout','corrective','progress','coach','aiAssistant','nutrition','profile','admin','coachExplore','coachPanel','foodLibrary','shop','education'].forEach(x=>{const page=document.getElementById(x+'Page');if(page)page.classList.toggle('hidden',x!==p)});document.querySelectorAll('.side-nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===p));toggleSidebar(false);if(p==='admin')renderAdmin();if(p==='home')loadCommunicationCenter();if(p==='coachExplore')loadCoachExplore();if(p==='coachPanel'){loadIronChatPartners();loadIronAdminPanel();loadIronCoachLinks();loadMyCoachPlans();loadMyStudentLogs();loadIronCoachProfile();icLoadRole();loadIronGroups()}if(p==='library'&&!exerciseCatalog.length)loadExerciseCatalog();if(p==='library')renderLibrary();if(p==='homeWorkout'){restorePhysicalLimits();renderHomeExercises();if(!exerciseCatalog.length)loadExerciseCatalog().then(renderHomeExercises)}if(p==='corrective'){restorePhysicalLimits();renderCorrective();if(!exerciseCatalog.length)loadExerciseCatalog().then(renderCorrective)}if(p==='nutrition')renderNutrition();if(p==='foodLibrary'){renderMealBaskets();renderFoodLibrary();renderFoodDatabase();showFoodLayer('menu',false)}if(p==='shop'){renderShop();loadShopOrders();loadShopAdmin()}if(p==='education'){renderIronEducation();loadEducationAdmin()}if(p==='progress')renderProgress();if(p==='coach'){document.getElementById('coachWeight').value=data.weight;document.getElementById('nutWeight').value=data.weight}requestAnimationFrame(()=>{window.scrollTo(0,0);document.documentElement.scrollTop=0})}
 function toggleHomeNutritionHub(force){const panel=document.getElementById('homeNutritionLayers'),button=document.querySelector('.home-nutrition-launch');if(!panel||!button)return;const open=typeof force==='boolean'?force:panel.classList.contains('hidden');panel.classList.toggle('hidden',!open);button.setAttribute('aria-expanded',String(open))}
 function openHomeNutritionLayer(layer){if(layer==='nutrition'){showPage('nutrition');return}if(layer==='recipes'||layer==='baskets'){showPage('foodLibrary');showFoodLayer(layer);return}}
 function showFoodLayer(layer,focus=true){if(focus&&layer!=='menu'&&ironFoodLayer==='menu')history.pushState({ironFoodLayer:layer},'','#food-'+layer);ironFoodLayer=layer;const menu=document.getElementById('foodLaunchGrid'),recipes=document.getElementById('foodRecipePanel'),baskets=document.getElementById('foodBasketPanel');menu?.classList.toggle('hidden',layer!=='menu');recipes?.classList.toggle('hidden',layer!=='recipes');baskets?.classList.toggle('hidden',layer!=='baskets');if(focus)requestAnimationFrame(()=>{window.scrollTo(0,0);document.documentElement.scrollTop=0})}
@@ -1471,6 +1473,7 @@ async function icLoadRole(){const {data:{user}}=await supabaseClient.auth.getUse
 async function icSaveRole(){const name=document.getElementById('icName').value.trim(),role=document.getElementById('icRole').value;const {data:{user}}=await supabaseClient.auth.getUser();if(!user){document.getElementById('icStatus').textContent='ابتدا از بخش پروفایل وارد حساب کاربری شو.';return}const {data:existing,error:readError}=await supabaseClient.from('iron_account_roles_v2').select('role,status').eq('user_id',user.id).maybeSingle();if(readError){document.getElementById('icStatus').textContent='خطا: '+readError.message;return}if(existing){document.getElementById('icStatus').textContent='نقش قبلی این حساب قابل تغییر نیست: '+(existing.role==='coach'?'مربی':'شاگرد');await icLoadRole();return}const {error}=await supabaseClient.rpc('iron_set_role',{p_role:role,p_display_name:name});if(error){document.getElementById('icStatus').textContent='خطا: '+error.message;return}await icLoadRole();await loadIronAdminPanel();await loadIronCoachProfile()}
 
 let ironCommChannel=null,ironCommExpanded=new Set(),ironCommReadSet=new Set(),ironSelectedChatPartner=null;
+let ironCommIsMainAdmin=false;
 async function initCommunicationRealtime(){
  if(ironCommChannel){await supabaseClient.removeChannel(ironCommChannel);ironCommChannel=null}
  const {data:{user}}=await supabaseClient.auth.getUser();if(!user)return;
@@ -1492,7 +1495,7 @@ async function loadCommunicationCenter(){
   supabaseClient.from('iron_coach_broadcasts_v1').select('id,coach_id,title,body,created_at').order('created_at',{ascending:false}).limit(30),
   supabaseClient.from('iron_communication_reads_v1').select('communication_type,communication_id').eq('user_id',user.id),
   supabaseClient.from('iron_account_roles_v2').select('role,status').eq('user_id',user.id).maybeSingle(),
-  supabaseClient.from('iron_admins_v2').select('user_id').eq('user_id',user.id).maybeSingle(),
+  supabaseClient.from('iron_admins_v2').select('is_main_admin').eq('user_id',user.id).eq('is_main_admin',true).maybeSingle(),
   supabaseClient.from('iron_messages_v2').select('id',{count:'exact',head:true}).or('coach_id.eq.'+user.id+',student_id.eq.'+user.id).neq('sender_id',user.id).is('read_at',null)
  ]);
  if(pub.error||coach.error){status.textContent='دریافت اطلاعیه‌ها ناموفق بود: '+(pub.error?.message||coach.error?.message);return}
@@ -1500,7 +1503,7 @@ async function loadCommunicationCenter(){
  const publicRows=pub.data||[],coachRows=coach.data||[];
  const unread=publicRows.filter(x=>!ironCommReadSet.has('public:'+x.id)).length+coachRows.filter(x=>!ironCommReadSet.has('coach:'+x.id)).length+(chatUnread.count||0);
  const badge=document.getElementById('commUnreadBadge');if(badge){badge.textContent=unread.toLocaleString('fa-IR');badge.classList.toggle('hidden',!unread)}const topBadge=document.getElementById('commUnreadTop');if(topBadge){topBadge.textContent=unread>9?'۹+':unread.toLocaleString('fa-IR');topBadge.classList.toggle('hidden',!unread)}
- const adminComposer=document.getElementById('commAdminComposer');if(adminComposer)adminComposer.classList.toggle('hidden',!admin.data);
+ ironCommIsMainAdmin=!!admin.data?.is_main_admin;const adminComposer=document.getElementById('commAdminComposer');if(adminComposer)adminComposer.classList.toggle('hidden',!ironCommIsMainAdmin);
  const coachComposer=document.getElementById('commCoachComposer');if(coachComposer)coachComposer.classList.toggle('hidden',!(role.data?.role==='coach'&&role.data?.status==='approved'));
  status.textContent=(publicRows.length+coachRows.length).toLocaleString('fa-IR')+' پیام در دسترس است · '+unread.toLocaleString('fa-IR')+' خوانده‌نشده';
  const pl=document.getElementById('commPublicList');
@@ -1510,7 +1513,7 @@ async function loadCommunicationCenter(){
 }
 function communicationCard(type,x){
  const key=type+':'+x.id,unread=!ironCommReadSet.has(key),expanded=ironCommExpanded.has(key),bodyId='comm-body-'+type+'-'+x.id;
- return '<article class="comm-item '+(unread?'unread':'')+'"><div class="comm-meta"><span>'+(type==='public'?'اطلاعیه مدیریت':'پیام مربی')+'</span><time>'+new Date(x.created_at).toLocaleString('fa-IR')+'</time></div><b>'+safe(x.title)+'</b><div class="comm-body '+(expanded?'':'hidden')+'" id="'+bodyId+'">'+safe(x.body)+'</div><button type="button" class="btn secondary small" style="margin-top:8px" aria-expanded="'+String(expanded)+'" aria-controls="'+bodyId+'" data-communication-type="'+safe(type)+'" data-communication-id="'+safe(x.id)+'" onclick="toggleCommunication(this.dataset.communicationType,this.dataset.communicationId)">'+(expanded?'بستن پیام':'مشاهده پیام')+'</button></article>';
+ return '<article class="comm-item '+(unread?'unread':'')+'"><div class="comm-meta"><span>'+(type==='public'?'اطلاعیه مدیریت':'پیام مربی')+'</span><time>'+new Date(x.created_at).toLocaleString('fa-IR')+'</time></div><b>'+safe(x.title)+'</b><div class="comm-body '+(expanded?'':'hidden')+'" id="'+bodyId+'">'+safe(x.body)+'</div><div class="row" style="gap:8px;flex-wrap:wrap"><button type="button" class="btn secondary small" style="margin-top:8px" aria-expanded="'+String(expanded)+'" aria-controls="'+bodyId+'" data-communication-type="'+safe(type)+'" data-communication-id="'+safe(x.id)+'" onclick="toggleCommunication(this.dataset.communicationType,this.dataset.communicationId)">'+(expanded?'بستن پیام':'مشاهده پیام')+'</button>'+(type==='public'&&ironCommIsMainAdmin?'<button type="button" class="btn danger small" style="margin-top:8px" onclick="deletePublicAnnouncement(\''+safe(x.id)+'\')">حذف اطلاعیه</button>':'')+'</div></article>';
 }
 function coachCloudCard(x){
  const key='coach:'+x.id,unread=!ironCommReadSet.has(key),expanded=ironCommExpanded.has(key),bodyId='comm-body-coach-'+x.id;
@@ -1559,6 +1562,8 @@ async function publishPublicAnnouncement(){
  const {error}=await supabaseClient.from('iron_public_announcements_v1').insert({author_id:user.id,title,body});
  if(error){out.textContent='انتشار ناموفق بود: '+error.message;return}
  document.getElementById('commAdminTitle').value='';document.getElementById('commAdminBody').value='';out.textContent='اطلاعیه برای همه کاربران منتشر شد.';loadCommunicationCenter();
+}
+async function deletePublicAnnouncement(id){if(!ironCommIsMainAdmin||!id)return toast('دسترسی حذف اطلاعیه ندارید');if(!confirm('این اطلاعیه برای همه کاربران حذف شود؟'))return;const {error}=await supabaseClient.from('iron_public_announcements_v1').delete().eq('id',id);if(error)return toast('حذف اطلاعیه ناموفق بود: '+error.message);ironCommExpanded.delete('public:'+id);ironCommReadSet.delete('public:'+id);toast('اطلاعیه حذف شد');await loadCommunicationCenter();
 }
 async function publishCoachBroadcast(){
  const title=(document.getElementById('commCoachTitle').value.trim()||'سخنان حضرت مربی'),body=document.getElementById('commCoachBody').value.trim(),out=document.getElementById('commCoachStatus');
@@ -1612,19 +1617,18 @@ async function loadIronAdminPanel(){
  const adminNav=document.querySelector('[data-coach-admin-nav]');
  const menuButton=document.getElementById('ironMainAdminMenuButton');
  const statsCard=document.getElementById('ironInstallStatsCard');
- const aiCard=document.getElementById('ironAiAssistantCard');
- const hideAdmin=()=>{panel?.classList.add('hidden');adminNav?.classList.add('hidden');menuButton?.classList.add('hidden');statsCard?.classList.add('hidden');aiCard?.classList.add('hidden')};
+ 
+ const hideAdmin=()=>{panel?.classList.add('hidden');adminNav?.classList.add('hidden');menuButton?.classList.add('hidden');statsCard?.classList.add('hidden')};
  try{
   const auth=await supabaseClient.auth.getUser();
   const user=auth?.data?.user;
   if(!user){hideAdmin();return false}
   const {data,error}=await supabaseClient.from('iron_admins_v2').select('is_main_admin').eq('user_id',user.id).maybeSingle();
   if(error||!data?.is_main_admin){hideAdmin();return false}
-  panel?.classList.remove('hidden');adminNav?.classList.remove('hidden');menuButton?.classList.remove('hidden');statsCard?.classList.remove('hidden');aiCard?.classList.remove('hidden');
+  panel?.classList.remove('hidden');adminNav?.classList.remove('hidden');menuButton?.classList.remove('hidden');statsCard?.classList.remove('hidden');
   const adminArea=document.getElementById('coachSubpageAdmin');
   if(adminArea&&panel){
    if(statsCard&&statsCard.parentElement!==adminArea)adminArea.insertBefore(statsCard,panel);
-   if(aiCard&&aiCard.parentElement!==adminArea)adminArea.insertBefore(aiCard,panel);
   }
   Promise.all([refreshIronCoachRequests(),loadIronInstallStats()]).catch(error=>console.warn('IRONNOVA admin widgets:',error));
   return true;
@@ -1655,7 +1659,7 @@ async function sendIronAiMessage(){
  const message=(input?.value||'').trim();if(!message){if(status)status.textContent='اول پیام را بنویس.';return}
  if(message.length>3000){if(status)status.textContent='پیام بیش از حد طولانی است.';return}
  const {data:{session}}=await supabaseClient.auth.getSession();
- if(!session?.access_token){if(status)status.textContent='برای استفاده از دستیار ابتدا وارد حساب مدیر شو.';return}
+ if(!session?.access_token){if(status)status.textContent='برای استفاده از دستیار ابتدا وارد حساب کاربری شو.';return}
  ironAiBusy=true;if(button){button.disabled=true;button.textContent='در حال پاسخ...'}
  input.value='';ironAiAddBubble('user',message);ironAiHistory.push({role:'user',content:message});
  if(status)status.textContent='در حال دریافت پاسخ امن از سرور...';
