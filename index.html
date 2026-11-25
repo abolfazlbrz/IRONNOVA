@@ -1519,7 +1519,7 @@ async function toggleCommunication(type,id){
  await loadCommunicationCenter();
  const body=document.getElementById('comm-body-'+type+'-'+id);
  if(body){body.classList.toggle('hidden',!opening);body.scrollIntoView({behavior:'smooth',block:'nearest'})}
- const button=body?.parentElement?.querySelector('button');
+ const button=document.querySelector('[data-communication-type="'+type+'"][data-communication-id="'+id+'"]');
  if(button){button.setAttribute('aria-expanded',String(opening));button.textContent=opening?'بستن پیام':'مشاهده پیام'}
 }
 window.ironOpenPushNotification=async function(payload={}){
@@ -1530,8 +1530,8 @@ window.ironOpenPushNotification=async function(payload={}){
  showPage('home');
  await loadCommunicationCenter();
  if(id){
-  ironCommExpanded.add(type+':'+id);
-  await loadCommunicationCenter();
+  ironCommExpanded.delete(type+':'+id);
+  await toggleCommunication(type,id);
   const card=document.getElementById('comm-body-'+type+'-'+id);
   if(card){card.classList.remove('hidden');card.scrollIntoView({behavior:'smooth',block:'center'});return true}
  }
