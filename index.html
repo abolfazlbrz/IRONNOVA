@@ -712,6 +712,17 @@ body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.
 </nav>
 <div id="coachSubpageOverview" class="coach-subpage">
 <div class="card"><h2>داشبورد مربی و شاگرد</h2><p class="muted">برای جلوگیری از شلوغی، هر ابزار در صفحه مستقل خودش قرار گرفته است.</p>
+<section id="ironInstallStatsCard" class="card hidden" style="margin:14px 0 16px;padding:16px;border:1px solid var(--line)">
+ <div class="row" style="align-items:center;justify-content:space-between;gap:10px">
+  <div><h3 style="margin:0">آمار نصب IRONNOVA</h3><p class="muted" style="margin:5px 0 0">تعداد نصب‌های یکتای ثبت‌شده روی دستگاه‌های اندرویدی</p></div>
+  <button class="btn secondary small" type="button" onclick="loadIronInstallStats()">به‌روزرسانی</button>
+ </div>
+ <div style="display:flex;align-items:baseline;gap:9px;margin-top:14px">
+  <strong id="ironInstallTotal" style="font-size:34px;line-height:1.2;font-variant-numeric:tabular-nums">—</strong>
+  <span class="muted">نصب ثبت‌شده</span>
+ </div>
+ <div id="ironInstallStatsStatus" class="muted" style="font-size:12px;margin-top:5px">آمار پس از اولین اجرای نسخه جدید ثبت می‌شود.</div>
+</section>
 <div class="coach-shortcuts">
 <button class="plan-option" onclick="showCoachSubpage('connections')"><b>اتصال مربی و شاگرد</b><small>دعوت، درخواست و وضعیت ارتباط</small></button>
 <button class="plan-option" onclick="showCoachSubpage('plans')"><b>برنامه‌های تمرینی</b><small>ساخت، انتشار و مشاهده برنامه‌ها</small></button>
@@ -1578,11 +1589,39 @@ async function ironToggleVoice(scope){if(!navigator.mediaDevices?.getUserMedia||
 async function loadIronAdminPanel(){
  const panel=document.getElementById('ironMainAdminPanel');
  const adminNav=document.querySelector('[data-coach-admin-nav]');
+ const statsCard=document.getElementById('ironInstallStatsCard');
  const {data:{user}}=await supabaseClient.auth.getUser();
- if(!user){panel.classList.add('hidden');adminNav?.classList.add('hidden');return}
+ if(!user){panel.classList.add('hidden');adminNav?.classList.add('hidden');statsCard?.classList.add('hidden');return}
  const {data,error}=await supabaseClient.from('iron_admins_v2').select('is_main_admin').eq('user_id',user.id).maybeSingle();
- if(error||!data?.is_main_admin){panel.classList.add('hidden');adminNav?.classList.add('hidden');return}
- panel.classList.remove('hidden');adminNav?.classList.remove('hidden');await refreshIronCoachRequests();
+ if(error||!data?.is_main_admin){panel.classList.add('hidden');adminNav?.classList.add('hidden');statsCard?.classList.add('hidden');return}
+ panel.classList.remove('hidden');adminNav?.classList.remove('hidden');statsCard?.classList.remove('hidden');
+ await Promise.all([refreshIronCoachRequests(),loadIronInstallStats()]);
+}
+async function registerIronInstall(){
+ try{
+  const cap=window.Capacitor;
+  if(!cap?.isNativePlatform?.()||cap.getPlatform?.()!=='android')return;
+  const storageKey='ironNovaInstallIdV1',registeredKey='ironNovaInstallRegisteredV1';
+  if(localStorage.getItem(registeredKey)==='1')return;
+  let installId=localStorage.getItem(storageKey);
+  if(!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(installId||'')){
+   if(window.crypto?.randomUUID)installId=window.crypto.randomUUID();
+   else{const bytes=new Uint8Array(16);window.crypto.getRandomValues(bytes);bytes[6]=(bytes[6]&15)|64;bytes[8]=(bytes[8]&63)|128;const h=Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');installId=h.slice(0,8)+'-'+h.slice(8,12)+'-'+h.slice(12,16)+'-'+h.slice(16,20)+'-'+h.slice(20)}
+   localStorage.setItem(storageKey,installId);
+  }
+  const {error}=await supabaseClient.from('iron_app_installs_v1').insert({install_id:installId,platform:'android'});
+  if(!error||error.code==='23505')localStorage.setItem(registeredKey,'1');
+  else console.warn('IRONNOVA install registration failed:',error.message);
+ }catch(error){console.warn('IRONNOVA install registration unavailable:',error?.message||error)}
+}
+async function loadIronInstallStats(){
+ const value=document.getElementById('ironInstallTotal'),status=document.getElementById('ironInstallStatsStatus');
+ if(!value||!status)return;
+ value.textContent='…';status.textContent='در حال دریافت آمار';
+ const {count,error}=await supabaseClient.from('iron_app_installs_v1').select('install_id',{count:'exact',head:true});
+ if(error){value.textContent='—';status.textContent='دریافت آمار ناموفق بود: '+error.message;return}
+ value.textContent=Number(count||0).toLocaleString('fa-IR');
+ status.textContent='نصب‌های یکتای اندروید ثبت‌شده · اطلاعات ناشناس و بدون ذخیره مشخصات شخصی';
 }
 async function refreshIronCoachRequests(){
  const out=document.getElementById('ironCoachRequests');
@@ -1706,6 +1745,7 @@ renderNutrition();
 renderCorrective();
 supabaseClient.auth.getSession().then(({data:r,error})=>{if(error)setAuthMessage('خطای بررسی حساب: '+error.message);else handleAuthSession(r.session)});
 supabaseClient.auth.onAuthStateChange((_event,session)=>setTimeout(()=>handleAuthSession(session),0));
+registerIronInstall();
 if('serviceWorker'in navigator&&!window.Capacitor?.isNativePlatform?.())window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 function closeIronIntro(){const el=document.getElementById('ironIntro');if(!el||el.classList.contains('is-leaving'))return;el.classList.add('is-leaving');setTimeout(()=>el.remove(),700)}
 window.addEventListener('load',()=>{const intro=document.getElementById('ironIntro');if(intro)setTimeout(closeIronIntro,4300)});
