@@ -486,6 +486,7 @@ body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.
 <button data-page="profile" onclick="showPage('profile')"><span class="ico">♙</span>پروفایل و تنظیمات</button>
 <button data-page="coachExplore" onclick="showPage('coachExplore')"><span class="ico">🔎</span>اکسپلور مربیان</button>
 <button data-page="coachPanel" onclick="showPage('coachPanel')"><span class="ico">👨‍🏫</span>پنل مربی و شاگرد</button>
+<button id="ironMainAdminMenuButton" class="hidden" type="button" onclick="openIronMainAdmin()"><span class="ico">🛡️</span>پنل مدیریت اصلی</button>
 <button data-page="foodLibrary" onclick="showPage('foodLibrary')"><span class="ico">🍎</span>دستور پخت و بانک غذا</button>
 
 <button data-page="education" onclick="showPage('education')"><span class="ico">🎓</span>آموزش و ویدئو</button>
@@ -807,7 +808,7 @@ function save(){localStorage.setItem('ironTrack',JSON.stringify(data));render();
 function scheduleCloudSave(){clearTimeout(cloudTimer);cloudTimer=setTimeout(saveCloudData,900)}
 async function saveCloudData(){if(!cloudReady||!currentUserId)return;if(cloudBusy){cloudAgain=true;return}cloudBusy=true;const uid=currentUserId,snapshot=JSON.parse(JSON.stringify(data));const {error}=await supabaseClient.from('iron_track_cloud').upsert({user_id:uid,app_data:snapshot,updated_at:new Date().toISOString()},{onConflict:'user_id'});cloudBusy=false;if(error)setCloudStatus('خطا در ذخیره ابری: '+error.message+' | اطلاعات گوشی محفوظ است.');else if(uid===currentUserId)setCloudStatus('همگام‌سازی فعال است؛ آخرین تغییرات ذخیره شد.');if(cloudAgain){cloudAgain=false;if(uid===currentUserId)scheduleCloudSave()}}
 async function loadCloudData(uid){cloudReady=false;setCloudStatus('در حال دریافت اطلاعات حساب...');const {data:row,error}=await supabaseClient.from('iron_track_cloud').select('app_data').eq('user_id',uid).maybeSingle();if(error){setCloudStatus('خطا در دریافت ابری: '+error.message+' | اطلاعات گوشی تغییر نکرد.');return false}if(row&&row.app_data){const remote=normalizeCloudData(row.app_data);if(remote){data=remote;localStorage.setItem('ironTrack',JSON.stringify(data));render();cloudReady=true;setCloudStatus('اطلاعات حساب دریافت شد و همگام‌سازی فعال است.');return true}}cloudReady=true;setCloudStatus('اطلاعات قبلی پیدا نشد؛ اطلاعات فعلی در حساب ذخیره می‌شود...');await saveCloudData();return true}
-function handleAuthSession(s){const uid=s&&s.user?s.user.id:null;showAuthSession(s);ironFilterMusicForOwner(uid||null);if(!uid){currentUserId=null;cloudReady=false;clearTimeout(cloudTimer);if(ironCommChannel){supabaseClient.removeChannel(ironCommChannel);ironCommChannel=null}icLoadRole();return}icLoadRole();initCommunicationRealtime();loadCommunicationCenter();if(uid===currentUserId&&cloudReady){syncIronMusicCloud(uid);return}currentUserId=uid;loadCloudData(uid).then(loaded=>{if(loaded&&uid===currentUserId)syncIronMusicCloud(uid);else if(!loaded)setCloudStatus('همگام‌سازی متوقف شد؛ دریافت اطلاعات حساب ناموفق بود و فایل‌های محلی محفوظ ماندند.')})}
+function handleAuthSession(s){const uid=s&&s.user?s.user.id:null;showAuthSession(s);loadIronAdminPanel();ironFilterMusicForOwner(uid||null);if(!uid){currentUserId=null;cloudReady=false;clearTimeout(cloudTimer);if(ironCommChannel){supabaseClient.removeChannel(ironCommChannel);ironCommChannel=null}icLoadRole();return}icLoadRole();initCommunicationRealtime();loadCommunicationCenter();if(uid===currentUserId&&cloudReady){syncIronMusicCloud(uid);return}currentUserId=uid;loadCloudData(uid).then(loaded=>{if(loaded&&uid===currentUserId)syncIronMusicCloud(uid);else if(!loaded)setCloudStatus('همگام‌سازی متوقف شد؛ دریافت اطلاعات حساب ناموفق بود و فایل‌های محلی محفوظ ماندند.')})}
 function toast(s){const e=document.getElementById('toast');e.textContent=s;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2400)}
 function toggleSidebar(force){const sb=document.getElementById('sidebar'),shade=document.getElementById('sidebarShade');const open=typeof force==='boolean'?force:!sb.classList.contains('open');sb.classList.toggle('open',open);shade.classList.toggle('open',open)}
 let ironCoachStack=[];function showCoachSubpage(key,opts={}){const allowed=['overview','account','connections','plans','reports','messages','groups','admin'];if(!allowed.includes(key))key='overview';const current=allowed.find(k=>!document.getElementById('coachSubpage'+k.charAt(0).toUpperCase()+k.slice(1))?.classList.contains('hidden'))||'overview';if(!opts.fromPop&&current!==key){ironCoachStack.push(current);history.pushState({ironCoachLayer:key},'','#coach-'+key)}allowed.forEach(k=>{const el=document.getElementById('coachSubpage'+k.charAt(0).toUpperCase()+k.slice(1));if(el)el.classList.toggle('hidden',k!==key)});document.querySelectorAll('[data-coach-tab]').forEach(b=>b.classList.toggle('active',b.dataset.coachTab===key));requestAnimationFrame(()=>{window.scrollTo(0,0);document.documentElement.scrollTop=0})}
@@ -1609,14 +1610,33 @@ async function ironToggleVoice(scope){if(!navigator.mediaDevices?.getUserMedia||
 async function loadIronAdminPanel(){
  const panel=document.getElementById('ironMainAdminPanel');
  const adminNav=document.querySelector('[data-coach-admin-nav]');
+ const menuButton=document.getElementById('ironMainAdminMenuButton');
  const statsCard=document.getElementById('ironInstallStatsCard');
  const aiCard=document.getElementById('ironAiAssistantCard');
- const {data:{user}}=await supabaseClient.auth.getUser();
- if(!user){panel.classList.add('hidden');adminNav?.classList.add('hidden');statsCard?.classList.add('hidden');aiCard?.classList.add('hidden');return}
- const {data,error}=await supabaseClient.from('iron_admins_v2').select('is_main_admin').eq('user_id',user.id).maybeSingle();
- if(error||!data?.is_main_admin){panel.classList.add('hidden');adminNav?.classList.add('hidden');statsCard?.classList.add('hidden');aiCard?.classList.add('hidden');return}
- panel.classList.remove('hidden');adminNav?.classList.remove('hidden');statsCard?.classList.remove('hidden');aiCard?.classList.remove('hidden');
- await Promise.all([refreshIronCoachRequests(),loadIronInstallStats()]);
+ const hideAdmin=()=>{panel?.classList.add('hidden');adminNav?.classList.add('hidden');menuButton?.classList.add('hidden');statsCard?.classList.add('hidden');aiCard?.classList.add('hidden')};
+ try{
+  const auth=await supabaseClient.auth.getUser();
+  const user=auth?.data?.user;
+  if(!user){hideAdmin();return false}
+  const {data,error}=await supabaseClient.from('iron_admins_v2').select('is_main_admin').eq('user_id',user.id).maybeSingle();
+  if(error||!data?.is_main_admin){hideAdmin();return false}
+  panel?.classList.remove('hidden');adminNav?.classList.remove('hidden');menuButton?.classList.remove('hidden');statsCard?.classList.remove('hidden');aiCard?.classList.remove('hidden');
+  const adminArea=document.getElementById('coachSubpageAdmin');
+  if(adminArea&&panel){
+   if(statsCard&&statsCard.parentElement!==adminArea)adminArea.insertBefore(statsCard,panel);
+   if(aiCard&&aiCard.parentElement!==adminArea)adminArea.insertBefore(aiCard,panel);
+  }
+  Promise.all([refreshIronCoachRequests(),loadIronInstallStats()]).catch(error=>console.warn('IRONNOVA admin widgets:',error));
+  return true;
+ }catch(error){hideAdmin();console.warn('IRONNOVA admin access check failed:',error);return false}
+}
+async function openIronMainAdmin(){
+ showPage('coachPanel');
+ const allowed=await loadIronAdminPanel();
+ if(!allowed){toast('دسترسی پنل مدیریت اصلی برای این حساب تأیید نشد.');return}
+ showCoachSubpage('admin');
+ document.getElementById('ironMainAdminMenuButton')?.classList.add('active');
+ toggleSidebar(false);
 }
 let ironAiHistory=[],ironAiBusy=false;
 function ironAiAddBubble(role,content){
