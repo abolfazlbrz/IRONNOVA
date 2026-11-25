@@ -102,6 +102,11 @@ jobs:
           print(f'Verified IRONNOVA splash: 941x1672, {p.stat().st_size} bytes')
           PY
 
+      - name: Build offline licensed exercise image catalog
+        run: |
+          python3 -m py_compile scripts/build-exercise-assets.py
+          python3 scripts/build-exercise-assets.py
+
       - name: Prepare web files
         run: |
           mkdir -p www
