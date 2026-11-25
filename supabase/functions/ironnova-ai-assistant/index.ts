@@ -47,6 +47,24 @@ Deno.serve(async (req: Request) => {
   }
   if (!openAiKey) return json({ error: "کلید OPENAI_API_KEY در Secrets پروژه ثبت نشده است. آن را فقط در تنظیمات امن Edge Functions ثبت کن، نه داخل APK." }, 503);
 
+  // Read only a privacy-safe aggregate. RLS permits this count only for the main admin.
+  let liveContext = "آمار زنده نصب‌ها در این درخواست در دسترس نبود.";
+  try {
+    const statsResponse = await fetch(
+      `${supabaseUrl}/rest/v1/iron_app_installs_v1?select=install_id`,
+      { headers: { apikey: anonKey, Authorization: authorization, Prefer: "count=exact", Range: "0-0" } },
+    );
+    if (statsResponse.ok) {
+      const contentRange = statsResponse.headers.get("content-range") || "";
+      const total = contentRange.split("/").pop();
+      if (total && total !== "*") {
+        liveContext = `آمار زنده برنامه: ${total} نصب یکتای ثبت‌شده اندروید. این عدد دانلود APK نیست؛ نصب‌هایی است که پس از اولین اجرای برنامه ثبت شده‌اند.`;
+      }
+    }
+  } catch (error) {
+    console.error("IRONNOVA install aggregate unavailable", error);
+  }
+
   let body: { messages?: Array<{ role?: string; content?: string }> };
   try { body = await req.json(); } catch { return json({ error: "درخواست معتبر نیست." }, 400); }
   if (!Array.isArray(body.messages) || body.messages.length < 1 || body.messages.length > 12) {
@@ -72,7 +90,7 @@ Deno.serve(async (req: Request) => {
       model: "gpt-4.1-mini",
       store: false,
       max_output_tokens: 900,
-      input: [{ role: "system", content: systemPrompt }, ...messages],
+      input: [{ role: "system", content: systemPrompt + "\\n\\n" + liveContext }, ...messages],
     }),
   });
   const aiBody = await aiResponse.json().catch(() => ({}));
