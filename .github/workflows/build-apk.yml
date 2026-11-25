@@ -166,7 +166,9 @@ jobs:
           fi
 
       - name: Build signed Release APK
+        id: release-signing
         if: env.ANDROID_KEYSTORE_BASE64 != ''
+        continue-on-error: true
         run: |
           set -euo pipefail
           test -n "$ANDROID_KEYSTORE_PASSWORD"
@@ -214,7 +216,7 @@ jobs:
           rm -f android/ironnova-release.jks
 
       - name: Upload signed Release APK
-        if: env.ANDROID_KEYSTORE_BASE64 != ''
+        if: steps.release-signing.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: IRONNOVA-Release-APK
