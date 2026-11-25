@@ -205,7 +205,11 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleRelease
           cd ..
-          jarsigner -verify -verbose -certs android/app/build/outputs/apk/release/app-release-unsigned.apk >/dev/null 2>&1 && exit 1 || true
+          APK=android/app/build/outputs/apk/release/app-release.apk
+          test -s "$APK"
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner -type f | sort | tail -n 1)
+          test -x "$APKSIGNER"
+          "$APKSIGNER" verify --verbose --print-certs "$APK"
           keytool -list -keystore android/ironnova-release.jks -storepass "$ANDROID_KEYSTORE_PASSWORD" -alias ironnova-release >/dev/null
           rm -f android/ironnova-release.jks
 
