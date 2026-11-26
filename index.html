@@ -771,6 +771,13 @@ body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.
  <div id="ironInstallStatsStatus" class="muted" style="font-size:12px;margin-top:5px">آمار پس از اولین اجرای نسخه جدید ثبت می‌شود.</div>
 </section>
 
+<section id="ironDiagnosticsCard" class="card hidden" style="margin:14px 0;padding:16px;border:1px solid var(--line)">
+ <div class="row" style="align-items:center;justify-content:space-between;gap:10px"><div><h3 style="margin:0">عیب‌یابی هوشمند برنامه</h3><p class="muted" style="margin:5px 0 0">بررسی مسیر صفحه‌ها، خطاهای زمان اجرا، تصاویر و کنترل‌های رابط کاربری</p></div><span class="pill">فقط مدیر اصلی</span></div>
+ <p class="muted" style="font-size:12px;line-height:1.8">بررسی بدون کلیک روی دکمه‌های عملیاتی انجام می‌شود؛ بنابراین پیام، سفارش، تمرین یا اطلاعاتی حذف و ارسال نخواهد شد.</p>
+ <button id="ironDiagnosticsRun" class="btn" type="button" onclick="runIronAppDiagnostics()">شروع بررسی همه بخش‌ها</button>
+ <div id="ironDiagnosticsStatus" class="muted" style="margin-top:10px;font-size:12px">هنوز بررسی‌ای اجرا نشده است.</div>
+ <div id="ironDiagnosticsReport" style="margin-top:12px"></div>
+</section>
 <section id="ironMainAdminPanel" class="card hidden"><h2>مدیریت اصلی IRONNOVA</h2><p class="muted">فقط مدیر اصلی می‌تواند درخواست مربیان را بررسی کند.</p>
 <button class="btn secondary" onclick="refreshIronCoachRequests()">به‌روزرسانی درخواست‌ها</button><div id="ironCoachRequests" style="margin-top:12px"></div><div class="divider"></div><h3>مدیریت دسترسی مدیر</h3><div class="field"><label>شناسه حساب کاربر (UUID)</label><input id="ironAdminTarget" placeholder="UUID کاربر"></div><div class="row"><button class="btn grow" onclick="setIronAdminAccess(true)">افزودن مدیر</button><button class="btn secondary grow" onclick="setIronAdminAccess(false)">لغو دسترسی مدیر</button></div><div id="ironAdminStatus" class="muted" style="margin-top:8px"></div></section>
 </div>
@@ -1681,7 +1688,7 @@ async function loadIronAdminPanel(){
  const menuButton=document.getElementById('ironMainAdminMenuButton');
  const statsCard=document.getElementById('ironInstallStatsCard');
  
- const hideAdmin=()=>{panel?.classList.add('hidden');adminNav?.classList.add('hidden');menuButton?.classList.add('hidden');statsCard?.classList.add('hidden')};
+ const hideAdmin=()=>{panel?.classList.add('hidden');adminNav?.classList.add('hidden');menuButton?.classList.add('hidden');statsCard?.classList.add('hidden');document.getElementById('ironDiagnosticsCard')?.classList.add('hidden')};
  try{
   const auth=await supabaseClient.auth.getUser();
   const user=auth?.data?.user;
@@ -1689,6 +1696,7 @@ async function loadIronAdminPanel(){
   const {data,error}=await supabaseClient.from('iron_admins_v2').select('is_main_admin').eq('user_id',user.id).maybeSingle();
   if(error||!data?.is_main_admin){hideAdmin();return false}
   panel?.classList.remove('hidden');adminNav?.classList.remove('hidden');menuButton?.classList.remove('hidden');statsCard?.classList.remove('hidden');
+  document.getElementById('ironDiagnosticsCard')?.classList.remove('hidden');
   Promise.all([refreshIronCoachRequests(),loadIronInstallStats()]).catch(error=>console.warn('IRONNOVA admin widgets:',error));
   return true;
  }catch(error){hideAdmin();console.warn('IRONNOVA admin access check failed:',error);return false}
@@ -1701,6 +1709,65 @@ async function openIronMainAdmin(){
  document.getElementById('ironMainAdminMenuButton')?.classList.add('active');
  toggleSidebar(false);
 }
+
+// IRONNOVA safe admin diagnostics: observes the rendered app, never activates business actions.
+const ironDiagRuntimeErrors=[];
+(function installIronDiagErrorCapture(){
+ if(window.__ironDiagCaptureInstalled)return;window.__ironDiagCaptureInstalled=true;
+ window.addEventListener('error',event=>{
+  const msg=String(event.message||event.target?.src||event.target?.href||'خطای منبع');
+  if(ironDiagRuntimeErrors.length<100)ironDiagRuntimeErrors.push({type:event.target&&event.target!==window?'resource':'javascript',message:msg.slice(0,240),source:String(event.filename||'').slice(-120),line:event.lineno||0});
+ },true);
+ window.addEventListener('unhandledrejection',event=>{
+  if(ironDiagRuntimeErrors.length<100)ironDiagRuntimeErrors.push({type:'promise',message:String(event.reason?.message||event.reason||'Promise rejection').slice(0,240)});
+ });
+})();
+const ironDiagPageNames={home:'خانه',workout:'برنامه تمرینی',library:'بانک حرکات',homeWorkout:'تمرین خانگی',corrective:'حرکات اصلاحی',progress:'آمار و پیشرفت',coach:'مربی هوشمند',aiAssistant:'دستیار هوشمند',nutrition:'تغذیه و کالری',profile:'پروفایل',admin:'مدیریت حرکات',coachExplore:'اکسپلور مربیان',coachPanel:'پنل مربی و شاگرد',foodLibrary:'بانک غذا',shop:'فروشگاه',education:'آموزش و ویدئو'};
+const ironDiagWait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+async function runIronAppDiagnostics(){
+ const button=document.getElementById('ironDiagnosticsRun'),status=document.getElementById('ironDiagnosticsStatus'),report=document.getElementById('ironDiagnosticsReport');
+ if(button){button.disabled=true;button.textContent='در حال بررسی…'} if(report)report.innerHTML='';
+ try{
+  const auth=await supabaseClient.auth.getUser(),user=auth?.data?.user;
+  if(!user)throw new Error('نشست کاربری معتبر نیست.');
+  const {data:admin,error}=await supabaseClient.from('iron_admins_v2').select('is_main_admin').eq('user_id',user.id).maybeSingle();
+  if(error||!admin?.is_main_admin)throw new Error('دسترسی مدیر اصلی تأیید نشد.');
+  const original=[...document.querySelectorAll('.app>section[id$="Page"]:not(.hidden)')].map(x=>x.id.replace(/Page$/,'')).find(x=>x)||'home';
+  const runtimeStart=ironDiagRuntimeErrors.length,results=[],pageIds=Object.keys(ironDiagPageNames);
+  if(status)status.textContent='در حال پیمایش '+pageIds.length+' مسیر صفحه…';
+  for(const pageName of pageIds){
+   const page=document.getElementById(pageName+'Page');
+   if(!page){results.push({page:pageName,label:ironDiagPageNames[pageName],state:'missing',detail:'عنصر صفحه در ساختار برنامه پیدا نشد.'});continue}
+   try{
+    if(typeof showPage==='function')showPage(pageName,{fromPop:true});
+    await ironDiagWait(180);
+    const visible=!page.classList.contains('hidden')&&page.getClientRects().length>0;
+    const buttons=[...page.querySelectorAll('button,[role="button"]')];
+    const noAction=buttons.filter(b=>!b.disabled&&!b.hasAttribute('onclick')&&!b.closest('form')&&!b.dataset.action).length;
+    const images=[...page.querySelectorAll('img')],broken=images.filter(img=>img.complete&&img.naturalWidth===0&&!!(img.currentSrc||img.src)).length;
+    const emptyImages=images.filter(img=>!(img.currentSrc||img.src||img.getAttribute('src'))).length;
+    const emptyLinks=[...page.querySelectorAll('a')].filter(a=>!a.getAttribute('href')&&!a.hasAttribute('onclick')).length;
+    const issues=[];
+    if(!visible)issues.push('صفحه پس از بازکردن قابل نمایش نشد');
+    if(noAction)issues.push(noAction+' دکمه بدون handler آشکار');
+    if(broken)issues.push(broken+' تصویر بارگذاری‌نشده');
+    if(emptyImages)issues.push(emptyImages+' تصویر بدون src');
+    if(emptyLinks)issues.push(emptyLinks+' لینک بدون مقصد');
+    results.push({page:pageName,label:ironDiagPageNames[pageName],state:issues.length?'warning':'ok',detail:issues.join('؛ ')||'ساختار صفحه و عناصر قابل مشاهده بررسی شد',buttons:buttons.length,images:images.length});
+   }catch(e){results.push({page:pageName,label:ironDiagPageNames[pageName],state:'error',detail:String(e?.message||e).slice(0,220)})}
+  }
+  if(typeof showPage==='function')showPage(original,{fromPop:true});
+  await ironDiagWait(100);
+  const freshErrors=ironDiagRuntimeErrors.slice(runtimeStart);
+  const summary={pages:results.length,ok:results.filter(x=>x.state==='ok').length,warnings:results.filter(x=>x.state==='warning').length,missing:results.filter(x=>x.state==='missing').length,errors:results.filter(x=>x.state==='error').length,runtime:freshErrors.length};
+  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const row=x=>'<div style="padding:10px 0;border-bottom:1px solid var(--line)"><b>'+esc(x.label)+'</b> <span class="muted">· '+(x.state==='ok'?'بدون ایراد ساختاری آشکار':x.state==='warning'?'نیازمند بررسی':x.state==='missing'?'صفحه پیدا نشد':'خطای بررسی')+'</span><div class="muted" style="font-size:12px;margin-top:4px">'+esc(x.detail)+'</div></div>';
+  if(report)report.innerHTML='<div class="card" style="padding:12px"><b>خلاصه بررسی</b><div style="display:flex;flex-wrap:wrap;gap:12px;margin:9px 0;font-size:13px"><span>صفحه‌ها: '+summary.pages+'</span><span>سالم از نظر ساختاری: '+summary.ok+'</span><span>هشدار: '+summary.warnings+'</span><span>خطای پیمایش: '+summary.errors+'</span><span>خطاهای زمان اجرا در طول بررسی: '+summary.runtime+'</span></div>'+results.map(row).join('')+(freshErrors.length?'<h4>خطاهای ثبت‌شده در زمان بررسی</h4>'+freshErrors.map(e=>'<div class="muted" style="font-size:12px;padding:5px 0">'+esc(e.type)+': '+esc(e.message)+'</div>').join(''):'<p class="muted" style="font-size:12px">در طول این بررسی خطای جدیدی در زمان اجرا ثبت نشد.</p>')+'<p class="muted" style="font-size:11px;margin-top:12px">محدودیت: این گزارش آزمون واقعی ورود، ارسال پیام، آپلود، پرداخت یا عملیات وابسته به حساب‌های دیگر نیست. دکمه‌ها برای جلوگیری از تغییر داده‌ها کلیک نشدند. خطاهای قدیمی ثبت‌شده پیش از شروع این بررسی جدا از نتایج این نوبت هستند.</p></div>';
+  if(status)status.textContent='بررسی تمام شد · '+new Date().toLocaleString('fa-IR');
+ }catch(error){if(status)status.textContent='بررسی انجام نشد: '+String(error?.message||error)}
+ finally{if(button){button.disabled=false;button.textContent='اجرای دوباره بررسی'}}
+}
+
 let ironAiHistory=[],ironAiBusy=false;
 function ironAiAddBubble(role,content){
  const wrap=document.getElementById('ironAiMessages');if(!wrap)return;
