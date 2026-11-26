@@ -726,17 +726,7 @@ body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.
 </nav>
 <div id="coachSubpageOverview" class="coach-subpage">
 <div class="card"><h2>داشبورد مربی و شاگرد</h2><p class="muted">برای جلوگیری از شلوغی، هر ابزار در صفحه مستقل خودش قرار گرفته است.</p>
-<section id="ironInstallStatsCard" class="card hidden" style="margin:14px 0 16px;padding:16px;border:1px solid var(--line)">
- <div class="row" style="align-items:center;justify-content:space-between;gap:10px">
-  <div><h3 style="margin:0">آمار نصب IRONNOVA</h3><p class="muted" style="margin:5px 0 0">تعداد نصب‌های یکتای ثبت‌شده روی دستگاه‌های اندرویدی</p></div>
-  <button class="btn secondary small" type="button" onclick="loadIronInstallStats()">به‌روزرسانی</button>
- </div>
- <div style="display:flex;align-items:baseline;gap:9px;margin-top:14px">
-  <strong id="ironInstallTotal" style="font-size:34px;line-height:1.2;font-variant-numeric:tabular-nums">—</strong>
-  <span class="muted">نصب ثبت‌شده</span>
- </div>
- <div id="ironInstallStatsStatus" class="muted" style="font-size:12px;margin-top:5px">آمار پس از اولین اجرای نسخه جدید ثبت می‌شود.</div>
-</section>
+
 
 <div class="coach-shortcuts">
 <button class="plan-option" onclick="showCoachSubpage('connections')"><b>اتصال مربی و شاگرد</b><small>دعوت، درخواست و وضعیت ارتباط</small></button>
@@ -769,6 +759,18 @@ body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.
 <div class="card"><h2>گفت‌وگوی گروهی</h2><p class="muted">مربی می‌تواند فقط شاگردان متصل و تأییدشده خودش را به گروه اضافه کند.</p><section id="icGroupCreateCard" class="hidden"><div class="field"><label>نام گروه</label><input id="icGroupName" placeholder="مثلاً گروه تمرین صبح"></div><div class="field"><label>شناسه شاگردها (هر UUID در یک خط یا با ویرگول)</label><textarea id="icGroupStudents" rows="4" placeholder="UUID شاگرد اول&#10;UUID شاگرد دوم"></textarea></div><button class="btn" onclick="createIronGroup()">ساخت گروه</button></section><button class="btn secondary small" onclick="loadIronGroups()">به‌روزرسانی گروه‌ها</button><div id="icGroups" style="margin:10px 0"></div><div class="field"><label>شناسه گروه انتخاب‌شده</label><input id="icSelectedGroupId" placeholder="گروهی را از فهرست انتخاب کن" readonly></div><div id="icGroupMessages" style="max-height:300px;overflow:auto"></div><div class="field"><label>پیام گروه</label><textarea id="icGroupMessageBody" rows="3" maxlength="4000" placeholder="پیام گروهی..."></textarea></div><div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn secondary small" onclick="this.parentElement.nextElementSibling.click()">＋ رسانه</button><button class="btn secondary small" data-scope="group" id="icVoiceGroup" onclick="ironToggleVoice(this.dataset.scope)">🎙 ویس</button><button class="btn" onclick="sendIronGroupMessage()">ارسال به گروه</button></div><input id="icGroupMedia" type="file" accept="image/*,video/mp4,video/webm,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.txt" hidden onchange="ironUploadChatMedia(this.dataset.scope,this)" data-scope="group"></div>
 </div>
 <div id="coachSubpageAdmin" class="coach-subpage hidden">
+<section id="ironInstallStatsCard" class="card hidden" style="margin:14px 0 16px;padding:16px;border:1px solid var(--line)">
+ <div class="row" style="align-items:center;justify-content:space-between;gap:10px">
+  <div><h3 style="margin:0">آمار نصب IRONNOVA</h3><p class="muted" style="margin:5px 0 0">تعداد نصب‌های یکتای ثبت‌شده روی دستگاه‌های اندرویدی</p></div>
+  <button class="btn secondary small" type="button" onclick="loadIronInstallStats()">به‌روزرسانی</button>
+ </div>
+ <div style="display:flex;align-items:baseline;gap:9px;margin-top:14px">
+  <strong id="ironInstallTotal" style="font-size:34px;line-height:1.2;font-variant-numeric:tabular-nums">—</strong>
+  <span class="muted">نصب ثبت‌شده</span>
+ </div>
+ <div id="ironInstallStatsStatus" class="muted" style="font-size:12px;margin-top:5px">آمار پس از اولین اجرای نسخه جدید ثبت می‌شود.</div>
+</section>
+
 <section id="ironMainAdminPanel" class="card hidden"><h2>مدیریت اصلی IRONNOVA</h2><p class="muted">فقط مدیر اصلی می‌تواند درخواست مربیان را بررسی کند.</p>
 <button class="btn secondary" onclick="refreshIronCoachRequests()">به‌روزرسانی درخواست‌ها</button><div id="ironCoachRequests" style="margin-top:12px"></div><div class="divider"></div><h3>مدیریت دسترسی مدیر</h3><div class="field"><label>شناسه حساب کاربر (UUID)</label><input id="ironAdminTarget" placeholder="UUID کاربر"></div><div class="row"><button class="btn grow" onclick="setIronAdminAccess(true)">افزودن مدیر</button><button class="btn secondary grow" onclick="setIronAdminAccess(false)">لغو دسترسی مدیر</button></div><div id="ironAdminStatus" class="muted" style="margin-top:8px"></div></section>
 </div>
@@ -814,7 +816,17 @@ async function loadCloudData(uid){cloudReady=false;setCloudStatus('در حال �
 function handleAuthSession(s){const uid=s&&s.user?s.user.id:null;showAuthSession(s);loadIronAdminPanel();ironFilterMusicForOwner(uid||null);if(!uid){currentUserId=null;cloudReady=false;clearTimeout(cloudTimer);if(ironCommChannel){supabaseClient.removeChannel(ironCommChannel);ironCommChannel=null}icLoadRole();return}icLoadRole();initCommunicationRealtime();loadCommunicationCenter();if(uid===currentUserId&&cloudReady){syncIronMusicCloud(uid);return}currentUserId=uid;loadCloudData(uid).then(loaded=>{if(loaded&&uid===currentUserId)syncIronMusicCloud(uid);else if(!loaded)setCloudStatus('همگام‌سازی متوقف شد؛ دریافت اطلاعات حساب ناموفق بود و فایل‌های محلی محفوظ ماندند.')})}
 function toast(s){const e=document.getElementById('toast');e.textContent=s;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2400)}
 function toggleSidebar(force){const sb=document.getElementById('sidebar'),shade=document.getElementById('sidebarShade');const open=typeof force==='boolean'?force:!sb.classList.contains('open');sb.classList.toggle('open',open);shade.classList.toggle('open',open)}
-let ironCoachStack=[];function showCoachSubpage(key,opts={}){const allowed=['overview','account','connections','plans','reports','messages','groups','admin'];if(!allowed.includes(key))key='overview';const current=allowed.find(k=>!document.getElementById('coachSubpage'+k.charAt(0).toUpperCase()+k.slice(1))?.classList.contains('hidden'))||'overview';if(!opts.fromPop&&current!==key){ironCoachStack.push(current);history.pushState({ironCoachLayer:key},'','#coach-'+key)}allowed.forEach(k=>{const el=document.getElementById('coachSubpage'+k.charAt(0).toUpperCase()+k.slice(1));if(el)el.classList.toggle('hidden',k!==key)});document.querySelectorAll('[data-coach-tab]').forEach(b=>b.classList.toggle('active',b.dataset.coachTab===key));requestAnimationFrame(()=>{window.scrollTo(0,0);document.documentElement.scrollTop=0})}
+let ironCoachStack=[];
+function showCoachSubpage(key,opts={}){
+ const allowed=['overview','account','connections','plans','reports','messages','groups','admin'];
+ if(!allowed.includes(key))key='overview';
+ const current=allowed.find(k=>!document.getElementById('coachSubpage'+k.charAt(0).toUpperCase()+k.slice(1))?.classList.contains('hidden'))||'overview';
+ if(!opts.fromPop&&current!==key){ironCoachStack.push(current);history.pushState({ironCoachLayer:key},'','#coach-'+key)}
+ allowed.forEach(k=>{const el=document.getElementById('coachSubpage'+k.charAt(0).toUpperCase()+k.slice(1));if(el)el.classList.toggle('hidden',k!==key)});
+ document.querySelectorAll('[data-coach-tab]').forEach(b=>b.classList.toggle('active',b.dataset.coachTab===key));
+ if(key==='admin')void loadIronInstallStats();
+ requestAnimationFrame(()=>{window.scrollTo(0,0);document.documentElement.scrollTop=0});
+}
 let ironPageStack=[],ironHandlingPop=false,ironLastRootBack=0,ironFoodLayer='menu';
 
 function toggleHomeTrainingHub(force){const panel=document.getElementById('homeTrainingLayers'),button=document.getElementById('homeTrainingToggle');if(!panel||!button)return;const open=typeof force==='boolean'?force:panel.classList.contains('hidden');panel.classList.toggle('hidden',!open);button.setAttribute('aria-expanded',String(open));}
@@ -1467,9 +1479,45 @@ async function loadShopAdminOrders(){const el=document.getElementById('shopAdmin
 async function submitShopReceipt(){const orderId=document.getElementById('shopReceiptOrderId').value.trim(),file=document.getElementById('shopReceiptFile').files?.[0];if(!/^[0-9a-f-]{36}$/i.test(orderId)||!file)return toast('شناسه سفارش و فایل رسید را انتخاب کن');const allowed=['image/jpeg','image/png','image/webp','application/pdf'];if(!allowed.includes(file.type)||file.size>5*1024*1024)return toast('فرمت فایل مجاز نیست یا حجم آن بیشتر از ۵ مگابایت است');const {data:{user}}=await supabaseClient.auth.getUser();if(!user)return toast('ابتدا وارد حساب شو');const clean=file.name.replace(/[^a-zA-Z0-9._-]/g,'_').slice(-90)||'receipt';const path=`${user.id}/${orderId}/${Date.now()}-${clean}`;const {error:uploadError}=await supabaseClient.storage.from('iron-order-receipts').upload(path,file,{upsert:false,contentType:file.type});if(uploadError)return toast('بارگذاری رسید ناموفق بود: '+uploadError.message);const {data,error}=await supabaseClient.rpc('iron_submit_order_receipt_v2',{p_order_id:orderId,p_receipt_path:path});if(error){await supabaseClient.storage.from('iron-order-receipts').remove([path]);return toast('ثبت رسید ناموفق بود: '+error.message)}toast(data||'رسید ارسال شد');document.getElementById('shopReceiptFile').value='';loadShopOrders()}
 async function viewShopReceipt(orderId){const {data,error}=await supabaseClient.from('iron_store_orders_v2').select('receipt_url').eq('id',orderId).single();if(error||!data?.receipt_url)return toast('رسید پیدا نشد');const {data:signed,error:signError}=await supabaseClient.storage.from('iron-order-receipts').createSignedUrl(data.receipt_url,120);if(signError)return toast('ساخت لینک امن رسید ناموفق بود: '+signError.message);window.location.href=signed.signedUrl}
 async function adminSetOrderStatus(id,status){const allowed=['pending','awaiting_payment','paid','processing','shipped','delivered','cancelled','rejected'];if(!allowed.includes(status))return;const {error}=await supabaseClient.from('iron_store_orders_v2').update({status,updated_at:new Date().toISOString()}).eq('id',id);toast(error?'خطا: '+error.message:'وضعیت سفارش تغییر کرد');if(!error)loadShopAdminOrders()}
-async function renderIronEducation(){const el=document.getElementById('educationList');if(!el)return;el.textContent='در حال دریافت آموزش‌ها...';const {data,error}=await supabaseClient.from('iron_education_v2').select('id,title,description,category,video_url,thumbnail_url,media_type').eq('is_published',true).order('created_at',{ascending:false});if(error){el.textContent='خطا: '+error.message;return}const q=(document.getElementById('educationSearch')?.value||'').trim().toLowerCase();const rows=(data||[]).filter(x=>(x.title+' '+x.description+' '+x.category).toLowerCase().includes(q));el.innerHTML=rows.length?rows.map(v=>{const isVideo=/^video\//i.test(v.media_type||'')||/\.(mp4|webm|mov)(\?|$)/i.test(v.video_url||'');const media=isVideo?`<video controls playsinline preload="metadata" poster="${safe(v.thumbnail_url||'')}" src="${safe(v.video_url)}" style="width:100%;max-height:320px;border-radius:14px;background:#000"></video>`:`<img loading="lazy" src="${safe(v.video_url)}" alt="${safe(v.title)}" style="width:100%;max-height:320px;object-fit:contain;border-radius:14px">`;return `<div class="card"><b>${safe(v.title)}</b><div class="muted">${safe(v.category)}</div>${media}<p>${safe(v.description||'')}</p></div>`}).join(''):'هنوز محتوای آموزشی منتشرشده‌ای ثبت نشده است.'}
+async function renderIronEducation(){
+ const el=document.getElementById('educationList');if(!el)return;
+ el.textContent='در حال دریافت آموزش‌ها...';
+ try{
+  const {data:{user}}=await supabaseClient.auth.getUser();
+  let isAdmin=false;
+  if(user){
+   const {data:admin,error:adminError}=await supabaseClient.from('iron_admins_v2').select('is_main_admin').eq('user_id',user.id).maybeSingle();
+   if(adminError)console.warn('Education admin check:',adminError.message);
+   isAdmin=!!admin?.is_main_admin;
+  }
+  let request=supabaseClient.from('iron_education_v2').select('id,title,description,category,video_url,thumbnail_url,media_type,is_published').order('created_at',{ascending:false});
+  if(!isAdmin)request=request.eq('is_published',true);
+  const {data,error}=await request;
+  if(error)throw error;
+  const q=(document.getElementById('educationSearch')?.value||'').trim().toLowerCase();
+  const rows=(data||[]).filter(x=>(x.title+' '+x.description+' '+x.category).toLowerCase().includes(q));
+  el.innerHTML=rows.length?rows.map(v=>{
+   const isVideo=/^video\//i.test(v.media_type||'')||/\.(mp4|webm|mov)(\?|$)/i.test(v.video_url||'');
+   const media=isVideo?'<video controls playsinline preload="metadata" poster="'+safe(v.thumbnail_url||'')+'" src="'+safe(v.video_url)+'" style="width:100%;max-height:320px;border-radius:14px;background:#000"></video>':'<img loading="lazy" src="'+safe(v.video_url)+'" alt="'+safe(v.title)+'" style="width:100%;max-height:320px;object-fit:contain;border-radius:14px">';
+   const draft=isAdmin&&!v.is_published?'<span class="pill" style="background:#fff0c2;color:#8a5b00">پیش‌نویس</span>':'';
+   const action=isAdmin&&!v.is_published?'<button class="btn small" type="button" onclick="publishIronEducation(\''+safe(v.id)+'\')">انتشار برای همه کاربران</button>':'';
+   return '<div class="card"><div class="row between" style="align-items:center;gap:8px;flex-wrap:wrap"><b>'+safe(v.title)+'</b>'+draft+'</div><div class="muted">'+safe(v.category)+'</div>'+media+'<p>'+safe(v.description||'')+'</p>'+action+'</div>';
+  }).join(''):(isAdmin?'هنوز محتوای آموزشی ثبت نشده است.':'هنوز محتوای آموزشی منتشرشده‌ای ثبت نشده است.');
+ }catch(error){el.textContent='دریافت آموزش‌ها ناموفق بود: '+(error?.message||'خطای ناشناخته')}
+}
+async function publishIronEducation(id){
+ const {data:{user}}=await supabaseClient.auth.getUser();
+ if(!user)return toast('ابتدا وارد حساب مدیریت شو');
+ const {data:admin,error:adminError}=await supabaseClient.from('iron_admins_v2').select('is_main_admin').eq('user_id',user.id).maybeSingle();
+ if(adminError||!admin?.is_main_admin)return toast('فقط مدیر اصلی اجازه انتشار آموزش را دارد');
+ const {data,error}=await supabaseClient.from('iron_education_v2').update({is_published:true,updated_at:new Date().toISOString()}).eq('id',id).select('id').maybeSingle();
+ if(error)return toast('انتشار آموزش ناموفق بود: '+error.message);
+ if(!data?.id)return toast('محتوا پیدا نشد یا اجازه انتشار آن وجود ندارد');
+ toast('آموزش برای همه کاربران منتشر شد');
+ await renderIronEducation();
+}
 async function loadEducationAdmin(){const el=document.getElementById('educationAdmin');if(!el)return;const {data:{user}}=await supabaseClient.auth.getUser();if(!user){el.classList.add('hidden');return}const {data}=await supabaseClient.from('iron_admins_v2').select('is_main_admin').eq('user_id',user.id).maybeSingle();el.classList.toggle('hidden',!data?.is_main_admin)}
-async function adminAddEducation(){const title=document.getElementById('educationTitle').value.trim(),category=document.getElementById('educationCategory').value.trim(),description=document.getElementById('educationDescription').value.trim(),media=document.getElementById('educationMediaFile')?.files?.[0],thumb=document.getElementById('educationThumbFile')?.files?.[0];if(title.length<2||!media)return toast('عنوان و فایل عکس یا ویدئو را انتخاب کن');if(media.size>50*1024*1024||thumb?.size>10*1024*1024)return toast('حجم فایل اصلی حداکثر ۵۰ و تصویر بندانگشتی حداکثر ۱۰ مگابایت است');const allowedImages=['image/jpeg','image/png','image/webp','image/gif','image/avif'],allowedVideos=['video/mp4','video/webm','video/quicktime'];const extensionMime=name=>/\\.(mp4|m4v)$/i.test(name||'')?'video/mp4':/\\.webm$/i.test(name||'')?'video/webm':/\\.mov$/i.test(name||'')?'video/quicktime':/\\.png$/i.test(name||'')?'image/png':/\\.webp$/i.test(name||'')?'image/webp':/\\.gif$/i.test(name||'')?'image/gif':/\\.avif$/i.test(name||'')?'image/avif':'image/jpeg';const mediaMime=allowedImages.includes(media.type)||allowedVideos.includes(media.type)?media.type:(!media.type||media.type==='application/octet-stream')?extensionMime(media.name):media.type;if(!allowedImages.includes(mediaMime)&&!allowedVideos.includes(mediaMime))return toast('فرمت عکس یا ویدئو پشتیبانی نمی‌شود');if(thumb&&!allowedImages.includes(thumb.type))return toast('فرمت تصویر بندانگشتی پشتیبانی نمی‌شود');const {data:{user}}=await supabaseClient.auth.getUser();if(!user)return toast('ابتدا وارد حساب مدیریت شو');const safeName=f=>String(f.name||'media').normalize('NFKC').replace(/[^\p{L}\p{N}._-]+/gu,'-').slice(-90);const paths=[];const upload=async file=>{const path=user.id+'/'+Date.now()+'-'+crypto.randomUUID()+'-'+safeName(file);const {error}=await supabaseClient.storage.from('iron-education-media').upload(path,file,{contentType:file===media?mediaMime:(file.type||extensionMime(file.name)),upsert:false,cacheControl:'31536000'});if(error)throw error;paths.push(path);return supabaseClient.storage.from('iron-education-media').getPublicUrl(path).data.publicUrl};try{const video_url=await upload(media),thumbnail_url=thumb?await upload(thumb):null;const {error}=await supabaseClient.from('iron_education_v2').insert({title,category,video_url,thumbnail_url,description,media_type:mediaMime,is_published:true});if(error)throw error;document.getElementById('educationTitle').value='';document.getElementById('educationMediaFile').value='';document.getElementById('educationThumbFile').value='';document.getElementById('educationDescription').value='';toast('محتوای آموزشی منتشر شد');await renderIronEducation()}catch(error){if(paths.length)await supabaseClient.storage.from('iron-education-media').remove(paths);toast('انتشار ناموفق بود: '+(error?.message||'خطای ناشناخته'))}}
+async function adminAddEducation(){const title=document.getElementById('educationTitle').value.trim(),category=document.getElementById('educationCategory').value.trim(),description=document.getElementById('educationDescription').value.trim(),media=document.getElementById('educationMediaFile')?.files?.[0],thumb=document.getElementById('educationThumbFile')?.files?.[0];if(title.length<2||!media)return toast('عنوان و فایل عکس یا ویدئو را انتخاب کن');if(media.size>50*1024*1024||thumb?.size>10*1024*1024)return toast('حجم فایل اصلی حداکثر ۵۰ و تصویر بندانگشتی حداکثر ۱۰ مگابایت است');const allowedImages=['image/jpeg','image/png','image/webp','image/gif','image/avif'],allowedVideos=['video/mp4','video/webm','video/quicktime'];const extensionMime=name=>/\\.(mp4|m4v)$/i.test(name||'')?'video/mp4':/\\.webm$/i.test(name||'')?'video/webm':/\\.mov$/i.test(name||'')?'video/quicktime':/\\.png$/i.test(name||'')?'image/png':/\\.webp$/i.test(name||'')?'image/webp':/\\.gif$/i.test(name||'')?'image/gif':/\\.avif$/i.test(name||'')?'image/avif':'image/jpeg';const mediaMime=allowedImages.includes(media.type)||allowedVideos.includes(media.type)?media.type:(!media.type||media.type==='application/octet-stream')?extensionMime(media.name):media.type;if(!allowedImages.includes(mediaMime)&&!allowedVideos.includes(mediaMime))return toast('فرمت عکس یا ویدئو پشتیبانی نمی‌شود');if(thumb&&!allowedImages.includes(thumb.type))return toast('فرمت تصویر بندانگشتی پشتیبانی نمی‌شود');const {data:{user}}=await supabaseClient.auth.getUser();if(!user)return toast('ابتدا وارد حساب مدیریت شو');const safeName=f=>String(f.name||'media').normalize('NFKC').replace(/[^\p{L}\p{N}._-]+/gu,'-').slice(-90);const paths=[];const upload=async file=>{const path=user.id+'/'+Date.now()+'-'+crypto.randomUUID()+'-'+safeName(file);const {error}=await supabaseClient.storage.from('iron-education-media').upload(path,file,{contentType:file===media?mediaMime:(file.type||extensionMime(file.name)),upsert:false,cacheControl:'31536000'});if(error)throw error;paths.push(path);return supabaseClient.storage.from('iron-education-media').getPublicUrl(path).data.publicUrl};try{const video_url=await upload(media),thumbnail_url=thumb?await upload(thumb):null;const {data:created,error}=await supabaseClient.from('iron_education_v2').insert({title,category,video_url,thumbnail_url,description,media_type:mediaMime,is_published:true}).select('id').single();if(error)throw error;if(!created?.id)throw new Error('رکورد آموزش در پایگاه داده ثبت نشد');document.getElementById('educationTitle').value='';document.getElementById('educationMediaFile').value='';document.getElementById('educationThumbFile').value='';document.getElementById('educationDescription').value='';toast('محتوای آموزشی منتشر شد');await renderIronEducation()}catch(error){if(paths.length)await supabaseClient.storage.from('iron-education-media').remove(paths);toast('انتشار ناموفق بود: '+(error?.message||'خطای ناشناخته'))}}
 async function icLoadRole(){const {data:{user}}=await supabaseClient.auth.getUser();const select=document.getElementById('icRole'),status=document.getElementById('icStatus');if(!select||!status)return;if(!user){select.disabled=false;status.textContent='برای انتخاب نقش ابتدا وارد حساب شو.';return}const {data,error}=await supabaseClient.from('iron_account_roles_v2').select('role,status').eq('user_id',user.id).maybeSingle();if(error){status.textContent='خطا در دریافت نقش: '+error.message;return}if(data){select.value=data.role;select.disabled=true;const labels={approved:'تأییدشده',pending:'در انتظار تأیید مدیر اصلی',rejected:'ردشده',suspended:'تعلیق‌شده'};status.textContent='نقش ثبت‌شده: '+(data.role==='coach'?'مربی':'شاگرد')+' · '+(labels[data.status]||data.status)+' · نقش تا خروج از حساب قابل تغییر نیست.'}else{select.disabled=false;status.textContent='نقش را فقط یک‌بار برای این حساب انتخاب کن.'}}
 async function icSaveRole(){const name=document.getElementById('icName').value.trim(),role=document.getElementById('icRole').value;const {data:{user}}=await supabaseClient.auth.getUser();if(!user){document.getElementById('icStatus').textContent='ابتدا از بخش پروفایل وارد حساب کاربری شو.';return}const {data:existing,error:readError}=await supabaseClient.from('iron_account_roles_v2').select('role,status').eq('user_id',user.id).maybeSingle();if(readError){document.getElementById('icStatus').textContent='خطا: '+readError.message;return}if(existing){document.getElementById('icStatus').textContent='نقش قبلی این حساب قابل تغییر نیست: '+(existing.role==='coach'?'مربی':'شاگرد');await icLoadRole();return}const {error}=await supabaseClient.rpc('iron_set_role',{p_role:role,p_display_name:name});if(error){document.getElementById('icStatus').textContent='خطا: '+error.message;return}await icLoadRole();await loadIronAdminPanel();await loadIronCoachProfile()}
 
@@ -1518,39 +1566,53 @@ function communicationCard(type,x){
 }
 function coachCloudCard(x){
  const key='coach:'+x.id,unread=!ironCommReadSet.has(key),expanded=ironCommExpanded.has(key),bodyId='comm-body-coach-'+x.id;
- return '<div class="comm-cloud-wrap"><button type="button" class="comm-cloud" aria-expanded="'+String(expanded)+'" aria-controls="'+bodyId+'" data-communication-type="coach" data-communication-id="'+safe(x.id)+'" onclick="toggleCommunication(this.dataset.communicationType,this.dataset.communicationId)"><span>سخنان حضرت مربی<small>'+new Date(x.created_at).toLocaleDateString('fa-IR')+'</small></span></button></div>'+(expanded?'<div class="comm-cloud-message" id="'+bodyId+'"><div class="comm-meta"><b>'+safe(x.title||'سخنان حضرت مربی')+'</b><time>'+new Date(x.created_at).toLocaleString('fa-IR')+'</time></div>'+safe(x.body)+'</div>':'')+(unread?'<div class="muted" style="text-align:center">پیام جدید مربی · برای خواندن ابر را لمس کن</div>':'');
+ return '<div class="comm-cloud-wrap"><button type="button" class="comm-cloud" aria-expanded="'+String(expanded)+'" aria-controls="'+bodyId+'" data-communication-type="coach" data-communication-id="'+safe(x.id)+'" onclick="toggleCommunication(this.dataset.communicationType,this.dataset.communicationId)"><span>سخنان حضرت مربی<small>'+new Date(x.created_at).toLocaleDateString('fa-IR')+'</small></span></button></div><div class="comm-cloud-message '+(expanded?'':'hidden')+'" id="'+bodyId+'"><div class="comm-meta"><b>'+safe(x.title||'سخنان حضرت مربی')+'</b><time>'+new Date(x.created_at).toLocaleString('fa-IR')+'</time></div>'+safe(x.body)+'</div>'+(unread?'<div class="muted" data-communication-unread-type="coach" data-communication-unread-id="'+safe(x.id)+'" style="text-align:center">پیام جدید مربی · برای خواندن ابر را لمس کن</div>':'');
 }
 async function toggleCommunication(type,id){
+ type=String(type||'public').toLowerCase().includes('coach')?'coach':'public';
+ id=String(id||'').trim();
+ if(!id)return false;
  const key=type+':'+id,opening=!ironCommExpanded.has(key);
  if(opening)ironCommExpanded.add(key);else ironCommExpanded.delete(key);
- if(opening&&!ironCommReadSet.has(key)){
+ const body=document.getElementById('comm-body-'+type+'-'+id);
+ if(body){
+  body.classList.toggle('hidden',!opening);
+  if(opening)body.scrollIntoView({behavior:'smooth',block:'nearest'});
+ }
+ const button=document.querySelector('[data-communication-type="'+type+'"][data-communication-id="'+id+'"]');
+ if(button){
+  button.setAttribute('aria-expanded',String(opening));
+  if(type==='public')button.textContent=opening?'بستن پیام':'مشاهده پیام';
+ }
+ if(!opening)return false;
+ button?.closest('.comm-item')?.classList.remove('unread');
+ document.querySelector('[data-communication-unread-type="'+type+'"][data-communication-unread-id="'+id+'"]')?.remove();
+ if(!ironCommReadSet.has(key)){
   try{
    const {data:{user}}=await supabaseClient.auth.getUser();
    if(user){
     const {error}=await supabaseClient.from('iron_communication_reads_v1').upsert({communication_type:type,communication_id:id,user_id:user.id},{onConflict:'communication_type,communication_id,user_id'});
-    if(!error)ironCommReadSet.add(key);
-    else console.warn('Communication read status could not be saved:',error.message);
+    if(!error){
+     ironCommReadSet.add(key);
+     void loadCommunicationCenter();
+    }else console.warn('Communication read status could not be saved:',error.message);
    }
   }catch(error){console.warn('Communication read status could not be saved:',error?.message||error)}
  }
- await loadCommunicationCenter();
- const body=document.getElementById('comm-body-'+type+'-'+id);
- if(body){body.classList.toggle('hidden',!opening);body.scrollIntoView({behavior:'smooth',block:'nearest'})}
- const button=document.querySelector('[data-communication-type="'+type+'"][data-communication-id="'+id+'"]');
- if(button){button.setAttribute('aria-expanded',String(opening));button.textContent=opening?'بستن پیام':'مشاهده پیام'}
+ return true;
 }
 window.ironOpenPushNotification=async function(payload={}){
- const data=payload?.data||payload||{};
+ const data=payload?.data?.data||payload?.data||payload||{};
  const rawType=String(data.communication_type||data.communicationType||data.message_type||data.notification_type||data.type||data.kind||'public').toLowerCase();
  const type=rawType.includes('coach')?'coach':'public';
- const id=String(data.communication_id||data.communicationId||data.announcement_id||data.message_id||data.notification_id||data.id||'').trim();
+ const id=String(data.communication_id||data.communicationId||data.announcement_id||data.announcementId||data.message_id||data.messageId||data.id||'').trim();
  showPage('home');
  await loadCommunicationCenter();
  if(id){
   ironCommExpanded.delete(type+':'+id);
-  await toggleCommunication(type,id);
+  const opened=await toggleCommunication(type,id);
   const card=document.getElementById('comm-body-'+type+'-'+id);
-  if(card){card.classList.remove('hidden');card.scrollIntoView({behavior:'smooth',block:'center'});return true}
+  if(opened&&card){card.classList.remove('hidden');card.scrollIntoView({behavior:'smooth',block:'center'});return true}
  }
  const list=document.getElementById(type==='coach'?'commCoachCloud':'commPublicList');
  list?.scrollIntoView({behavior:'smooth',block:'start'});
@@ -1627,10 +1689,6 @@ async function loadIronAdminPanel(){
   const {data,error}=await supabaseClient.from('iron_admins_v2').select('is_main_admin').eq('user_id',user.id).maybeSingle();
   if(error||!data?.is_main_admin){hideAdmin();return false}
   panel?.classList.remove('hidden');adminNav?.classList.remove('hidden');menuButton?.classList.remove('hidden');statsCard?.classList.remove('hidden');
-  const adminArea=document.getElementById('coachSubpageAdmin');
-  if(adminArea&&panel){
-   if(statsCard&&statsCard.parentElement!==adminArea)adminArea.insertBefore(statsCard,panel);
-  }
   Promise.all([refreshIronCoachRequests(),loadIronInstallStats()]).catch(error=>console.warn('IRONNOVA admin widgets:',error));
   return true;
  }catch(error){hideAdmin();console.warn('IRONNOVA admin access check failed:',error);return false}
@@ -1695,10 +1753,16 @@ async function loadIronInstallStats(){
  const value=document.getElementById('ironInstallTotal'),status=document.getElementById('ironInstallStatsStatus');
  if(!value||!status)return;
  value.textContent='…';status.textContent='در حال دریافت آمار';
- const {count,error}=await supabaseClient.from('iron_app_installs_v1').select('install_id',{count:'exact',head:true});
- if(error){value.textContent='—';status.textContent='دریافت آمار ناموفق بود: '+error.message;return}
- value.textContent=Number(count||0).toLocaleString('fa-IR');
- status.textContent='نصب‌های یکتای اندروید ثبت‌شده · اطلاعات ناشناس و بدون ذخیره مشخصات شخصی';
+ try{
+  const {count,error}=await supabaseClient.from('iron_app_installs_v1').select('install_id',{count:'exact',head:true});
+  if(error)throw error;
+  value.textContent=Number(count??0).toLocaleString('fa-IR');
+  status.textContent='نصب‌های یکتای اندروید ثبت‌شده · اطلاعات ناشناس و بدون ذخیره مشخصات شخصی';
+ }catch(error){
+  value.textContent='—';
+  status.textContent='دریافت آمار ناموفق بود: '+(error?.message||'خطای ناشناخته');
+  console.warn('IRONNOVA install stats failed:',error);
+ }
 }
 async function refreshIronCoachRequests(){
  const out=document.getElementById('ironCoachRequests');
