@@ -79,7 +79,7 @@ main.app .anatomy-heading .anatomy-kicker,main.app .anatomy-live{color:#79caff!i
 main.app .anatomy-view{background:linear-gradient(160deg,#102d4d,#071a30)!important;border:1px solid #ffffff1c!important;border-radius:19px!important;box-shadow:inset 0 0 20px #0003!important}
 main.app .anatomy-view-title{color:#edf7ff!important}
 main.app .anatomy-view-title span,main.app .anatomy-legend{color:#a9c9e3!important}
-.anatomy-svg{display:block!important;width:100%!important;height:clamp(300px,92vw,430px)!important;max-height:none!important;margin:4px auto 0!important;background-size:200% 100%!important;background-repeat:no-repeat!important}
+.anatomy-svg{display:block!important;width:100%!important;height:auto!important;max-height:430px!important;aspect-ratio:360/660!important;margin:4px auto 0!important;background-size:200% 100%!important;background-repeat:no-repeat!important}
 .anatomy-svg .anatomy-base{opacity:0!important}
 .anatomy-svg .anatomy-muscles .muscle-hit{opacity:.001!important;fill:#000!important;stroke:#000!important;pointer-events:all!important}
 @media(max-width:420px){main.app .home-feature-grid{gap:9px!important}main.app .home-feature-grid>.home-workout-program-launch,main.app .home-feature-grid>.home-feature-tile,main.app .home-feature-grid>.home-shop-launch,main.app .home-feature-grid>.home-nutrition-hub{min-height:150px!important;padding:9px!important}main.app .home-feature-grid .home-feature-tile>span,main.app .home-feature-grid .home-workout-program-art,main.app .home-feature-grid .home-nutrition-main-art,main.app .home-feature-grid .home-shop-art{height:94px!important;min-height:94px!important;flex-basis:94px!important}.profile-hero-avatar{width:66px;height:66px;flex-basis:66px}}
