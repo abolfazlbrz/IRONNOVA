@@ -2072,11 +2072,13 @@ async function setIronCoachAccessByCode(){
  if(!/^[0-9]{6}$/.test(code)){document.getElementById('ironAdminStatus').textContent='کد اختصاصی شش‌رقمی معتبر وارد کن.';return}
  const {data,error}=await supabaseClient.rpc('iron_admin_assign_coach_by_code_v1',{p_code:code});
  document.getElementById('ironAdminStatus').textContent=error?'خطا: '+error.message:(data||'کاربر به مربی ارتقا یافت.');
+ if(!error){await loadIronCoachOverview();await refreshIronCoachRequests()}
 }
 async function reviewIronCoach(id,approve){
- const {data,error}=await supabaseClient.rpc('iron_review_coach_v2',{p_coach_id:id,p_approve:approve});
+ if(approve){await issueIronCoachCode(id);return}
+ const {data,error}=await supabaseClient.rpc('iron_review_coach_v2',{p_coach_id:id,p_approve:false});
  if(error){toast('خطا: '+error.message);return}
- toast(data|| (approve?'مربی تأیید شد':'درخواست رد شد'));await refreshIronCoachRequests();
+ toast(data||'درخواست رد شد');await refreshIronCoachRequests();await loadIronCoachOverview();
 }
 async function loadIronCoachLinks(){
  const out=document.getElementById('icLinks');
