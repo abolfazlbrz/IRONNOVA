@@ -745,6 +745,7 @@ body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.
 <div id="coachSubpageAccount" class="coach-subpage hidden">
 <div class="card"><h2>حساب کاربری</h2><div class="field"><label>نام نمایشی</label><input id="icName" placeholder="نام مربی یا شاگرد"></div><div class="field"><label>نقش</label><select id="icRole"><option value="student">شاگرد</option><option value="coach">مربی</option></select></div><button class="btn" onclick="icSaveRole()">ثبت نقش</button><div id="icStatus" class="muted" style="margin-top:10px"></div></div>
 <div id="icCoachProfileCard" class="card hidden"><h2>پروفایل مربی</h2><div class="field"><label>نام کامل</label><input id="icCoachFullName" placeholder="نام و نام خانوادگی"></div><div class="field"><label>تخصص</label><input id="icCoachSpecialty" placeholder="مثلاً مربی بدنسازی"></div><div class="field"><label>معرفی کوتاه</label><textarea id="icCoachBio" rows="3"></textarea></div><div class="field"><label>مدارک و سوابق</label><textarea id="icCoachCredentials" rows="2"></textarea></div><div class="field"><label>شماره تماس</label><input id="icCoachPhone" inputmode="tel"></div><div class="field"><label>لینک عکس پروفایل (اختیاری)</label><input id="icCoachPhoto" placeholder="https://..."></div><button class="btn" onclick="saveIronCoachProfile()">ذخیره پروفایل مربی</button><div id="icCoachProfileStatus" class="muted"></div></div>
+<div id="icCoachVerifyCard" class="card hidden"><h3>تأیید نهایی حساب مربی</h3><p class="muted">پس از بررسی رزومه توسط مدیر اصلی، کد شش‌رقمی یک‌بارمصرف را اینجا وارد کن.</p><div class="field"><label>کد تأیید ۶ رقمی</label><input id="icCoachVerifyCode" inputmode="numeric" maxlength="6" placeholder="کد دریافتی از مدیر"></div><button class="btn" onclick="icVerifyCoachCode()">تأیید کد و فعال‌سازی پنل مربی</button><div id="icCoachVerifyStatus" class="muted" style="margin-top:8px"></div></div>
 </div>
 <div id="coachSubpageConnections" class="coach-subpage hidden">
 <div class="card"><h2>دعوت و اتصال مربی و شاگرد</h2><button class="btn" onclick="icCreateInvite()">نمایش کد اختصاصی من</button><div id="icInvite" style="margin:10px 0"></div><div class="field"><label>کد اختصاصی ۶ رقمی مربی</label><input id="icCode" inputmode="numeric" maxlength="6" placeholder="مثلاً ۱۲۳۴۵۶"></div><button class="btn secondary" onclick="icClaimInvite()">ارسال درخواست اتصال</button><div id="icLinks" class="muted" style="margin-top:12px"></div><div class="divider"></div><h3>اتصال‌های فعال و درخواست‌ها</h3><button class="btn secondary" onclick="loadIronCoachLinks()">به‌روزرسانی اتصال‌ها</button></div>
@@ -784,8 +785,10 @@ body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.
  <div id="ironDiagnosticsReport" style="margin-top:12px"></div>
 </section>
 <section id="ironEducationAdminManager" class="card hidden" style="margin:12px 0"><div class="row between" style="align-items:center"><h3 style="margin:0">مدیریت آموزش و ویدئو</h3><button class="btn secondary small" type="button" onclick="loadIronEducationAdminList()">به‌روزرسانی</button></div><p class="muted" style="font-size:12px">مدیریت و حذف محتوای منتشرشده و پیش‌نویس‌ها</p><div id="ironEducationAdminList" class="muted">برای دریافت فهرست، به‌روزرسانی را بزن.</div></section>
-<section id="ironMainAdminPanel" class="card hidden"><h2>مدیریت اصلی IRONNOVA</h2><p class="muted">فقط مدیر اصلی می‌تواند درخواست مربیان را بررسی کند.</p>
-<button class="btn secondary" onclick="refreshIronCoachRequests()">به‌روزرسانی درخواست‌ها</button><div id="ironCoachRequests" style="margin-top:12px"></div><div class="divider"></div><h3>مدیریت دسترسی مدیر</h3><div class="field"><label>کد اختصاصی ۶ رقمی کاربر</label><input id="ironAdminTarget" inputmode="numeric" maxlength="6" placeholder="کد کاربر را وارد کن"></div><div class="row"><button class="btn grow" onclick="setIronAdminAccess(true)">ارتقا به مدیر</button><button class="btn secondary grow" onclick="setIronAdminAccess(false)">لغو مدیر</button></div><button class="btn secondary" style="width:100%;margin-top:8px" onclick="setIronCoachAccessByCode()">ارتقا به مربی تأییدشده</button><div id="ironAdminStatus" class="muted" style="margin-top:8px"></div></section>
+<section id="ironMainAdminPanel" class="card hidden"><h2>مدیریت اصلی IRONNOVA</h2><p class="muted">فقط مدیر اصلی می‌تواند درخواست‌ها و دسترسی مربیان را مدیریت کند.</p>
+<h3>درخواست‌های مربی</h3><button class="btn secondary" onclick="refreshIronCoachRequests()">به‌روزرسانی درخواست‌ها</button><div id="ironCoachRequests" style="margin-top:12px"></div><div id="ironCoachCodeOutput" class="result-box hidden" style="margin-top:10px"></div>
+<div class="divider"></div><h3>فهرست و مدیریت مربیان</h3><button class="btn secondary" onclick="loadIronCoachOverview()">به‌روزرسانی فهرست مربیان</button><div id="ironCoachOverview" style="margin-top:12px"></div>
+<div class="divider"></div><h3>مدیریت دسترسی مدیر</h3><div class="field"><label>کد اختصاصی ۶ رقمی کاربر</label><input id="ironAdminTarget" inputmode="numeric" maxlength="6" placeholder="کد کاربر را وارد کن"></div><div class="row"><button class="btn grow" onclick="setIronAdminAccess(true)">ارتقا به مدیر</button><button class="btn secondary grow" onclick="setIronAdminAccess(false)">لغو مدیر</button></div><button class="btn secondary" style="width:100%;margin-top:8px" onclick="setIronCoachAccessByCode()">ارتقا به مربی تأییدشده</button><div id="ironAdminStatus" class="muted" style="margin-top:8px"></div></section>
 </div>
 </div>
 </section>
@@ -1613,8 +1616,49 @@ async function publishIronEducation(id){
 async function ironEducationCanUpload(){const {data:{user}}=await supabaseClient.auth.getUser();if(!user)return false;const {data:admin,error:adminError}=await supabaseClient.from('iron_admins_v2').select('is_main_admin').eq('user_id',user.id).maybeSingle();if(!adminError&&admin?.is_main_admin)return true;const {data:coach,error:coachError}=await supabaseClient.from('iron_account_roles_v2').select('role,status').eq('user_id',user.id).maybeSingle();return !coachError&&coach?.role==='coach'&&coach?.status==='approved'}
 async function loadEducationAdmin(){const el=document.getElementById('educationAdmin');if(!el)return;el.classList.toggle('hidden',!await ironEducationCanUpload())}
 async function adminAddEducation(){const title=document.getElementById('educationTitle').value.trim(),category=document.getElementById('educationCategory').value.trim(),description=document.getElementById('educationDescription').value.trim(),media=document.getElementById('educationMediaFile')?.files?.[0],thumb=document.getElementById('educationThumbFile')?.files?.[0];if(title.length<2||!media)return toast('عنوان و فایل عکس یا ویدئو را انتخاب کن');if(media.size>50*1024*1024||thumb?.size>10*1024*1024)return toast('حجم فایل اصلی حداکثر ۵۰ و تصویر بندانگشتی حداکثر ۱۰ مگابایت است');const allowedImages=['image/jpeg','image/png','image/webp','image/gif','image/avif'],allowedVideos=['video/mp4','video/webm','video/quicktime'];const extensionMime=name=>/\\.(mp4|m4v)$/i.test(name||'')?'video/mp4':/\\.webm$/i.test(name||'')?'video/webm':/\\.mov$/i.test(name||'')?'video/quicktime':/\\.png$/i.test(name||'')?'image/png':/\\.webp$/i.test(name||'')?'image/webp':/\\.gif$/i.test(name||'')?'image/gif':/\\.avif$/i.test(name||'')?'image/avif':'image/jpeg';const mediaMime=allowedImages.includes(media.type)||allowedVideos.includes(media.type)?media.type:(!media.type||media.type==='application/octet-stream')?extensionMime(media.name):media.type;if(!allowedImages.includes(mediaMime)&&!allowedVideos.includes(mediaMime))return toast('فرمت عکس یا ویدئو پشتیبانی نمی‌شود');if(thumb&&!allowedImages.includes(thumb.type))return toast('فرمت تصویر بندانگشتی پشتیبانی نمی‌شود');const {data:{user}}=await supabaseClient.auth.getUser();if(!user)return toast('ابتدا وارد حساب کاربری شو');if(!await ironEducationCanUpload())return toast('آپلود آموزش فقط برای مدیر اصلی و مربی تأییدشده مجاز است');const safeName=f=>String(f.name||'media').normalize('NFKC').replace(/[^\p{L}\p{N}._-]+/gu,'-').slice(-90);const paths=[];const upload=async file=>{const path=user.id+'/'+Date.now()+'-'+crypto.randomUUID()+'-'+safeName(file);const {error}=await supabaseClient.storage.from('iron-education-media').upload(path,file,{contentType:file===media?mediaMime:(file.type||extensionMime(file.name)),upsert:false,cacheControl:'31536000'});if(error)throw error;paths.push(path);return supabaseClient.storage.from('iron-education-media').getPublicUrl(path).data.publicUrl};try{const video_url=await upload(media),thumbnail_url=thumb?await upload(thumb):null;const {data:role}=await supabaseClient.from('iron_account_roles_v2').select('role,status').eq('user_id',user.id).maybeSingle();const {data:created,error}=await supabaseClient.from('iron_education_v2').insert({title,category,video_url,thumbnail_url,description,media_type:mediaMime,is_published:true,coach_id:role?.role==='coach'&&role?.status==='approved'?user.id:null}).select('id').single();if(error)throw error;if(!created?.id)throw new Error('رکورد آموزش در پایگاه داده ثبت نشد');document.getElementById('educationTitle').value='';document.getElementById('educationMediaFile').value='';document.getElementById('educationThumbFile').value='';document.getElementById('educationDescription').value='';toast('محتوای آموزشی منتشر شد');await renderIronEducation()}catch(error){if(paths.length)await supabaseClient.storage.from('iron-education-media').remove(paths);toast('انتشار ناموفق بود: '+(error?.message||'خطای ناشناخته'))}}
-async function icLoadRole(){const {data:{user}}=await supabaseClient.auth.getUser();const select=document.getElementById('icRole'),status=document.getElementById('icStatus');if(!select||!status)return;if(!user){select.disabled=false;status.textContent='برای انتخاب نقش ابتدا وارد حساب شو.';return}const {data,error}=await supabaseClient.from('iron_account_roles_v2').select('role,status').eq('user_id',user.id).maybeSingle();if(error){status.textContent='خطا در دریافت نقش: '+error.message;return}if(data){select.value=data.role;select.disabled=true;const labels={approved:'تأییدشده',pending:'در انتظار تأیید مدیر اصلی',rejected:'ردشده',suspended:'تعلیق‌شده'};status.textContent='نقش ثبت‌شده: '+(data.role==='coach'?'مربی':'شاگرد')+' · '+(labels[data.status]||data.status)+' · نقش تا خروج از حساب قابل تغییر نیست.'}else{select.disabled=false;status.textContent='نقش را فقط یک‌بار برای این حساب انتخاب کن.'}}
-async function icSaveRole(){const name=document.getElementById('icName').value.trim(),role=document.getElementById('icRole').value;const {data:{user}}=await supabaseClient.auth.getUser();if(!user){document.getElementById('icStatus').textContent='ابتدا از بخش پروفایل وارد حساب کاربری شو.';return}const {data:existing,error:readError}=await supabaseClient.from('iron_account_roles_v2').select('role,status').eq('user_id',user.id).maybeSingle();if(readError){document.getElementById('icStatus').textContent='خطا: '+readError.message;return}if(existing){document.getElementById('icStatus').textContent='نقش قبلی این حساب قابل تغییر نیست: '+(existing.role==='coach'?'مربی':'شاگرد');await icLoadRole();return}const {error}=await supabaseClient.rpc('iron_set_role',{p_role:role,p_display_name:name});if(error){document.getElementById('icStatus').textContent='خطا: '+error.message;return}await icLoadRole();await loadIronAdminPanel();await loadIronCoachProfile()}
+async function icLoadRole(){
+ const {data:{user}}=await supabaseClient.auth.getUser();
+ const select=document.getElementById('icRole'),status=document.getElementById('icStatus'),verifyCard=document.getElementById('icCoachVerifyCard');
+ if(!select||!status)return;
+ if(!user){select.disabled=false;status.textContent='برای انتخاب نقش ابتدا وارد حساب شو.';verifyCard?.classList.add('hidden');document.getElementById('icCoachProfileCard')?.classList.add('hidden');return}
+ const {data,error}=await supabaseClient.from('iron_account_roles_v2').select('role,status').eq('user_id',user.id).maybeSingle();
+ if(error){status.textContent='خطا در دریافت نقش: '+error.message;return}
+ if(data){
+  select.value=data.role;select.disabled=true;
+  const labels={approved:'تأییدشده',pending:'در انتظار بررسی و تأیید مدیر اصلی',rejected:'ردشده',suspended:'تعلیق‌شده'};
+  status.textContent='نقش ثبت‌شده: '+(data.role==='coach'?'مربی':'شاگرد')+' · '+(labels[data.status]||data.status)+' · نقش تا خروج از حساب قابل تغییر نیست.';
+  verifyCard?.classList.toggle('hidden',!(data.role==='coach'&&data.status==='pending'));
+ }else{
+  select.disabled=false;status.textContent='نقش را فقط یک‌بار برای این حساب انتخاب کن.';
+  verifyCard?.classList.add('hidden');
+ }
+ await loadIronCoachProfile();
+}
+async function icSaveRole(){
+ const name=document.getElementById('icName').value.trim(),role=document.getElementById('icRole').value;
+ const {data:{user}}=await supabaseClient.auth.getUser();
+ if(!user){document.getElementById('icStatus').textContent='ابتدا از بخش پروفایل وارد حساب کاربری شو.';return}
+ const {data:existing,error:readError}=await supabaseClient.from('iron_account_roles_v2').select('role,status').eq('user_id',user.id).maybeSingle();
+ if(readError){document.getElementById('icStatus').textContent='خطا: '+readError.message;return}
+ if(existing){document.getElementById('icStatus').textContent='نقش قبلی این حساب قابل تغییر نیست: '+(existing.role==='coach'?'مربی':'شاگرد');await icLoadRole();return}
+ const {error}=await supabaseClient.rpc('iron_request_role_v2',{p_role:role});
+ if(error){document.getElementById('icStatus').textContent='ثبت نقش ناموفق بود: '+error.message;return}
+ if(name){
+  const {error:profileError}=await supabaseClient.from('profiles').upsert({id:user.id,full_name:name},{onConflict:'id'});
+  if(profileError)console.warn('Could not save account display name:',profileError.message);
+ }
+ await icLoadRole();await loadIronAdminPanel();
+ if(role==='coach')document.getElementById('icStatus').textContent='درخواست مربی ثبت شد. رزومه و اطلاعاتت را تکمیل کن؛ پس از بررسی مدیر اصلی کد تأیید دریافت می‌کنی.';
+}
+async function icVerifyCoachCode(){
+ const input=document.getElementById('icCoachVerifyCode'),out=document.getElementById('icCoachVerifyStatus');
+ const code=String(input?.value||'').trim().replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+ if(!/^[0-9]{6}$/.test(code)){if(out)out.textContent='کد باید دقیقاً شش رقم باشد.';return}
+ const {data,error}=await supabaseClient.rpc('iron_verify_coach_code_v2',{p_code:code});
+ if(error){if(out)out.textContent='تأیید کد ناموفق بود: '+error.message;return}
+ if(out)out.textContent=data||'پاسخ تأیید دریافت نشد.';
+ if(/تأیید شد|فعال است/.test(String(data||''))){if(input)input.value='';await icLoadRole();await loadIronCoachProfile();await loadIronAdminPanel()}
+}
 
 let ironCommChannel=null,ironCommExpanded=new Set(),ironCommReadSet=new Set(),ironSelectedChatPartner=null;
 let ironCommIsMainAdmin=false;
@@ -1787,7 +1831,7 @@ async function loadIronAdminPanel(){
   document.getElementById('ironDiagnosticsCard')?.classList.remove('hidden');
   document.getElementById('ironEducationAdminManager')?.classList.remove('hidden');
   loadIronEducationAdminList().catch(error=>console.warn('Education manager:',error));
-  Promise.all([refreshIronCoachRequests(),loadIronInstallStats()]).catch(error=>console.warn('IRONNOVA admin widgets:',error));
+  Promise.all([refreshIronCoachRequests(),loadIronCoachOverview(),loadIronInstallStats()]).catch(error=>console.warn('IRONNOVA admin widgets:',error));
   return true;
  }catch(error){hideAdmin();console.warn('IRONNOVA admin access check failed:',error);return false}
 }
@@ -1978,11 +2022,44 @@ async function loadIronInstallStats(){
  }
 }
 async function refreshIronCoachRequests(){
- const out=document.getElementById('ironCoachRequests');
+ const out=document.getElementById('ironCoachRequests');if(!out)return;
  const {data,error}=await supabaseClient.rpc('iron_admin_pending_coaches_v2');
  if(error){out.textContent='خطا: '+error.message;return}
  if(!data?.length){out.innerHTML='<p class="muted">درخواست مربی در انتظار بررسی وجود ندارد.</p>';return}
- out.innerHTML=data.map(x=>{const id=String(x.user_id||'');if(!/^[0-9a-f-]{36}$/i.test(id))return '';return '<div class="card" style="margin-top:10px"><b>'+safe(x.full_name||'مربی بدون نام')+'</b><p class="muted">'+safe(x.specialty||'بدون تخصص ثبت‌شده')+'</p><small>'+safe(id)+'</small><div class="row" style="margin-top:8px"><button class="btn grow" onclick="reviewIronCoach(\''+id+'\',true)">تأیید مربی</button><button class="btn secondary grow" onclick="reviewIronCoach(\''+id+'\',false)">رد درخواست</button></div></div>'}).join('');
+ out.innerHTML=data.map(x=>{
+  const id=String(x.user_id||'');if(!/^[0-9a-f-]{36}$/i.test(id))return '';
+  const modes=Array.isArray(x.training_modes)?x.training_modes.join('، '):'';
+  const photo=String(x.photo_url||''),photoHtml=/^https:\/\//i.test(photo)?'<img src="'+safe(photo)+'" alt="عکس رزومه مربی" style="width:76px;height:76px;object-fit:cover;border-radius:12px;margin-top:8px">':'';
+  return '<div class="card" style="margin-top:10px"><b>'+safe(x.full_name||'مربی بدون نام')+'</b><p class="muted">'+safe(x.specialty||'بدون تخصص ثبت‌شده')+' · '+safe(x.experience_years||0)+' سال تجربه · '+safe(x.city||'شهر ثبت نشده')+'</p><p>'+safe(x.bio||'بدون معرفی')+'</p><p class="muted">مدارک و سوابق: '+safe(x.credentials||'ثبت نشده')+'<br>تماس: '+safe(x.phone||'ثبت نشده')+'<br>شیوه تمرین: '+safe(modes||'ثبت نشده')+'<br>دستاوردها: '+safe(x.achievements||'ثبت نشده')+'</p>'+photoHtml+'<small class="muted">شناسه حساب: '+safe(id)+'</small><div class="row" style="margin-top:8px"><button class="btn grow" onclick="issueIronCoachCode(\\''+id+'\\')">صدور کد تأیید ۶ رقمی</button><button class="btn secondary grow" onclick="reviewIronCoach(\\''+id+'\\',false)">رد درخواست</button></div></div>';
+ }).join('');
+}
+async function issueIronCoachCode(id){
+ const out=document.getElementById('ironCoachCodeOutput');if(out){out.classList.remove('hidden');out.textContent='در حال صدور کد امن...'}
+ const {data,error}=await supabaseClient.rpc('iron_admin_issue_coach_code_v2',{p_coach_id:id});
+ if(error){if(out)out.textContent='صدور کد ناموفق بود: '+error.message;return}
+ if(out){out.classList.remove('hidden');out.innerHTML='<b>کد تأیید مربی (اعتبار ۲۴ ساعت و یک‌بارمصرف)</b><div style="font-size:30px;font-weight:900;letter-spacing:5px;direction:ltr;margin:8px 0">'+safe(data)+'</div><p class="muted">این کد را فقط به متقاضی موردنظر بده. پس از واردکردن کد توسط او، حساب مربی فعال می‌شود.</p>'}
+ await refreshIronCoachRequests();await loadIronCoachOverview();
+}
+async function loadIronCoachOverview(){
+ const out=document.getElementById('ironCoachOverview');if(!out)return;
+ out.textContent='در حال دریافت فهرست مربیان...';
+ const {data,error}=await supabaseClient.rpc('iron_admin_coaches_overview_v2');
+ if(error){out.textContent='دریافت فهرست مربیان ناموفق بود: '+error.message;return}
+ if(!data?.length){out.innerHTML='<p class="muted">هنوز حساب مربی ثبت نشده است.</p>';return}
+ const labels={approved:'فعال و تأییدشده',pending:'در انتظار تأیید',rejected:'ردشده',suspended:'تعلیق‌شده'};
+ out.innerHTML=data.map(x=>{
+  const id=String(x.user_id||'');if(!/^[0-9a-f-]{36}$/i.test(id))return '';
+  const action=x.status==='approved'
+   ?'<button class="btn secondary small" onclick="setIronCoachStatus(\\''+id+'\\',\\'suspended\\')">تعلیق دسترسی مربی</button>'
+   :'<button class="btn secondary small" onclick="setIronCoachStatus(\\''+id+'\\',\\'pending\\')">بازگردانی به انتظار تأیید</button>';
+  return '<div class="card" style="margin-top:8px"><b>'+safe(x.full_name||'مربی بدون نام')+'</b><div class="muted">'+safe(x.specialty||'')+' · '+safe(x.city||'')+'</div><div style="margin-top:6px">'+safe(labels[x.status]||x.status)+' · شاگرد فعال: '+safe(x.student_count||0)+' · درخواست جدید: '+safe(x.pending_count||0)+'</div><small class="muted">'+safe(id)+'</small><div style="margin-top:8px">'+action+'</div></div>';
+ }).join('');
+}
+async function setIronCoachStatus(id,status){
+ if(!confirm(status==='suspended'?'دسترسی این مربی تعلیق شود؟':'وضعیت مربی به انتظار تأیید برگردد؟'))return;
+ const {data,error}=await supabaseClient.rpc('iron_admin_set_coach_status_v2',{p_coach_id:id,p_status:status});
+ if(error){toast('تغییر وضعیت مربی ناموفق بود: '+error.message);return}
+ toast(data||'وضعیت مربی به‌روزرسانی شد');await loadIronCoachOverview();await refreshIronCoachRequests();
 }
 async function setIronAdminAccess(enabled){
  const code=document.getElementById('ironAdminTarget').value.trim().replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d));
@@ -2033,7 +2110,7 @@ async function loadIronCoachProfile(){
  const card=document.getElementById('icCoachProfileCard');if(!card)return;
  const {data:{user}}=await supabaseClient.auth.getUser();if(!user){card.classList.add('hidden');return}
  const {data:role}=await supabaseClient.from('iron_account_roles_v2').select('role,status').eq('user_id',user.id).maybeSingle();
- if(role?.role!=='coach'||role.status!=='approved'){card.classList.add('hidden');return}
+ if(role?.role!=='coach'||!['pending','approved'].includes(role.status)){card.classList.add('hidden');return}
  card.classList.remove('hidden');
  const {data,error}=await supabaseClient.from('iron_coach_profiles_v2').select('full_name,specialty,bio,credentials,phone,photo_url').eq('user_id',user.id).maybeSingle();
  if(error){document.getElementById('icCoachProfileStatus').textContent='خطا: '+error.message;return}
