@@ -1544,7 +1544,7 @@ async function loadIronEducationAdminList(){
  const {data,error}=await supabaseClient.from('iron_education_v2').select('id,title,category,media_type,is_published,created_at').order('created_at',{ascending:false}).limit(200);
  if(error){el.textContent='دریافت فهرست ناموفق بود: '+error.message;return}
  if(!data?.length){el.textContent='محتوایی ثبت نشده است.';return}
- el.innerHTML=data.map(v=>'<div class="row between" style="gap:8px;padding:9px 0;border-bottom:1px solid var(--line);align-items:center"><div style="min-width:0"><b>'+safe(v.title)+'</b><div class="muted" style="font-size:12px">'+safe(v.category||'')+' · '+(/^video\\//i.test(v.media_type||'')?'ویدئو':'تصویر')+' · '+(v.is_published?'منتشرشده':'پیش‌نویس')+'</div></div><button class="btn secondary small" type="button" onclick="deleteIronEducation(\''+safe(v.id)+'\')">حذف</button></div>').join('');
+ el.innerHTML=data.map(v=>'<div class="row between" style="gap:8px;padding:9px 0;border-bottom:1px solid var(--line);align-items:center"><div style="min-width:0"><b>'+safe(v.title)+'</b><div class="muted" style="font-size:12px">'+safe(v.category||'')+' · '+(/^video\//i.test(v.media_type||'')?'ویدئو':'تصویر')+' · '+(v.is_published?'منتشرشده':'پیش‌نویس')+'</div></div><button class="btn secondary small" type="button" onclick="deleteIronEducation(\''+safe(v.id)+'\')">حذف</button></div>').join('');
 }
 async function publishIronEducation(id){
  const {data:{user}}=await supabaseClient.auth.getUser();
