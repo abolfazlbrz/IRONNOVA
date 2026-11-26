@@ -2030,7 +2030,7 @@ async function refreshIronCoachRequests(){
   const id=String(x.user_id||'');if(!/^[0-9a-f-]{36}$/i.test(id))return '';
   const modes=Array.isArray(x.training_modes)?x.training_modes.join('، '):'';
   const photo=String(x.photo_url||''),photoHtml=/^https:\/\//i.test(photo)?'<img src="'+safe(photo)+'" alt="عکس رزومه مربی" style="width:76px;height:76px;object-fit:cover;border-radius:12px;margin-top:8px">':'';
-  return '<div class="card" style="margin-top:10px"><b>'+safe(x.full_name||'مربی بدون نام')+'</b><p class="muted">'+safe(x.specialty||'بدون تخصص ثبت‌شده')+' · '+safe(x.experience_years||0)+' سال تجربه · '+safe(x.city||'شهر ثبت نشده')+'</p><p>'+safe(x.bio||'بدون معرفی')+'</p><p class="muted">مدارک و سوابق: '+safe(x.credentials||'ثبت نشده')+'<br>تماس: '+safe(x.phone||'ثبت نشده')+'<br>شیوه تمرین: '+safe(modes||'ثبت نشده')+'<br>دستاوردها: '+safe(x.achievements||'ثبت نشده')+'</p>'+photoHtml+'<small class="muted">شناسه حساب: '+safe(id)+'</small><div class="row" style="margin-top:8px"><button class="btn grow" onclick="issueIronCoachCode(\\''+id+'\\')">صدور کد تأیید ۶ رقمی</button><button class="btn secondary grow" onclick="reviewIronCoach(\\''+id+'\\',false)">رد درخواست</button></div></div>';
+  return '<div class="card" style="margin-top:10px"><b>'+safe(x.full_name||'مربی بدون نام')+'</b><p class="muted">'+safe(x.specialty||'بدون تخصص ثبت‌شده')+' · '+safe(x.experience_years||0)+' سال تجربه · '+safe(x.city||'شهر ثبت نشده')+'</p><p>'+safe(x.bio||'بدون معرفی')+'</p><p class="muted">مدارک و سوابق: '+safe(x.credentials||'ثبت نشده')+'<br>تماس: '+safe(x.phone||'ثبت نشده')+'<br>شیوه تمرین: '+safe(modes||'ثبت نشده')+'<br>دستاوردها: '+safe(x.achievements||'ثبت نشده')+'</p>'+photoHtml+'<small class="muted">شناسه حساب: '+safe(id)+'</small><div class="row" style="margin-top:8px"><button class="btn grow" onclick="issueIronCoachCode(\''+id+'\')">صدور کد تأیید ۶ رقمی</button><button class="btn secondary grow" onclick="reviewIronCoach(\''+id+'\',false)">رد درخواست</button></div></div>';
  }).join('');
 }
 async function issueIronCoachCode(id){
@@ -2050,8 +2050,8 @@ async function loadIronCoachOverview(){
  out.innerHTML=data.map(x=>{
   const id=String(x.user_id||'');if(!/^[0-9a-f-]{36}$/i.test(id))return '';
   const action=x.status==='approved'
-   ?'<button class="btn secondary small" onclick="setIronCoachStatus(\\''+id+'\\',\\'suspended\\')">تعلیق دسترسی مربی</button>'
-   :'<button class="btn secondary small" onclick="setIronCoachStatus(\\''+id+'\\',\\'pending\\')">بازگردانی به انتظار تأیید</button>';
+   ?'<button class="btn secondary small" onclick="setIronCoachStatus(\''+id+'\',\'suspended\')">تعلیق دسترسی مربی</button>'
+   :'<button class="btn secondary small" onclick="setIronCoachStatus(\''+id+'\',\'pending\')">بازگردانی به انتظار تأیید</button>';
   return '<div class="card" style="margin-top:8px"><b>'+safe(x.full_name||'مربی بدون نام')+'</b><div class="muted">'+safe(x.specialty||'')+' · '+safe(x.city||'')+'</div><div style="margin-top:6px">'+safe(labels[x.status]||x.status)+' · شاگرد فعال: '+safe(x.student_count||0)+' · درخواست جدید: '+safe(x.pending_count||0)+'</div><small class="muted">'+safe(id)+'</small><div style="margin-top:8px">'+action+'</div></div>';
  }).join('');
 }
