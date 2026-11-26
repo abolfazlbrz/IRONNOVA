@@ -8,6 +8,7 @@ on:
       - main
       - feature/home-training-hub
       - release/ironnova-exercise-images
+      - feature/admin-app-diagnostics
 
 jobs:
   build:
