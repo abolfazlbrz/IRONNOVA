@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ironnova-v19-original-ui';
+const CACHE_NAME = 'ironnova-v20-original-layout';
 const APP_SHELL = ['./', './index.html', './manifest.webmanifest', './assets/icon-192.png', './assets/icon-512.png', './assets/icon-maskable-512.png', './assets/exercise-photo-catalog.json', './assets/icons/home-workouts.svg', './assets/icons/ai-doctor-dumbbell.svg', './assets/icons/home-program.svg', './assets/icons/home-smart-coach.svg', './assets/icons/home-nutrition.svg', './assets/icons/home-progress.svg', './assets/icons/home-profile.svg', './assets/icons/home-coaches.svg', './assets/icons/home-coach-panel.svg', './assets/icons/home-store.svg', './assets/icons/home-education.svg'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)).then(() => self.skipWaiting()));
