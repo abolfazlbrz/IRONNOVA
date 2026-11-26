@@ -532,8 +532,8 @@ main.app .food-launch-tile,main.app .lib-card,main.app .plan-option,main.app .co
 @media(max-width:480px){main.app .home-hub{padding:11px}.home-primary-grid .home-training-launch,.home-primary-grid .home-ai-launch{min-height:132px;padding:10px}.home-primary-grid .home-training-art,.home-ai-art{height:68px}main.app .home-feature-grid{gap:8px!important}main.app .home-feature-grid>.home-workout-program-launch,main.app .home-feature-grid>.home-feature-tile,main.app .home-feature-grid>.home-shop-launch{min-height:122px!important;padding:10px!important}}
 @media(min-width:700px){main.app .home-feature-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}.home-primary-grid .home-training-launch,.home-primary-grid .home-ai-launch{min-height:160px}}
 </style>
-<link rel="stylesheet" href="assets/ironnova-reference-refresh.css?v=2">
-<link rel="stylesheet" href="assets/ironnova-anatomy-map.css?v=2">
+<link rel="stylesheet" href="assets/ironnova-reference-refresh.css?v=3">
+<link rel="stylesheet" href="assets/ironnova-anatomy-map.css?v=3">
 </head>
 <body><div id="ironIntro" class="iron-intro" aria-label="IRONNOVA">
   <div class="intro-bottom">
@@ -2028,7 +2028,7 @@ async function loadMyPublicCode(){
  const {data,error}=await supabaseClient.rpc('iron_get_my_public_code_v1');
  if(error){if(statusEl)statusEl.textContent='خطا در دریافت کد: '+error.message;return}
  codeEl.textContent=String(data||'------').replace(/[0-9]/g,d=>'۰۱۲۳۴۵۶۷۸۹'[Number(d)]);
- if(statusEl)statusEl.textContent='این کد ثابت است و برای اتصال‌ها و شناسایی حساب استفاده می‌شود.';
+ if(statusEl)statusEl.textContent='این کد ثابت است و برای اتصال‌ها و شناسایی حساب استفاده می‌شود.';syncIronProfileHero();
 }
 async function copyMyPublicCode(){
  const {data,error}=await supabaseClient.rpc('iron_get_my_public_code_v1');
