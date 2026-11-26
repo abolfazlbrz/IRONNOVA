@@ -78,8 +78,8 @@ Deno.serve(async (req: Request) => {
       },
     }),
   });
-  const aiBody = await aiResponse.json().catch(() => ({}));
   if (!aiResponse.ok) {
+    const aiBody = await aiResponse.json().catch(() => ({}));
     console.error("IRONNOVA free assistant upstream error", aiResponse.status, aiBody?.error?.code || "");
     return json({ error: aiResponse.status === 429
       ? "سهمیه رایگان هوش مصنوعی فعلاً تمام شده است؛ کمی بعد دوباره امتحان کن."
