@@ -778,6 +778,7 @@ body:not(.green):not(.red):not(.purple):not(.orange):not(.pink):not(.navy):not(.
  <div id="ironDiagnosticsStatus" class="muted" style="margin-top:10px;font-size:12px">هنوز بررسی‌ای اجرا نشده است.</div>
  <div id="ironDiagnosticsReport" style="margin-top:12px"></div>
 </section>
+<section id="ironEducationAdminManager" class="card hidden" style="margin:12px 0"><div class="row between" style="align-items:center"><h3 style="margin:0">مدیریت آموزش و ویدئو</h3><button class="btn secondary small" type="button" onclick="loadIronEducationAdminList()">به‌روزرسانی</button></div><p class="muted" style="font-size:12px">مدیریت و حذف محتوای منتشرشده و پیش‌نویس‌ها</p><div id="ironEducationAdminList" class="muted">برای دریافت فهرست، به‌روزرسانی را بزن.</div></section>
 <section id="ironMainAdminPanel" class="card hidden"><h2>مدیریت اصلی IRONNOVA</h2><p class="muted">فقط مدیر اصلی می‌تواند درخواست مربیان را بررسی کند.</p>
 <button class="btn secondary" onclick="refreshIronCoachRequests()">به‌روزرسانی درخواست‌ها</button><div id="ironCoachRequests" style="margin-top:12px"></div><div class="divider"></div><h3>مدیریت دسترسی مدیر</h3><div class="field"><label>شناسه حساب کاربر (UUID)</label><input id="ironAdminTarget" placeholder="UUID کاربر"></div><div class="row"><button class="btn grow" onclick="setIronAdminAccess(true)">افزودن مدیر</button><button class="btn secondary grow" onclick="setIronAdminAccess(false)">لغو دسترسی مدیر</button></div><div id="ironAdminStatus" class="muted" style="margin-top:8px"></div></section>
 </div>
@@ -1507,10 +1508,43 @@ async function renderIronEducation(){
    const isVideo=/^video\//i.test(v.media_type||'')||/\.(mp4|webm|mov)(\?|$)/i.test(v.video_url||'');
    const media=isVideo?'<video controls playsinline preload="metadata" poster="'+safe(v.thumbnail_url||'')+'" src="'+safe(v.video_url)+'" style="width:100%;max-height:320px;border-radius:14px;background:#000"></video>':'<img loading="lazy" src="'+safe(v.video_url)+'" alt="'+safe(v.title)+'" style="width:100%;max-height:320px;object-fit:contain;border-radius:14px">';
    const draft=isAdmin&&!v.is_published?'<span class="pill" style="background:#fff0c2;color:#8a5b00">پیش‌نویس</span>':'';
-   const action=isAdmin&&!v.is_published?'<button class="btn small" type="button" onclick="publishIronEducation(\''+safe(v.id)+'\')">انتشار برای همه کاربران</button>':'';
+   const action=isAdmin?((!v.is_published?'<button class="btn small" type="button" onclick="publishIronEducation(\''+safe(v.id)+'\')">انتشار برای همه کاربران</button>':'')+'<button class="btn secondary small" type="button" onclick="deleteIronEducation(\''+safe(v.id)+'\')">حذف محتوا</button>'):'';
    return '<div class="card"><div class="row between" style="align-items:center;gap:8px;flex-wrap:wrap"><b>'+safe(v.title)+'</b>'+draft+'</div><div class="muted">'+safe(v.category)+'</div>'+media+'<p>'+safe(v.description||'')+'</p>'+action+'</div>';
   }).join(''):(isAdmin?'هنوز محتوای آموزشی ثبت نشده است.':'هنوز محتوای آموزشی منتشرشده‌ای ثبت نشده است.');
  }catch(error){el.textContent='دریافت آموزش‌ها ناموفق بود: '+(error?.message||'خطای ناشناخته')}
+}
+async function ironEducationAdminAllowed(){
+ const {data:{user}}=await supabaseClient.auth.getUser();if(!user)return false;
+ const {data,error}=await supabaseClient.from('iron_admins_v2').select('is_main_admin').eq('user_id',user.id).maybeSingle();
+ return !error&&!!data?.is_main_admin;
+}
+function ironEducationStoragePath(url){
+ if(!url)return null;
+ try{const marker='/storage/v1/object/public/iron-education-media/';const i=String(url).indexOf(marker);if(i<0)return null;return decodeURIComponent(String(url).slice(i+marker.length).split('?')[0]);}catch(_){return null}
+}
+async function deleteIronEducation(id){
+ if(!/^[0-9a-f-]{36}$/i.test(String(id)))return toast('شناسه محتوای آموزشی معتبر نیست');
+ if(!await ironEducationAdminAllowed())return toast('فقط مدیر اصلی اجازه حذف آموزش را دارد');
+ if(!confirm('این محتوای آموزشی و فایل‌های پیوست آن حذف شوند؟ این کار قابل بازگشت نیست.'))return;
+ const {data:item,error:readError}=await supabaseClient.from('iron_education_v2').select('id,title,video_url,thumbnail_url').eq('id',id).maybeSingle();
+ if(readError)return toast('دریافت محتوا ناموفق بود: '+readError.message);
+ if(!item)return toast('محتوا پیدا نشد یا دسترسی حذف وجود ندارد');
+ const {error}=await supabaseClient.from('iron_education_v2').delete().eq('id',id);
+ if(error)return toast('حذف محتوا ناموفق بود: '+error.message);
+ const paths=[item.video_url,item.thumbnail_url].map(ironEducationStoragePath).filter(Boolean);
+ let storageWarning='';
+ if(paths.length){const {error:storageError}=await supabaseClient.storage.from('iron-education-media').remove(paths);if(storageError)storageWarning=' رکورد حذف شد اما پاک‌سازی یک یا چند فایل ذخیره‌شده ناموفق بود: '+storageError.message}
+ toast('محتوای «'+String(item.title||'آموزش').slice(0,70)+'» حذف شد.'+storageWarning);
+ await renderIronEducation();await loadIronEducationAdminList();
+}
+async function loadIronEducationAdminList(){
+ const el=document.getElementById('ironEducationAdminList');if(!el)return;
+ if(!await ironEducationAdminAllowed()){el.textContent='دسترسی مدیر اصلی تأیید نشد.';return}
+ el.textContent='در حال دریافت فهرست محتوا…';
+ const {data,error}=await supabaseClient.from('iron_education_v2').select('id,title,category,media_type,is_published,created_at').order('created_at',{ascending:false}).limit(200);
+ if(error){el.textContent='دریافت فهرست ناموفق بود: '+error.message;return}
+ if(!data?.length){el.textContent='محتوایی ثبت نشده است.';return}
+ el.innerHTML=data.map(v=>'<div class="row between" style="gap:8px;padding:9px 0;border-bottom:1px solid var(--line);align-items:center"><div style="min-width:0"><b>'+safe(v.title)+'</b><div class="muted" style="font-size:12px">'+safe(v.category||'')+' · '+(/^video\\//i.test(v.media_type||'')?'ویدئو':'تصویر')+' · '+(v.is_published?'منتشرشده':'پیش‌نویس')+'</div></div><button class="btn secondary small" type="button" onclick="deleteIronEducation(\''+safe(v.id)+'\')">حذف</button></div>').join('');
 }
 async function publishIronEducation(id){
  const {data:{user}}=await supabaseClient.auth.getUser();
@@ -1688,7 +1722,7 @@ async function loadIronAdminPanel(){
  const menuButton=document.getElementById('ironMainAdminMenuButton');
  const statsCard=document.getElementById('ironInstallStatsCard');
  
- const hideAdmin=()=>{panel?.classList.add('hidden');adminNav?.classList.add('hidden');menuButton?.classList.add('hidden');statsCard?.classList.add('hidden');document.getElementById('ironDiagnosticsCard')?.classList.add('hidden')};
+ const hideAdmin=()=>{panel?.classList.add('hidden');adminNav?.classList.add('hidden');menuButton?.classList.add('hidden');statsCard?.classList.add('hidden');document.getElementById('ironDiagnosticsCard')?.classList.add('hidden');document.getElementById('ironEducationAdminManager')?.classList.add('hidden')};
  try{
   const auth=await supabaseClient.auth.getUser();
   const user=auth?.data?.user;
@@ -1697,6 +1731,8 @@ async function loadIronAdminPanel(){
   if(error||!data?.is_main_admin){hideAdmin();return false}
   panel?.classList.remove('hidden');adminNav?.classList.remove('hidden');menuButton?.classList.remove('hidden');statsCard?.classList.remove('hidden');
   document.getElementById('ironDiagnosticsCard')?.classList.remove('hidden');
+  document.getElementById('ironEducationAdminManager')?.classList.remove('hidden');
+  loadIronEducationAdminList().catch(error=>console.warn('Education manager:',error));
   Promise.all([refreshIronCoachRequests(),loadIronInstallStats()]).catch(error=>console.warn('IRONNOVA admin widgets:',error));
   return true;
  }catch(error){hideAdmin();console.warn('IRONNOVA admin access check failed:',error);return false}
