@@ -154,6 +154,23 @@ jobs:
       - name: Sync Android
         run: npx cap sync android
 
+      - name: Set monotonically increasing Android versionCode
+        env:
+          ANDROID_VERSION_CODE: ${{ github.run_number }}
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import os, re
+          p = Path('android/app/build.gradle')
+          s = p.read_text()
+          s, count = re.subn(r'(?m)^(\\s*versionCode\\s+)\\d+', lambda m: m.group(1) + os.environ['ANDROID_VERSION_CODE'], s, count=1)
+          if count != 1:
+              raise SystemExit('Could not safely set Android versionCode')
+          p.write_text(s)
+          print('Android versionCode:', os.environ['ANDROID_VERSION_CODE'])
+          PY
+
+
       - name: Restore stable Android debug signing key
         uses: actions/cache@v4
         with:
