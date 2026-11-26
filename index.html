@@ -1345,12 +1345,8 @@ let ironCoachExploreCache=[];
 async function loadCoachExplore(){
  const grid=document.getElementById('coachExploreGrid'),status=document.getElementById('coachExploreStatus');if(!grid||!status)return;
  status.textContent='در حال دریافت مربیان تأییدشده...';grid.innerHTML='';
- const {data:roles,error:roleError}=await supabaseClient.from('iron_account_roles_v2').select('user_id').eq('role','coach').eq('status','approved');
- if(roleError){status.textContent='دریافت فهرست مربیان ممکن نشد؛ دسترسی خواندن فهرست در پایگاه داده فعال نیست.';return}
- const ids=(roles||[]).map(x=>x.user_id).filter(Boolean);
- if(!ids.length){status.textContent='هنوز مربی تأییدشده‌ای برای نمایش وجود ندارد.';return}
- const {data,error}=await supabaseClient.from('iron_coach_profiles_v2').select('user_id,full_name,specialty,bio,credentials,photo_url').in('user_id',ids);
- if(error){status.textContent='خطا در دریافت پروفایل مربیان: '+error.message;return}
+ const {data,error}=await supabaseClient.rpc('iron_public_coach_directory_v1');
+ if(error){status.textContent='دریافت فهرست مربیان ناموفق بود: '+error.message;return}
  ironCoachExploreCache=data||[];renderCoachExplore(ironCoachExploreCache);
 }
 function renderCoachExplore(rows){
