@@ -1,5 +1,5 @@
-const CACHE_NAME = 'ironnova-v16-reference-match';
-const APP_SHELL = ['./', './index.html', './manifest.webmanifest', './assets/icon-192.png', './assets/icon-512.png', './assets/icon-maskable-512.png', './assets/exercise-photo-catalog.json'];
+const CACHE_NAME = 'ironnova-v17-photo-quality';
+const APP_SHELL = ['./', './index.html', './manifest.webmanifest', './assets/icon-192.png', './assets/icon-512.png', './assets/icon-maskable-512.png', './assets/exercise-photo-catalog.json', './assets/ironnova-reference-refresh.css?v=4', './assets/home-photo-grid.webp'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)).then(() => self.skipWaiting()));
 });
