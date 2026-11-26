@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - feature/2026-11-26-visual-refresh-six-digit-codes
 
 permissions:
   contents: read
