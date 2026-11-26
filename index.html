@@ -1874,7 +1874,7 @@ async function sendIronAiMessage(){
  ironAiHistory.push({role:'user',content:message});
  let answer='',assistantBubble=null;
  try{
-  if(!window.supabaseClient?.auth)throw new Error('اتصال حساب کاربری آماده نیست؛ صفحه را یک‌بار تازه‌سازی کن.');
+  if(typeof supabaseClient==='undefined'||!supabaseClient?.auth)throw new Error('اتصال حساب کاربری آماده نیست؛ بارگذاری کتابخانه حساب کامل نشده است.');
   const {data,error:sessionError}=await supabaseClient.auth.getSession();
   if(sessionError)throw new Error('بررسی حساب ناموفق بود: '+sessionError.message);
   const session=data?.session;
