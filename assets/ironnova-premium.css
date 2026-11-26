@@ -1,0 +1,182 @@
+/* IRONNOVA premium visual system v1 — presentation-only overrides.
+   No DOM, data, navigation, auth, exercise catalog, or business logic changes. */
+:root{
+ --bg:#f3f9fe;--surface:#ffffff;--text:#102f4b;--muted:#668198;
+ --accent:#168bd0;--soft:#e5f3fc;--line:#c9e1f1;
+ --shadow:0 14px 34px rgba(25,93,139,.10);
+ --iron-navy:#092944;--iron-blue:#087fca;--iron-sky:#b9e5fb;
+}
+html{background:#f2f8fd}
+body{
+ background:
+  radial-gradient(ellipse at 8% 0%,rgba(151,214,247,.22),transparent 34%),
+  radial-gradient(ellipse at 100% 36%,rgba(193,231,250,.28),transparent 32%),
+  linear-gradient(180deg,#f8fcff 0%,#edf7fd 100%);
+ color:var(--text);
+}
+.dashboard-layout{background:transparent}
+main.app{max-width:940px}
+main.app>section:not(.hidden){animation:ironPageIn .22s ease both}
+@keyframes ironPageIn{from{opacity:.88;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+main.app h1,main.app h2,main.app h3{color:#103a5b;letter-spacing:-.25px}
+main.app h1{font-size:clamp(21px,5vw,28px);font-weight:900;margin-bottom:14px}
+main.app h2{font-weight:850}
+main.app .top{
+ border:1px solid rgba(193,222,240,.82);border-radius:22px;
+ background:rgba(255,255,255,.84);backdrop-filter:blur(18px);
+ box-shadow:0 8px 24px rgba(31,104,148,.07);padding:10px 13px;margin-bottom:14px
+}
+main.app .brand{font-weight:950;letter-spacing:1.2px;color:#086fb4}
+main.app .avatar{box-shadow:0 5px 15px rgba(21,111,164,.14)}
+main.app .card,main.app .coach-panel-shell,main.app .music-shell,
+main.app .anatomy-panel,main.app .food-detail-card{
+ border:1px solid #d1e6f4;border-radius:22px;
+ background:linear-gradient(150deg,rgba(255,255,255,.98),rgba(239,248,254,.97));
+ box-shadow:0 12px 30px rgba(23,93,139,.085);
+}
+main.app .card{padding:16px;margin:10px 0}
+main.app .stat{
+ border:1px solid #d3e8f5;border-radius:18px;
+ background:linear-gradient(145deg,#fff,#eaf6fd);
+ box-shadow:0 8px 20px rgba(32,111,157,.08);padding:13px
+}
+main.app .stats{gap:10px}
+main.app .btn,main.app button.btn{
+ border:1px solid #0c7fc2;background:linear-gradient(135deg,#159ce0,#086db3);
+ color:#fff;border-radius:14px;font-weight:800;
+ box-shadow:0 7px 16px rgba(10,119,185,.18);
+ transition:transform .16s,box-shadow .16s,filter .16s
+}
+main.app .btn.secondary,main.app button.btn.secondary{
+ background:linear-gradient(145deg,#fff,#eaf6fd);color:#176b9e;border:1px solid #c5e1f1;box-shadow:none
+}
+main.app button:active{transform:scale(.985)}
+main.app input,main.app select,main.app textarea{
+ border:1px solid #c9e2f1!important;border-radius:13px!important;
+ background:rgba(255,255,255,.96)!important;color:#153b58!important;
+ box-shadow:inset 0 1px 2px rgba(22,90,133,.035)
+}
+main.app input:focus,main.app select:focus,main.app textarea:focus{
+ outline:0;border-color:#48a9df!important;box-shadow:0 0 0 3px rgba(72,169,223,.15)!important
+}
+main.app .field label{color:#456b86;font-weight:750}
+main.app .nav{
+ border:1px solid #d5e9f5;border-bottom:0;border-radius:22px 22px 0 0;
+ background:rgba(255,255,255,.91);backdrop-filter:blur(20px);
+ box-shadow:0 -8px 28px rgba(22,93,139,.09)
+}
+main.app .nav button{font-weight:750}
+main.app .nav button.active{background:linear-gradient(135deg,#eaf7fe,#d8effc);color:#087fc3;border-radius:14px}
+main.app .home-hub{
+ border:1px solid #cfe5f3;border-radius:26px;
+ background:linear-gradient(145deg,rgba(255,255,255,.99),rgba(232,245,253,.96));
+ box-shadow:0 16px 38px rgba(31,108,155,.11);padding:16px
+}
+main.app .home-hub-heading h2{font-size:21px;color:#103a5b}
+main.app .home-hub-heading .eyebrow{color:#1688c7;font-weight:900;letter-spacing:2px}
+main.app .home-primary-grid{gap:12px}
+main.app .home-primary-grid .home-training-launch,
+main.app .home-primary-grid .home-ai-launch{
+ min-height:158px;border:1px solid #c5e1f2;border-radius:22px;
+ background:linear-gradient(150deg,#fff 0%,#e8f5fd 100%);
+ box-shadow:0 10px 24px rgba(24,101,150,.11);padding:13px;
+ position:relative;overflow:hidden
+}
+main.app .home-primary-grid .home-training-launch:before,
+main.app .home-primary-grid .home-ai-launch:before{
+ content:"";position:absolute;inset:0;pointer-events:none;
+ background:radial-gradient(ellipse at 80% 0%,rgba(117,202,244,.24),transparent 58%)
+}
+main.app .home-primary-grid .home-training-art,
+main.app .home-primary-grid .home-ai-art{
+ height:88px;border-radius:17px;
+ background:linear-gradient(135deg,#d8effc,#f8fcff 72%);
+ border:1px solid rgba(172,216,241,.68);position:relative;z-index:1
+}
+main.app .home-training-copy,main.app .home-ai-copy{position:relative;z-index:1}
+main.app .home-training-copy b,main.app .home-ai-copy b{font-size:16px;color:#103c5d}
+main.app .home-training-copy small,main.app .home-ai-copy small{font-size:10px;color:#587991}
+main.app .home-feature-grid{gap:11px!important}
+main.app .home-feature-grid>.home-workout-program-launch,
+main.app .home-feature-grid>.home-feature-tile,
+main.app .home-feature-grid>.home-shop-launch,
+main.app .home-feature-grid>.home-nutrition-hub{
+ border:1px solid #cfe5f3!important;border-radius:21px!important;
+ background:linear-gradient(150deg,#fff 0%,#edf7fd 100%)!important;
+ box-shadow:0 10px 24px rgba(27,100,147,.09)!important;
+ min-height:145px!important;padding:13px!important;position:relative
+}
+main.app .home-feature-grid>.home-feature-tile:before,
+main.app .home-feature-grid>.home-workout-program-launch:before{
+ content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+ background:radial-gradient(ellipse at 75% 0%,rgba(133,207,241,.18),transparent 60%)
+}
+main.app .home-feature-grid .home-feature-tile b,
+main.app .home-feature-grid .home-workout-program-copy b,
+main.app .home-feature-grid .home-nutrition-main-copy b,
+main.app .home-feature-grid .home-shop-copy b{font-size:14px!important;color:#123d5c!important}
+main.app .home-feature-grid .home-feature-tile small,
+main.app .home-feature-grid .home-workout-program-copy small,
+main.app .home-feature-grid .home-nutrition-main-copy small,
+main.app .home-feature-grid .home-shop-copy small{font-size:10px!important;color:#628096!important}
+main.app .home-feature-grid .home-feature-tile>span,
+main.app .home-feature-grid .home-workout-program-art,
+main.app .home-feature-grid .home-nutrition-main-art,
+main.app .home-feature-grid .home-shop-art{
+ background:linear-gradient(145deg,#d9effb,#f8fcff)!important;
+ border:1px solid #d1e9f7!important;border-radius:17px!important
+}
+main.app .home-training-layers .home-layer-tile,
+main.app .home-nutrition-layers .home-nutrition-layer{
+ border:1px solid #cfe5f3;border-radius:17px;
+ background:linear-gradient(145deg,#fff,#edf7fd);
+ box-shadow:0 7px 18px rgba(27,100,147,.07);color:#164563
+}
+main.app .anatomy-panel{
+ background:radial-gradient(ellipse at 50% 0%,#174b73 0%,#0b2b47 52%,#061d32 100%)!important;
+ border:1px solid #28658f!important;border-radius:26px!important;
+ box-shadow:0 18px 42px rgba(6,35,60,.24)!important;color:#f5fbff!important
+}
+main.app .anatomy-panel h2,main.app .anatomy-panel p{color:#f4faff!important}
+main.app .anatomy-kicker{color:#75d1ff!important}
+main.app .anatomy-view{
+ background:linear-gradient(160deg,#143d60,#092843)!important;
+ border:1px solid rgba(153,215,246,.22)!important;border-radius:19px!important
+}
+main.app .anatomy-view-title{color:#f3faff!important}
+main.app .anatomy-view-title span,main.app .anatomy-legend{color:#a9c9df!important}
+main.app .anatomy-live{color:#7bd4ff!important;border-color:#5cb8e65c!important}
+main.app .coach-panel-shell{padding:14px}
+main.app .coach-panel-tabs{background:#eaf5fc;border-color:#d0e5f3;border-radius:16px}
+main.app .coach-panel-tabs button{border-radius:12px}
+main.app .coach-panel-tabs button.active{background:linear-gradient(135deg,#168fd0,#086cae);color:#fff;box-shadow:0 6px 14px rgba(8,108,174,.2)}
+main.app .coach-grid,main.app .library-grid,main.app .food-launch-grid,
+main.app .plan-grid,main.app .corrective-grid,main.app .food-recipe-grid{gap:12px}
+main.app .coach-profile-tile,main.app .coach-info,main.app .coach-shortcuts,
+main.app .food-launch-tile,main.app .lib-card,main.app .plan-option,
+main.app .corrective-card,main.app .shop-product,main.app .food-recipe-card,
+main.app .recipe-tile,main.app .basket-tile,main.app .meal-basket-tile{
+ border:1px solid #d0e6f4!important;border-radius:20px!important;
+ background:linear-gradient(150deg,#fff,#eff8fd)!important;
+ box-shadow:0 9px 23px rgba(27,100,147,.08)!important;overflow:hidden
+}
+main.app .coach-photo,main.app .food-launch-art{border-radius:16px;overflow:hidden}
+main.app .music-shell{background:linear-gradient(145deg,#0a2b48,#123e60)!important;border:1px solid #2a6289!important;color:#f5fbff!important}
+main.app .music-shell .music-meta,main.app .music-shell .music-meta b{color:#f5fbff}
+main.app .music-shell .muted{color:#b5d1e3}
+main.app .music-art{background:linear-gradient(145deg,#168fd0,#082a48);border:1px solid #5db8e4}
+main.app .music-track{border:1px solid rgba(162,213,241,.2);border-radius:14px}
+main.app .music-controls button{border-radius:50%}
+main.app .public-user-code{border:1px solid #c5e3f3;box-shadow:inset 0 1px #fff,0 7px 16px rgba(25,105,153,.08)}
+main.app .contact-card,main.app .admin-note{border-radius:17px}
+main.app .side-nav button.active,main.app .side-nav button:hover{background:linear-gradient(135deg,#eaf7fe,#d8effc);color:#087fc3}
+@media(max-width:480px){
+ main.app{padding-left:12px!important;padding-right:12px!important}
+ main.app .home-hub{padding:12px}
+ main.app .home-primary-grid{gap:9px}
+ main.app .home-primary-grid .home-training-launch,main.app .home-primary-grid .home-ai-launch{min-height:148px;padding:10px}
+ main.app .home-feature-grid{gap:9px!important}
+ main.app .home-feature-grid>.home-workout-program-launch,main.app .home-feature-grid>.home-feature-tile,main.app .home-feature-grid>.home-shop-launch{min-height:132px!important;padding:10px!important}
+ main.app .card{padding:13px;border-radius:18px}
+}
+@media(prefers-reduced-motion:reduce){main.app>section:not(.hidden){animation:none!important}main.app button{transition:none!important}}
