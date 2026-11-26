@@ -1494,32 +1494,67 @@ async function renderIronEducation(){
  el.textContent='در حال دریافت آموزش‌ها...';
  try{
   const {data:{user}}=await supabaseClient.auth.getUser();
-  let isAdmin=false,isApprovedCoach=false;
+  let isAdmin=false,isApprovedCoach=false,isApprovedStudent=false;
   if(user){
    const {data:admin,error:adminError}=await supabaseClient.from('iron_admins_v2').select('is_main_admin').eq('user_id',user.id).maybeSingle();
    if(adminError)console.warn('Education admin check:',adminError.message);
    isAdmin=!!admin?.is_main_admin;
-   if(!isAdmin){
-    const {data:coach,error:coachError}=await supabaseClient.from('iron_account_roles_v2').select('role,status').eq('user_id',user.id).maybeSingle();
-    if(coachError)console.warn('Education coach check:',coachError.message);
-    isApprovedCoach=coach?.role==='coach'&&coach?.status==='approved';
-   }
+   const {data:role,error:roleError}=await supabaseClient.from('iron_account_roles_v2').select('role,status').eq('user_id',user.id).maybeSingle();
+   if(roleError)console.warn('Education role check:',roleError.message);
+   isApprovedCoach=role?.role==='coach'&&role?.status==='approved';
+   isApprovedStudent=role?.role==='student'&&role?.status==='approved';
   }
   const canDelete=isAdmin||isApprovedCoach;
-  let request=supabaseClient.from('iron_education_v2').select('id,title,description,category,video_url,thumbnail_url,media_type,is_published').order('created_at',{ascending:false});
+  let request=supabaseClient.from('iron_education_v2').select('id,title,description,category,video_url,thumbnail_url,media_type,is_published,coach_id').order('created_at',{ascending:false});
   if(!isAdmin)request=request.eq('is_published',true);
   const {data,error}=await request;
   if(error)throw error;
+  const coachIds=[...new Set((data||[]).map(x=>x.coach_id).filter(Boolean))];
+  const coachNames=new Map();
+  if(coachIds.length){
+   const {data:directory,error:directoryError}=await supabaseClient.rpc('iron_public_coach_directory_v1');
+   if(!directoryError)(directory||[]).forEach(c=>coachNames.set(c.user_id,c.full_name||'مربی تأییدشده'));
+   else console.warn('Education coach directory:',directoryError.message);
+  }
+  const myRequests=new Map();
+  if(user&&isApprovedStudent&&coachIds.length){
+   const {data:links,error:linksError}=await supabaseClient.from('iron_coach_students_v2').select('coach_id,status').eq('student_id',user.id).in('coach_id',coachIds);
+   if(!linksError)(links||[]).forEach(x=>myRequests.set(x.coach_id,x.status));
+   else console.warn('Education coach request status:',linksError.message);
+  }
   const q=(document.getElementById('educationSearch')?.value||'').trim().toLowerCase();
   const rows=(data||[]).filter(x=>(x.title+' '+x.description+' '+x.category).toLowerCase().includes(q));
   el.innerHTML=rows.length?rows.map(v=>{
    const isVideo=/^video\//i.test(v.media_type||'')||/\.(mp4|webm|mov)(\?|$)/i.test(v.video_url||'');
    const media=isVideo?'<video controls playsinline preload="metadata" poster="'+safe(v.thumbnail_url||'')+'" src="'+safe(v.video_url)+'" style="width:100%;max-height:320px;border-radius:14px;background:#000"></video>':'<img loading="lazy" src="'+safe(v.video_url)+'" alt="'+safe(v.title)+'" style="width:100%;max-height:320px;object-fit:contain;border-radius:14px">';
    const draft=isAdmin&&!v.is_published?'<span class="pill" style="background:#fff0c2;color:#8a5b00">پیش‌نویس</span>':'';
+   const coachName=v.coach_id?(coachNames.get(v.coach_id)||'مربی'): '';
+   const status=myRequests.get(v.coach_id);
+   let connect='';
+   if(v.coach_id&&user&&isApprovedStudent&&v.coach_id!==user.id){
+    if(status==='approved')connect='<div class="result-box">اتصال شما با این مربی برقرار است.</div>';
+    else if(status==='pending')connect='<div class="result-box">درخواست همکاری ارسال شده و منتظر پاسخ مربی است.</div>';
+    else connect='<button class="btn small" type="button" onclick="requestEducationCoach(\''+safe(v.coach_id)+'\')">درخواست همکاری با '+safe(coachName||'این مربی')+'</button>';
+   }
+   const coachLine=v.coach_id?'<div class="muted" style="margin:6px 0">منتشرشده توسط: '+safe(coachName||'مربی')+'</div>':'';
    const action=(isAdmin&&!v.is_published?'<button class="btn small" type="button" onclick="publishIronEducation(\''+safe(v.id)+'\')">انتشار برای همه کاربران</button>':'')+(canDelete?'<button class="btn secondary small" type="button" onclick="deleteIronEducation(\''+safe(v.id)+'\')">حذف محتوا</button>':'');
-   return '<div class="card"><div class="row between" style="align-items:center;gap:8px;flex-wrap:wrap"><b>'+safe(v.title)+'</b>'+draft+'</div><div class="muted">'+safe(v.category)+'</div>'+media+'<p>'+safe(v.description||'')+'</p>'+action+'</div>';
+   return '<div class="card"><div class="row between" style="align-items:center;gap:8px;flex-wrap:wrap"><b>'+safe(v.title)+'</b>'+draft+'</div><div class="muted">'+safe(v.category)+'</div>'+coachLine+media+'<p>'+safe(v.description||'')+'</p><div class="row" style="gap:8px;flex-wrap:wrap">'+connect+action+'</div></div>';
   }).join(''):(isAdmin?'هنوز محتوای آموزشی ثبت نشده است.':'هنوز محتوای آموزشی منتشرشده‌ای ثبت نشده است.');
  }catch(error){el.textContent='دریافت آموزش‌ها ناموفق بود: '+(error?.message||'خطای ناشناخته')}
+}
+async function requestEducationCoach(coachId){
+ if(!/^[0-9a-f-]{36}$/i.test(String(coachId)))return toast('شناسه مربی معتبر نیست');
+ const {data:{user}}=await supabaseClient.auth.getUser();
+ if(!user)return toast('برای درخواست همکاری ابتدا وارد حساب شو');
+ const {data:role,error:roleError}=await supabaseClient.from('iron_account_roles_v2').select('role,status').eq('user_id',user.id).maybeSingle();
+ if(roleError)return toast('بررسی نقش حساب ناموفق بود: '+roleError.message);
+ if(role?.role!=='student'||role?.status!=='approved')return toast('ارسال درخواست فقط برای شاگرد تأییدشده امکان‌پذیر است');
+ if(user.id===coachId)return toast('نمی‌توانی برای حساب خودت درخواست همکاری بفرستی');
+ const {data,error}=await supabaseClient.rpc('iron_request_coach_connection_v2',{p_coach_id:coachId});
+ if(error)return toast('ارسال درخواست ناموفق بود: '+error.message);
+ toast(data||'درخواست همکاری برای مربی ارسال شد');
+ await renderIronEducation();
+ await loadIronCoachLinks();
 }
 async function ironEducationCanDelete(){
  const {data:{user}}=await supabaseClient.auth.getUser();if(!user)return false;
@@ -1569,7 +1604,7 @@ async function publishIronEducation(id){
 }
 async function ironEducationCanUpload(){const {data:{user}}=await supabaseClient.auth.getUser();if(!user)return false;const {data:admin,error:adminError}=await supabaseClient.from('iron_admins_v2').select('is_main_admin').eq('user_id',user.id).maybeSingle();if(!adminError&&admin?.is_main_admin)return true;const {data:coach,error:coachError}=await supabaseClient.from('iron_account_roles_v2').select('role,status').eq('user_id',user.id).maybeSingle();return !coachError&&coach?.role==='coach'&&coach?.status==='approved'}
 async function loadEducationAdmin(){const el=document.getElementById('educationAdmin');if(!el)return;el.classList.toggle('hidden',!await ironEducationCanUpload())}
-async function adminAddEducation(){const title=document.getElementById('educationTitle').value.trim(),category=document.getElementById('educationCategory').value.trim(),description=document.getElementById('educationDescription').value.trim(),media=document.getElementById('educationMediaFile')?.files?.[0],thumb=document.getElementById('educationThumbFile')?.files?.[0];if(title.length<2||!media)return toast('عنوان و فایل عکس یا ویدئو را انتخاب کن');if(media.size>50*1024*1024||thumb?.size>10*1024*1024)return toast('حجم فایل اصلی حداکثر ۵۰ و تصویر بندانگشتی حداکثر ۱۰ مگابایت است');const allowedImages=['image/jpeg','image/png','image/webp','image/gif','image/avif'],allowedVideos=['video/mp4','video/webm','video/quicktime'];const extensionMime=name=>/\\.(mp4|m4v)$/i.test(name||'')?'video/mp4':/\\.webm$/i.test(name||'')?'video/webm':/\\.mov$/i.test(name||'')?'video/quicktime':/\\.png$/i.test(name||'')?'image/png':/\\.webp$/i.test(name||'')?'image/webp':/\\.gif$/i.test(name||'')?'image/gif':/\\.avif$/i.test(name||'')?'image/avif':'image/jpeg';const mediaMime=allowedImages.includes(media.type)||allowedVideos.includes(media.type)?media.type:(!media.type||media.type==='application/octet-stream')?extensionMime(media.name):media.type;if(!allowedImages.includes(mediaMime)&&!allowedVideos.includes(mediaMime))return toast('فرمت عکس یا ویدئو پشتیبانی نمی‌شود');if(thumb&&!allowedImages.includes(thumb.type))return toast('فرمت تصویر بندانگشتی پشتیبانی نمی‌شود');const {data:{user}}=await supabaseClient.auth.getUser();if(!user)return toast('ابتدا وارد حساب کاربری شو');if(!await ironEducationCanUpload())return toast('آپلود آموزش فقط برای مدیر اصلی و مربی تأییدشده مجاز است');const safeName=f=>String(f.name||'media').normalize('NFKC').replace(/[^\p{L}\p{N}._-]+/gu,'-').slice(-90);const paths=[];const upload=async file=>{const path=user.id+'/'+Date.now()+'-'+crypto.randomUUID()+'-'+safeName(file);const {error}=await supabaseClient.storage.from('iron-education-media').upload(path,file,{contentType:file===media?mediaMime:(file.type||extensionMime(file.name)),upsert:false,cacheControl:'31536000'});if(error)throw error;paths.push(path);return supabaseClient.storage.from('iron-education-media').getPublicUrl(path).data.publicUrl};try{const video_url=await upload(media),thumbnail_url=thumb?await upload(thumb):null;const {data:created,error}=await supabaseClient.from('iron_education_v2').insert({title,category,video_url,thumbnail_url,description,media_type:mediaMime,is_published:true}).select('id').single();if(error)throw error;if(!created?.id)throw new Error('رکورد آموزش در پایگاه داده ثبت نشد');document.getElementById('educationTitle').value='';document.getElementById('educationMediaFile').value='';document.getElementById('educationThumbFile').value='';document.getElementById('educationDescription').value='';toast('محتوای آموزشی منتشر شد');await renderIronEducation()}catch(error){if(paths.length)await supabaseClient.storage.from('iron-education-media').remove(paths);toast('انتشار ناموفق بود: '+(error?.message||'خطای ناشناخته'))}}
+async function adminAddEducation(){const title=document.getElementById('educationTitle').value.trim(),category=document.getElementById('educationCategory').value.trim(),description=document.getElementById('educationDescription').value.trim(),media=document.getElementById('educationMediaFile')?.files?.[0],thumb=document.getElementById('educationThumbFile')?.files?.[0];if(title.length<2||!media)return toast('عنوان و فایل عکس یا ویدئو را انتخاب کن');if(media.size>50*1024*1024||thumb?.size>10*1024*1024)return toast('حجم فایل اصلی حداکثر ۵۰ و تصویر بندانگشتی حداکثر ۱۰ مگابایت است');const allowedImages=['image/jpeg','image/png','image/webp','image/gif','image/avif'],allowedVideos=['video/mp4','video/webm','video/quicktime'];const extensionMime=name=>/\\.(mp4|m4v)$/i.test(name||'')?'video/mp4':/\\.webm$/i.test(name||'')?'video/webm':/\\.mov$/i.test(name||'')?'video/quicktime':/\\.png$/i.test(name||'')?'image/png':/\\.webp$/i.test(name||'')?'image/webp':/\\.gif$/i.test(name||'')?'image/gif':/\\.avif$/i.test(name||'')?'image/avif':'image/jpeg';const mediaMime=allowedImages.includes(media.type)||allowedVideos.includes(media.type)?media.type:(!media.type||media.type==='application/octet-stream')?extensionMime(media.name):media.type;if(!allowedImages.includes(mediaMime)&&!allowedVideos.includes(mediaMime))return toast('فرمت عکس یا ویدئو پشتیبانی نمی‌شود');if(thumb&&!allowedImages.includes(thumb.type))return toast('فرمت تصویر بندانگشتی پشتیبانی نمی‌شود');const {data:{user}}=await supabaseClient.auth.getUser();if(!user)return toast('ابتدا وارد حساب کاربری شو');if(!await ironEducationCanUpload())return toast('آپلود آموزش فقط برای مدیر اصلی و مربی تأییدشده مجاز است');const safeName=f=>String(f.name||'media').normalize('NFKC').replace(/[^\p{L}\p{N}._-]+/gu,'-').slice(-90);const paths=[];const upload=async file=>{const path=user.id+'/'+Date.now()+'-'+crypto.randomUUID()+'-'+safeName(file);const {error}=await supabaseClient.storage.from('iron-education-media').upload(path,file,{contentType:file===media?mediaMime:(file.type||extensionMime(file.name)),upsert:false,cacheControl:'31536000'});if(error)throw error;paths.push(path);return supabaseClient.storage.from('iron-education-media').getPublicUrl(path).data.publicUrl};try{const video_url=await upload(media),thumbnail_url=thumb?await upload(thumb):null;const {data:role}=await supabaseClient.from('iron_account_roles_v2').select('role,status').eq('user_id',user.id).maybeSingle();const {data:created,error}=await supabaseClient.from('iron_education_v2').insert({title,category,video_url,thumbnail_url,description,media_type:mediaMime,is_published:true,coach_id:role?.role==='coach'&&role?.status==='approved'?user.id:null}).select('id').single();if(error)throw error;if(!created?.id)throw new Error('رکورد آموزش در پایگاه داده ثبت نشد');document.getElementById('educationTitle').value='';document.getElementById('educationMediaFile').value='';document.getElementById('educationThumbFile').value='';document.getElementById('educationDescription').value='';toast('محتوای آموزشی منتشر شد');await renderIronEducation()}catch(error){if(paths.length)await supabaseClient.storage.from('iron-education-media').remove(paths);toast('انتشار ناموفق بود: '+(error?.message||'خطای ناشناخته'))}}
 async function icLoadRole(){const {data:{user}}=await supabaseClient.auth.getUser();const select=document.getElementById('icRole'),status=document.getElementById('icStatus');if(!select||!status)return;if(!user){select.disabled=false;status.textContent='برای انتخاب نقش ابتدا وارد حساب شو.';return}const {data,error}=await supabaseClient.from('iron_account_roles_v2').select('role,status').eq('user_id',user.id).maybeSingle();if(error){status.textContent='خطا در دریافت نقش: '+error.message;return}if(data){select.value=data.role;select.disabled=true;const labels={approved:'تأییدشده',pending:'در انتظار تأیید مدیر اصلی',rejected:'ردشده',suspended:'تعلیق‌شده'};status.textContent='نقش ثبت‌شده: '+(data.role==='coach'?'مربی':'شاگرد')+' · '+(labels[data.status]||data.status)+' · نقش تا خروج از حساب قابل تغییر نیست.'}else{select.disabled=false;status.textContent='نقش را فقط یک‌بار برای این حساب انتخاب کن.'}}
 async function icSaveRole(){const name=document.getElementById('icName').value.trim(),role=document.getElementById('icRole').value;const {data:{user}}=await supabaseClient.auth.getUser();if(!user){document.getElementById('icStatus').textContent='ابتدا از بخش پروفایل وارد حساب کاربری شو.';return}const {data:existing,error:readError}=await supabaseClient.from('iron_account_roles_v2').select('role,status').eq('user_id',user.id).maybeSingle();if(readError){document.getElementById('icStatus').textContent='خطا: '+readError.message;return}if(existing){document.getElementById('icStatus').textContent='نقش قبلی این حساب قابل تغییر نیست: '+(existing.role==='coach'?'مربی':'شاگرد');await icLoadRole();return}const {error}=await supabaseClient.rpc('iron_set_role',{p_role:role,p_display_name:name});if(error){document.getElementById('icStatus').textContent='خطا: '+error.message;return}await icLoadRole();await loadIronAdminPanel();await loadIronCoachProfile()}
 
