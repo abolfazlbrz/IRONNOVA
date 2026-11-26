@@ -1832,22 +1832,40 @@ function clearIronAiChat(){
 async function sendIronAiMessage(){
  if(ironAiBusy)return;
  const input=document.getElementById('ironAiInput'),button=document.getElementById('ironAiSend'),status=document.getElementById('ironAiStatus');
- const message=(input?.value||'').trim();if(!message){if(status)status.textContent='اول پیام را بنویس.';return}
+ const message=(input?.value||'').trim();
+ if(!message){if(status)status.textContent='اول پیام را بنویس.';return}
  if(message.length>3000){if(status)status.textContent='پیام بیش از حد طولانی است.';return}
- const {data:{session}}=await supabaseClient.auth.getSession();
- if(!session?.access_token){if(status)status.textContent='برای استفاده از دستیار ابتدا وارد حساب کاربری شو.';return}
- ironAiBusy=true;if(button){button.disabled=true;button.textContent='در حال پاسخ...'}
- input.value='';ironAiAddBubble('user',message);ironAiHistory.push({role:'user',content:message});
- if(status)status.textContent='در حال دریافت پاسخ امن از سرور...';
+ ironAiBusy=true;
+ if(button){button.disabled=true;button.textContent='در حال ارسال...'}
+ input.value='';
+ ironAiAddBubble('user',message);
+ ironAiHistory.push({role:'user',content:message});
+ if(status)status.textContent='در حال بررسی حساب کاربری...';
  try{
+  if(!window.supabaseClient?.auth)throw new Error('اتصال حساب کاربری آماده نیست؛ صفحه را یک‌بار تازه‌سازی کن.');
+  const {data,error:sessionError}=await supabaseClient.auth.getSession();
+  if(sessionError)throw new Error('بررسی حساب ناموفق بود: '+sessionError.message);
+  const session=data?.session;
+  if(!session?.access_token)throw new Error('برای استفاده از دستیار ابتدا وارد حساب کاربری شو.');
+  if(status)status.textContent='پیام ارسال شد؛ در حال دریافت پاسخ...';
+  if(button)button.textContent='در حال پاسخ...';
   const response=await fetch(SUPABASE_URL+'/functions/v1/ironnova-ai-assistant',{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+session.access_token},body:JSON.stringify({messages:ironAiHistory.slice(-12)})});
   const payload=await response.json().catch(()=>({}));
   if(!response.ok)throw new Error(payload.error||('خطای سرور ('+response.status+')'));
   const answer=String(payload.answer||'پاسخی دریافت نشد.').slice(0,12000);
-  ironAiHistory.push({role:'assistant',content:answer});ironAiAddBubble('assistant',answer);
+  ironAiHistory.push({role:'assistant',content:answer});
+  ironAiAddBubble('assistant',answer);
   if(status)status.textContent='پاسخ دریافت شد.';
- }catch(error){ironAiHistory.pop();ironAiAddBubble('assistant','ارسال پیام ناموفق بود: '+(error?.message||'خطای ناشناخته'));if(status)status.textContent='اتصال دستیار برقرار نشد.'}
- finally{ironAiBusy=false;if(button){button.disabled=false;button.textContent='ارسال پیام'};input?.focus()}
+ }catch(error){
+  ironAiHistory.pop();
+  const reason=String(error?.message||'خطای ناشناخته');
+  ironAiAddBubble('assistant','ارسال پیام ناموفق بود: '+reason);
+  if(status)status.textContent=reason;
+ }finally{
+  ironAiBusy=false;
+  if(button){button.disabled=false;button.textContent='ارسال پیام'}
+  input?.focus();
+ }
 }
 async function registerIronInstall(){
  try{
