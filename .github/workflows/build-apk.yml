@@ -10,6 +10,7 @@ on:
       - release/ironnova-exercise-images
       - feature/admin-app-diagnostics
       - feature/2026-11-26-visual-refresh-six-digit-codes
+      - feature/reference-match-2026-11-26
 
 jobs:
   build:
