@@ -58,34 +58,56 @@ Deno.serve(async (req: Request) => {
     return json({ error: "حجم یا ترتیب پیام‌ها معتبر نیست." }, 400);
   }
 
-  const aiResponse = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${openRouterKey}`,
-      "Content-Type": "application/json",
-      "HTTP-Referer": "https://ironnova.app",
-      "X-Title": "IRONNOVA",
-    },
-    body: JSON.stringify({
-      model: "openrouter/free",
-      messages: [{ role: "system", content: systemPrompt }, ...messages],
-      max_tokens: 700,
-      stream: true,
-      provider: {
-        sort: "latency",
-        data_collection: "deny",
-        zdr: true,
+  let aiResponse: Response;
+  try {
+    aiResponse = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${openRouterKey}`,
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://ironnova.app",
+        "X-Title": "IRONNOVA",
       },
-    }),
-  });
+      body: JSON.stringify({
+        model: "openrouter/free",
+        messages: [{ role: "system", content: systemPrompt }, ...messages],
+        max_tokens: 700,
+        stream: true,
+        provider: { sort: "latency", data_collection: "deny" },
+      }),
+    });
+  } catch (error) {
+    console.error("IRONNOVA OpenRouter connection failed", error instanceof Error ? error.name : "unknown");
+    return json({ error: "اتصال به سرویس هوش مصنوعی برقرار نشد؛ چند لحظه بعد دوباره امتحان کن." }, 502);
+  }
   if (!aiResponse.ok) {
-    const aiBody = await aiResponse.json().catch(() => ({}));
-    console.error("IRONNOVA free assistant upstream error", aiResponse.status, aiBody?.error?.code || "");
+    const errorText = await aiResponse.text().catch(() => "");
+    let upstreamCode = "";
+    try { upstreamCode = JSON.parse(errorText)?.error?.code || ""; } catch { /* non-JSON upstream error */ }
+    console.error("IRONNOVA free assistant upstream error", aiResponse.status, upstreamCode);
     return json({ error: aiResponse.status === 429
       ? "سهمیه رایگان هوش مصنوعی فعلاً تمام شده است؛ کمی بعد دوباره امتحان کن."
-      : "سرویس رایگان هوش مصنوعی فعلاً پاسخ نداد. تنظیمات کلید و سرویس را بررسی کن." }, 502);
+      : aiResponse.status === 401 || aiResponse.status === 402
+        ? "کلید یا اعتبار سرویس هوش مصنوعی مشکل دارد؛ مدیر برنامه باید تنظیمات سرور را بررسی کند."
+        : "مدل رایگان فعلاً پاسخ‌گو نیست؛ چند لحظه بعد دوباره امتحان کن." }, 502);
   }
   if (!aiResponse.body) return json({ error: "جریان پاسخ هوش مصنوعی برقرار نشد؛ دوباره امتحان کن." }, 502);
+
+  const contentType = aiResponse.headers.get("content-type") || "";
+  if (contentType.includes("application/json")) {
+    const payload = await aiResponse.json().catch(() => null);
+    const content = payload?.choices?.[0]?.message?.content;
+    if (typeof content !== "string" || !content.trim()) {
+      console.error("IRONNOVA OpenRouter returned empty JSON response");
+      return json({ error: "مدل هوش مصنوعی پاسخ متنی برنگرداند؛ دوباره امتحان کن." }, 502);
+    }
+    const event = `data: ${JSON.stringify({ choices: [{ delta: { content }, finish_reason: null }] })}\\n\\ndata: [DONE]\\n\\n`;
+    return new Response(event, {
+      status: 200,
+      headers: { ...corsHeaders, "Content-Type": "text/event-stream; charset=utf-8", "Cache-Control": "no-cache, no-transform" },
+    });
+  }
+
   return new Response(aiResponse.body, {
     status: 200,
     headers: {

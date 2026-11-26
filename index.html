@@ -1950,17 +1950,29 @@ async function sendIronAiMessage(){
   if(button)button.textContent='در حال نوشتن...';
   const reader=response.body.getReader(),decoder=new TextDecoder();
   let buffer='',finished=false;
+  let streamError='';
   const consumeLine=line=>{
    const trimmed=line.trim();
-   if(!trimmed.startsWith('data:'))return;
+   if(!trimmed||trimmed.startsWith(':')||!trimmed.startsWith('data:'))return;
    const raw=trimmed.slice(5).trim();
    if(raw==='[DONE]'){finished=true;return}
    if(!raw)return;
    try{
     const packet=JSON.parse(raw);
-    const delta=packet?.choices?.[0]?.delta?.content;
-    if(typeof delta==='string'&&delta){
-     answer+=delta;
+    const upstreamError=packet?.error||packet?.choices?.[0]?.error;
+    if(upstreamError){
+     streamError=String(upstreamError?.message||upstreamError?.code||upstreamError);
+     finished=true;return;
+    }
+    const choice=packet?.choices?.[0];
+    if(choice?.finish_reason==='error'){
+     streamError='ارائه‌دهنده هوش مصنوعی هنگام تولید پاسخ خطا داد.';
+     finished=true;return;
+    }
+    const delta=choice?.delta?.content;
+    const chunkText=typeof delta==='string'?delta:Array.isArray(delta)?delta.map(x=>typeof x?.text==='string'?x.text:'').join(''):'';
+    if(chunkText){
+     answer+=chunkText;
      if(assistantBubble)assistantBubble.textContent=answer;
      if(wrap)wrap.scrollTop=wrap.scrollHeight;
     }
@@ -1971,10 +1983,12 @@ async function sendIronAiMessage(){
    if(part.done)break;
    buffer+=decoder.decode(part.value,{stream:true});
    const lines=buffer.split(/\r?\n/);buffer=lines.pop()||'';
-   for(const line of lines)consumeLine(line);
+   for(const line of lines){consumeLine(line);if(finished)break}
   }
+  buffer+=decoder.decode();
   if(buffer)consumeLine(buffer);
-  if(!answer.trim())throw new Error('پاسخ هوش مصنوعی خالی بود؛ دوباره امتحان کن.');
+  if(streamError)throw new Error('خطای سرویس هوش مصنوعی: '+streamError);
+  if(!answer.trim())throw new Error('سرویس پاسخ خالی فرستاد؛ ممکن است مدل رایگان موقتاً در دسترس نباشد. دوباره امتحان کن.');
   ironAiHistory.push({role:'assistant',content:answer.slice(0,12000)});
   if(status)status.textContent='پاسخ کامل شد.';
  }catch(error){
