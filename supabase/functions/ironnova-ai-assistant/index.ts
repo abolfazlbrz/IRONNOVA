@@ -69,8 +69,10 @@ Deno.serve(async (req: Request) => {
     body: JSON.stringify({
       model: "openrouter/free",
       messages: [{ role: "system", content: systemPrompt }, ...messages],
-      max_tokens: 900,
+      max_tokens: 700,
+      stream: true,
       provider: {
+        sort: "latency",
         data_collection: "deny",
         zdr: true,
       },
@@ -83,7 +85,15 @@ Deno.serve(async (req: Request) => {
       ? "سهمیه رایگان هوش مصنوعی فعلاً تمام شده است؛ کمی بعد دوباره امتحان کن."
       : "سرویس رایگان هوش مصنوعی فعلاً پاسخ نداد. تنظیمات کلید و سرویس را بررسی کن." }, 502);
   }
-  const answer = aiBody.choices?.[0]?.message?.content || "";
-  if (!String(answer).trim()) return json({ error: "پاسخ هوش مصنوعی خالی بود؛ دوباره امتحان کن." }, 502);
-  return json({ answer: String(answer).slice(0, 12000) });
+  if (!aiResponse.body) return json({ error: "جریان پاسخ هوش مصنوعی برقرار نشد؛ دوباره امتحان کن." }, 502);
+  return new Response(aiResponse.body, {
+    status: 200,
+    headers: {
+      ...corsHeaders,
+      "Content-Type": "text/event-stream; charset=utf-8",
+      "Cache-Control": "no-cache, no-transform",
+      "Connection": "keep-alive",
+      "X-Accel-Buffering": "no",
+    },
+  });
 });
