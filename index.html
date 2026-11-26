@@ -1492,12 +1492,18 @@ async function renderIronEducation(){
  el.textContent='در حال دریافت آموزش‌ها...';
  try{
   const {data:{user}}=await supabaseClient.auth.getUser();
-  let isAdmin=false;
+  let isAdmin=false,isApprovedCoach=false;
   if(user){
    const {data:admin,error:adminError}=await supabaseClient.from('iron_admins_v2').select('is_main_admin').eq('user_id',user.id).maybeSingle();
    if(adminError)console.warn('Education admin check:',adminError.message);
    isAdmin=!!admin?.is_main_admin;
+   if(!isAdmin){
+    const {data:coach,error:coachError}=await supabaseClient.from('iron_account_roles_v2').select('role,status').eq('user_id',user.id).maybeSingle();
+    if(coachError)console.warn('Education coach check:',coachError.message);
+    isApprovedCoach=coach?.role==='coach'&&coach?.status==='approved';
+   }
   }
+  const canDelete=isAdmin||isApprovedCoach;
   let request=supabaseClient.from('iron_education_v2').select('id,title,description,category,video_url,thumbnail_url,media_type,is_published').order('created_at',{ascending:false});
   if(!isAdmin)request=request.eq('is_published',true);
   const {data,error}=await request;
@@ -1508,15 +1514,17 @@ async function renderIronEducation(){
    const isVideo=/^video\//i.test(v.media_type||'')||/\.(mp4|webm|mov)(\?|$)/i.test(v.video_url||'');
    const media=isVideo?'<video controls playsinline preload="metadata" poster="'+safe(v.thumbnail_url||'')+'" src="'+safe(v.video_url)+'" style="width:100%;max-height:320px;border-radius:14px;background:#000"></video>':'<img loading="lazy" src="'+safe(v.video_url)+'" alt="'+safe(v.title)+'" style="width:100%;max-height:320px;object-fit:contain;border-radius:14px">';
    const draft=isAdmin&&!v.is_published?'<span class="pill" style="background:#fff0c2;color:#8a5b00">پیش‌نویس</span>':'';
-   const action=isAdmin?((!v.is_published?'<button class="btn small" type="button" onclick="publishIronEducation(\''+safe(v.id)+'\')">انتشار برای همه کاربران</button>':'')+'<button class="btn secondary small" type="button" onclick="deleteIronEducation(\''+safe(v.id)+'\')">حذف محتوا</button>'):'';
+   const action=(isAdmin&&!v.is_published?'<button class="btn small" type="button" onclick="publishIronEducation(\\''+safe(v.id)+'\\')">انتشار برای همه کاربران</button>':'')+(canDelete?'<button class="btn secondary small" type="button" onclick="deleteIronEducation(\\''+safe(v.id)+'\\')">حذف محتوا</button>':'');
    return '<div class="card"><div class="row between" style="align-items:center;gap:8px;flex-wrap:wrap"><b>'+safe(v.title)+'</b>'+draft+'</div><div class="muted">'+safe(v.category)+'</div>'+media+'<p>'+safe(v.description||'')+'</p>'+action+'</div>';
   }).join(''):(isAdmin?'هنوز محتوای آموزشی ثبت نشده است.':'هنوز محتوای آموزشی منتشرشده‌ای ثبت نشده است.');
  }catch(error){el.textContent='دریافت آموزش‌ها ناموفق بود: '+(error?.message||'خطای ناشناخته')}
 }
-async function ironEducationAdminAllowed(){
+async function ironEducationCanDelete(){
  const {data:{user}}=await supabaseClient.auth.getUser();if(!user)return false;
- const {data,error}=await supabaseClient.from('iron_admins_v2').select('is_main_admin').eq('user_id',user.id).maybeSingle();
- return !error&&!!data?.is_main_admin;
+ const {data:admin,error:adminError}=await supabaseClient.from('iron_admins_v2').select('is_main_admin').eq('user_id',user.id).maybeSingle();
+ if(!adminError&&admin?.is_main_admin)return true;
+ const {data:coach,error:coachError}=await supabaseClient.from('iron_account_roles_v2').select('role,status').eq('user_id',user.id).maybeSingle();
+ return !coachError&&coach?.role==='coach'&&coach?.status==='approved';
 }
 function ironEducationStoragePath(url){
  if(!url)return null;
@@ -1524,7 +1532,7 @@ function ironEducationStoragePath(url){
 }
 async function deleteIronEducation(id){
  if(!/^[0-9a-f-]{36}$/i.test(String(id)))return toast('شناسه محتوای آموزشی معتبر نیست');
- if(!await ironEducationAdminAllowed())return toast('فقط مدیر اصلی اجازه حذف آموزش را دارد');
+ if(!await ironEducationCanDelete())return toast('حذف آموزش فقط برای مدیر اصلی و مربی تأییدشده مجاز است');
  if(!confirm('این محتوای آموزشی و فایل‌های پیوست آن حذف شوند؟ این کار قابل بازگشت نیست.'))return;
  const {data:item,error:readError}=await supabaseClient.from('iron_education_v2').select('id,title,video_url,thumbnail_url').eq('id',id).maybeSingle();
  if(readError)return toast('دریافت محتوا ناموفق بود: '+readError.message);
