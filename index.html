@@ -2122,18 +2122,6 @@ async function saveIronCoachProfile(){
  const {error}=await supabaseClient.from('iron_coach_profiles_v2').upsert(profile,{onConflict:'user_id'});
  document.getElementById('icCoachProfileStatus').textContent=error?'خطا: '+error.message:'پروفایل مربی ذخیره شد.';
 }
-async function icSaveRole(){
- const name=document.getElementById('icName').value.trim(),role=document.getElementById('icRole').value;
- const {data:{user}}=await supabaseClient.auth.getUser();
- if(!user){document.getElementById('icStatus').textContent='ابتدا از بخش پروفایل وارد حساب کاربری شو.';return}
- const {error}=await supabaseClient.rpc('iron_set_role',{p_role:role,p_display_name:name});
- if(error){document.getElementById('icStatus').textContent='خطا: '+error.message;return}
- const {data:current,error:readError}=await supabaseClient.from('iron_account_roles_v2').select('role,status').eq('user_id',user.id).maybeSingle();
- if(readError){document.getElementById('icStatus').textContent='نقش ثبت شد؛ وضعیت فعلی قابل دریافت نیست.';return}
- const status={approved:'تأیید شده',pending:'در انتظار تأیید مدیر اصلی',rejected:'رد شده',suspended:'تعلیق شده'};
- document.getElementById('icStatus').textContent=current?'نقش حساب: '+(current.role==='coach'?'مربی':'شاگرد')+' · وضعیت: '+(status[current.status]||current.status):'درخواست نقش ثبت شد.';
- await loadIronAdminPanel();await loadIronCoachProfile();
-}
 async function loadMyPublicCode(){
  const codeEl=document.getElementById('ironPublicCode'),statusEl=document.getElementById('ironPublicCodeStatus');
  if(!codeEl)return;
