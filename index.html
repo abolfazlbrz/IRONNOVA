@@ -1863,7 +1863,7 @@ function clearIronAiChat(){
 }
 async function sendIronAiMessage(){
  if(ironAiBusy)return;
- const input=document.getElementById('ironAiInput'),button=document.getElementById('ironAiSend'),status=document.getElementById('ironAiStatus');
+ const input=document.getElementById('ironAiInput'),button=document.getElementById('ironAiSend'),status=document.getElementById('ironAiStatus'),wrap=document.getElementById('ironAiMessages');
  const message=(input?.value||'').trim();
  if(!message){if(status)status.textContent='اول پیام را بنویس.';return}
  if(message.length>3000){if(status)status.textContent='پیام بیش از حد طولانی است.';return}
@@ -1872,26 +1872,64 @@ async function sendIronAiMessage(){
  input.value='';
  ironAiAddBubble('user',message);
  ironAiHistory.push({role:'user',content:message});
- if(status)status.textContent='در حال بررسی حساب کاربری...';
+ let answer='',assistantBubble=null;
  try{
   if(!window.supabaseClient?.auth)throw new Error('اتصال حساب کاربری آماده نیست؛ صفحه را یک‌بار تازه‌سازی کن.');
   const {data,error:sessionError}=await supabaseClient.auth.getSession();
   if(sessionError)throw new Error('بررسی حساب ناموفق بود: '+sessionError.message);
   const session=data?.session;
   if(!session?.access_token)throw new Error('برای استفاده از دستیار ابتدا وارد حساب کاربری شو.');
-  if(status)status.textContent='پیام ارسال شد؛ در حال دریافت پاسخ...';
-  if(button)button.textContent='در حال پاسخ...';
-  const response=await fetch(SUPABASE_URL+'/functions/v1/ironnova-ai-assistant',{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+session.access_token},body:JSON.stringify({messages:ironAiHistory.slice(-12)})});
-  const payload=await response.json().catch(()=>({}));
-  if(!response.ok)throw new Error(payload.error||('خطای سرور ('+response.status+')'));
-  const answer=String(payload.answer||'پاسخی دریافت نشد.').slice(0,12000);
-  ironAiHistory.push({role:'assistant',content:answer});
-  ironAiAddBubble('assistant',answer);
-  if(status)status.textContent='پاسخ دریافت شد.';
+  if(status)status.textContent='در حال اتصال به هوش مصنوعی...';
+  if(button)button.textContent='در حال دریافت...';
+  const response=await fetch(SUPABASE_URL+'/functions/v1/ironnova-ai-assistant',{
+   method:'POST',
+   headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+session.access_token},
+   body:JSON.stringify({messages:ironAiHistory.slice(-8)})
+  });
+  if(!response.ok){
+   const payload=await response.json().catch(()=>({}));
+   throw new Error(payload.error||('خطای سرور ('+response.status+')'));
+  }
+  if(!response.body)throw new Error('مرورگر امکان دریافت زنده پاسخ را فراهم نکرد.');
+  assistantBubble=document.createElement('div');
+  assistantBubble.style.cssText='align-self:flex-start;max-width:94%;padding:11px 13px;border-radius:14px;line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere;background:var(--soft);color:var(--text)';
+  wrap?.appendChild(assistantBubble);
+  if(status)status.textContent='هوش مصنوعی در حال نوشتن پاسخ است...';
+  if(button)button.textContent='در حال نوشتن...';
+  const reader=response.body.getReader(),decoder=new TextDecoder();
+  let buffer='',finished=false;
+  const consumeLine=line=>{
+   const trimmed=line.trim();
+   if(!trimmed.startsWith('data:'))return;
+   const raw=trimmed.slice(5).trim();
+   if(raw==='[DONE]'){finished=true;return}
+   if(!raw)return;
+   try{
+    const packet=JSON.parse(raw);
+    const delta=packet?.choices?.[0]?.delta?.content;
+    if(typeof delta==='string'&&delta){
+     answer+=delta;
+     if(assistantBubble)assistantBubble.textContent=answer;
+     if(wrap)wrap.scrollTop=wrap.scrollHeight;
+    }
+   }catch(_){}
+  };
+  while(!finished){
+   const part=await reader.read();
+   if(part.done)break;
+   buffer+=decoder.decode(part.value,{stream:true});
+   const lines=buffer.split(/\r?\n/);buffer=lines.pop()||'';
+   for(const line of lines)consumeLine(line);
+  }
+  if(buffer)consumeLine(buffer);
+  if(!answer.trim())throw new Error('پاسخ هوش مصنوعی خالی بود؛ دوباره امتحان کن.');
+  ironAiHistory.push({role:'assistant',content:answer.slice(0,12000)});
+  if(status)status.textContent='پاسخ کامل شد.';
  }catch(error){
   ironAiHistory.pop();
   const reason=String(error?.message||'خطای ناشناخته');
-  ironAiAddBubble('assistant','ارسال پیام ناموفق بود: '+reason);
+  if(assistantBubble)assistantBubble.textContent=(answer?answer+'\n\n':'')+'ادامه پاسخ دریافت نشد: '+reason;
+  else ironAiAddBubble('assistant','ارسال پیام ناموفق بود: '+reason);
   if(status)status.textContent=reason;
  }finally{
   ironAiBusy=false;
