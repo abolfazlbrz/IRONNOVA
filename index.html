@@ -1926,8 +1926,15 @@ async function sendIronAiMessage(){
  ironAiHistory.push({role:'user',content:message});
  let answer='',assistantBubble=null;
  try{
-  if(typeof supabaseClient==='undefined'||!supabaseClient?.auth)throw new Error('اتصال حساب کاربری آماده نیست؛ بارگذاری کتابخانه حساب کامل نشده است.');
-  const {data,error:sessionError}=await supabaseClient.auth.getSession();
+  // Use the explicitly exposed singleton so this handler also works when the
+  // app shell invokes it from a different JavaScript execution context.
+  let aiClient=window.ironSupabaseClient;
+  if(!aiClient?.auth&&typeof window.supabase?.createClient==='function'){
+   aiClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+   window.ironSupabaseClient=aiClient;
+  }
+  if(!aiClient?.auth)throw new Error('اتصال حساب کاربری بارگذاری نشده است؛ اتصال اینترنت و بارگذاری برنامه را بررسی کن.');
+  const {data,error:sessionError}=await aiClient.auth.getSession();
   if(sessionError)throw new Error('بررسی حساب ناموفق بود: '+sessionError.message);
   const session=data?.session;
   if(!session?.access_token)throw new Error('برای استفاده از دستیار ابتدا وارد حساب کاربری شو.');
